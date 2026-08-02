@@ -1,6 +1,9 @@
 # 工作流产品交付
 
-Status: Open
+Status: Superseded
+
+本 Slice 的已完成纵切保留为历史依据；其未完成 UI 编排和“Dictionary 携带 Hook/字体”的模型已由
+[可组合资产与 Adapter Catalog](composable-assets-and-adapter-catalog.md)替代。
 
 ## Outcome
 

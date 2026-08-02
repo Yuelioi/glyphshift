@@ -2,8 +2,8 @@
 
 ## Open Work
 
-- **Focus:** [Glyphshift 通用产品交付](work/glyphshift/index.md) — 独立仓库迁移已完成；下一步收口
-  每个 Workflow Target 的有序词典编排与生产词典导入。
+- **Focus:** [Glyphshift 通用产品交付](work/glyphshift/index.md) — 设置与多语言调研已完成；下一步
+  建立真实 AppSettings、Vue I18n 与结构化桌面错误。
 
 ## Project links
 
