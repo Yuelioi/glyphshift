@@ -1,11 +1,12 @@
 # Nuxt UI 与 Tauri 前端约定
 
-GUI 使用 Vue 3、Vite、Nuxt UI 4、Tailwind CSS 4 和 Tauri 2。Vite 固定使用 `1420` 且 `strictPort`；Tauri 的 `devUrl`、`frontendDist`、前置 build 命令必须与之保持一致。
+GUI 使用 Vue 3、Vite、Nuxt UI 4、Tailwind CSS 4 和 Tauri 2。Vite 固定使用 `1430` 且 `strictPort`；Tauri 的 `devUrl`、`frontendDist`、前置 build 命令必须与之保持一致。
 
 ## 组件与内容约定
 
 - 应用根包在 `<UApp>` 中，图标统一使用 `i-tabler-*`。
-- 界面文案使用中文；颜色优先使用 Nuxt UI 语义 token，避免散落裸色板。
+- 核心界面文案使用 Vue I18n 语义 key，完整提供 `zh-CN` 与 `en-US`；颜色优先使用 Nuxt UI
+  语义 token，避免散落裸色板。
 - 页面和组件样式以 Tailwind 工具类为主。Vue 单文件组件默认不写 `<style>`；只有动态值、
   浏览器能力或 Tailwind 无法可靠表达的规则才允许少量 CSS，并在代码旁说明原因。
 - `assets/css/main.css` 只承载 Tailwind/Nuxt UI 引入、设计令牌、根元素、滚动条与
@@ -28,28 +29,30 @@ GUI 使用 Vue 3、Vite、Nuxt UI 4、Tailwind CSS 4 和 Tauri 2。Vite 固定�
 - 管理表分页由共享框架完整提供首页、上一页、页码、下一页、末页和每页数量，页面只维护
   `page`/`pageSize` 状态。长列表滚动条在全局根规则统一使用细滚动条、透明轨道、圆角 thumb，
   并隐藏 WebView 的原生 scrollbar button。
-- `useHook()` 是 IPC 和轮询的单例入口；`useTheme()` 同样保持单例。
+- `useWorkspace()` 是产品 IPC 与浏览器预览的单例入口；`useAppSettings()` 是语言、主题、持久化
+  与系统偏好监听的唯一入口。页面不得建立第二份 locale/theme 状态。
 - 可编辑行的本地状态使用完整复合身份键，不能只用英文原文，因为同一原文可能属于不同分类或语境。
 - 大列表使用 `@tanstack/vue-virtual`；虚拟列表的 count 必须随过滤结果响应更新。
 
 ## 主题与无边框窗口
 
-Tailwind 4 会裁剪未被直接引用的自定义 theme 变量。Glyphshift 的 `signal` 色阶必须使用
-`@theme static`，在 `vite.config.ts` 中声明为 Nuxt UI primary，并显式连接
-`--ui-color-primary-*` 与 `--ui-primary`；只通过运行时颜色名映射会出现“编译成功但
-primary 无颜色”。
+深色和浅色都通过根元素的 `dark`/`light` class 与 `data-theme` 选择器连接完整语义 token。
+首次启动默认深色；`system` 只是一种显式偏好，系统变化由 `useAppSettings()` 统一响应。Nuxt UI
+可能在 mount 期间调整根 class，因此 mount 后需要通过同一 Module 重放最终设置。
 
 无边框窗口的拖拽区域和窗口按钮必须是不同元素。窗口最小化、最大化、关闭和拖拽需要在 Tauri capabilities 中逐项授权。
 
 ## 验证
 
 ```powershell
-cd gui
+cd apps/glyphshift-desktop
 npx vue-tsc --noEmit
 npm run build
-npm run test:visual
+npm test
 ```
 
-视觉验证使用 Playwright 启动 Chromium，并 stub `window.__TAURI_INTERNALS__.invoke`，为四个路由提供稳定假数据后分别检查暗色/亮色截图。类型检查不能替代视觉检查；至少验证 `--ui-primary` 非空、主要按钮背景色正确、长列表没有全量渲染。
+视觉验证使用仓库 Playwright runner 启动 Chromium，浏览器 adapter 只保存合成产品模型和设置，
+分别检查中英文、深浅主题与 960×640/1440×900 截图。类型检查不能替代视觉检查；至少验证
+主题与语言切换可持久化、顶栏按钮可访问、核心页面翻译完整且无溢出。
 
-完整发布验证由 [便携分发 smoke](../../work/gui-productization/slices/portable-distribution-smoke.md)负责。
+完整发布验证由当前 Work 的生产 Extension/Runtime Bundle 与首个可分发桌面构建阶段负责。

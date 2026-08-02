@@ -16,9 +16,11 @@ package、Tauri/Vue 桌面、测试支持与架构检查均在当前仓库内闭
 和桌面 UI。标题栏提供 Help/Settings 入口，Help 从 Runtime Bundle 展示当前 Adapter Catalog，
 Settings 不再保存在线翻译服务地址；桌面后端不可用按产品错误处理，不显示伪连接状态。
 
-已完成[全局设置与桌面端多语言调研](references/settings-and-desktop-i18n-research.md)：Settings 只管理
-应用级行为；下一阶段推荐以 Vue I18n 提供完整 `zh-CN`/`en-US` UI，并把 Tauri 字符串错误改为
-稳定 code + typed args。UI locale、字典内容语言和动态 Artifact presentation locale 保持正交。
+`AppSettings/1`、Vue I18n 与 `CommandError/1` 已交付：应用 mount 前解析真实语言和主题设置，
+完整核心 UI 提供 `zh-CN`/`en-US`，Settings 只展示可立即生效并持久化的界面语言与主题，Tauri
+command 跨 seam 返回稳定 code + typed args。UI locale、字典内容语言和动态 Artifact
+presentation locale 保持正交。生产构建、Playwright 20 项、Rust workspace test、fmt、Clippy
+及真实 Tauri 设置跨重启验证均通过。
 
 旧 AE 与 Premiere 词典仅作为未接入 Runtime 的源数据保存在 `archive/dictionary-sources/`；
 架构检查禁止生产代码引用归档路径或旧 schema。原仓库保持不变，继续作为只读回退来源。
@@ -29,9 +31,9 @@ Profile、Platform、Technology 和 Adapter 独立，Workflow Target 是唯一�
 
 ## Next
 
-- 确认并实施 P0 AppSettings 与桌面 i18n：真实语言/主题/生命周期/诊断设置、Vue I18n、结构化
-  CommandError；删除当前 Settings 的说明性占位内容。
-- 随后以现有 Artifact Descriptor seam 设计在线 Dictionary Catalog、presentation locale 与安装记录。
+- 以现有 [Artifact Descriptor seam](references/composable-assets-technical-design.md) 设计在线
+  Dictionary Catalog、presentation locale、安装记录与签名边界。
+- 随后建立生产 Extension/Runtime Bundle 与词典导入发布流程。
 
 ## Progress
 
@@ -41,6 +43,8 @@ Profile、Platform、Technology 和 Adapter 独立，Workflow Target 是唯一�
   Workflow `/2` 与 Target Runtime Deployment `/2` 已落地。
 - Help/Settings Slice 完成；Adapter 版本与 Feature presentation 贯通 Runtime、Tauri 与 Vue，
   标题栏去除连接状态，设置页去除在线翻译器配置。
+- AppSettings 与桌面多语言 Slice 完成；语言/主题持久化、完整中英文 UI、结构化桌面错误及真实
+  Tauri 跨重启验证闭合，Playwright 20 项通过。
 - 桌面生产构建与 Playwright 18 项 GUI 回归通过；覆盖双词典排序、双字体绑定冲突恢复、
   多 Target 暂存隔离、完整 metadata 保存及 960×640/1440×900 稳定帧。
 - 完成同类产品、现有 Adapter Registry 与 macOS 拦截边界的一手资料调研。

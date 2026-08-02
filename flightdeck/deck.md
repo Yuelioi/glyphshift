@@ -2,8 +2,8 @@
 
 ## Open Work
 
-- **Focus:** [Glyphshift 通用产品交付](work/glyphshift/index.md) — 设置与多语言调研已完成；下一步
-  建立真实 AppSettings、Vue I18n 与结构化桌面错误。
+- **Focus:** [Glyphshift 通用产品交付](work/glyphshift/index.md) — AppSettings、桌面多语言与结构化
+  错误已完成；下一步设计在线 Dictionary Catalog 与安装边界。
 
 ## Project links
 

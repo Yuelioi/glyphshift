@@ -40,3 +40,7 @@
 - Help 从 Runtime Bundle Catalog 展示公开 Adapter 信息；Settings 不保存在线翻译服务地址，只导航
   到本地资产与工作流页面，并说明未来网站/字典市场的下载方向。
 - GUI 使用仓库 Playwright 验证，实际桌面与实机证据只存本地忽略目录。
+- AppSettings 只承载全局且已有执行路径的偏好；当前 `/1` 包含 UI locale 与 theme，生命周期、
+  更新、诊断、账号和市场能力存在后才进入设置 UI。
+- Vue I18n 管理 Glyphshift 核心 UI；Rust/Tauri 跨 seam 返回稳定语义错误码和类型化参数，不返回
+  vue-i18n key 或本地化句子。Dictionary 内容语言与动态 Artifact presentation locale 独立。
