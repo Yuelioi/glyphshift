@@ -10,5 +10,13 @@
   [Slice](slices/help-adapter-catalog-and-settings.md)
 - [x] 建立 AppSettings、Vue I18n 与结构化桌面错误的 P0 基础。
   [Slice](slices/app-settings-and-desktop-i18n.md)
+- [x] 收敛纯 Dictionary `/2`，删除 Location、Context 与 keep，并更新桌面编辑链路。
+  [Slice](slices/dictionary-hooks-and-probe.md)
+- [x] 修复 Adapter Catalog 编码并按探针证据增加常用 Windows 文字 Adapter。
+  [Slice](slices/dictionary-hooks-and-probe.md)
+- [x] 建立目标进程捕获会话、Capture Catalog 与 Dictionary Draft 导出。
+  [Slice](slices/dictionary-hooks-and-probe.md)
+- [ ] 建立 Dictionary Catalog、可信安装与本地 provenance seam。
+  [Slice](slices/dictionary-catalog-and-installation.md)
 - [ ] 建立生产 Extension/Runtime Bundle 与词典导入发布流程。
 - [ ] 完成授权实机可见验收与首个可分发桌面构建。

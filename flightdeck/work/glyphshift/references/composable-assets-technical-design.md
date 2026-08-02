@@ -74,11 +74,13 @@ Adapter 是具体可执行实现，例如 `ExtTextOutW`、`GdipDrawString`。用
 
 ### 3.4 Dictionary
 
-Dictionary 是可独立编辑、安装、发布和复用的翻译资产。它拥有文字 keep/replace 规则、
-Location、可选 Context 和便携元数据，不拥有字体、Platform、Technology、Adapter 或 Hook。
+Dictionary 是可独立编辑、安装、发布和复用的纯翻译资产。它只拥有非空、按 source 唯一的
+`source + translation` 词条和便携元数据，不拥有 keep、Location、Context、字体、Platform、
+Technology、Adapter 或 Hook。
 
-Location/Context 是跨 Adapter 的软件语义，不是绘制技术。它们继续作为翻译匹配键；未来在线
-Dictionary 可以使用 Extension 声明的语义 schema，但运行机制不进入 Dictionary。
+现有 Adapter 无法从同一 Hook 稳定识别主界面、弹窗或面板，因此不能把猜测的 Location 写入
+Dictionary。未来只有在 Runtime 提供真实区域信号时，Workflow Target 才通过独立 Region Binding
+把区域选择器与 Dictionary 组合；Dictionary payload 保持不变。
 
 ### 3.5 Font Profile
 

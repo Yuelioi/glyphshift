@@ -2,8 +2,9 @@
 
 ## Open Work
 
-- **Focus:** [Glyphshift 通用产品交付](work/glyphshift/index.md) — AppSettings、桌面多语言与结构化
-  错误已完成；下一步设计在线 Dictionary Catalog 与安装边界。
+- **Focus:** [Glyphshift 通用产品交付](work/glyphshift/index.md) — 纯 Dictionary、四个常用 Windows
+  文字 Adapter 与 Capture Probe 已交付；下一步用真实软件捕获证据决定后续 seam，或继续
+  Dictionary Catalog 内容寻址安装。
 
 ## Project links
 
