@@ -70,14 +70,15 @@ Dictionary ID 与 revision：active 尚未切换时保留完整旧版，已经�
 点、modified/missing/unmanaged 派生状态及公开 Distribution—文件存储—重开组合均有 tempdir 合同。
 
 Desktop Backend 已把 installation state、已安装 release、已验证 publisher 与可更新 release 投影到
-Dictionary Summary；本地 CRUD 保持 unmanaged/modified 语义。Desktop API v14 提供 Catalog query
+Dictionary Summary；本地 CRUD 保持 unmanaged/modified 语义。Desktop API v15 提供 Catalog query
 和 release install 命令，Distribution 错误映射为稳定 `CommandError/1`，普通 DTO 不泄漏 URL、digest、
 signature、key ID 或存储路径。生产组合显式使用离线 Catalog/Trust adapters，在真实 endpoint 与 key
 policy 缺失时不制造伪在线能力。
 
 Dictionary 页面在同一一级导航内提供本地词典与在线目录两个紧凑模式。本地表展示 provenance，
-目录表使用后端搜索和 cursor 分页；覆盖 modified/unmanaged 词典前必须确认，已安装版本不可重复
-安装，presentation 跟随 effective UI locale。离线只影响目录模式，本地 Library、Workflow 与 Runtime
+目录表使用后端搜索、现有 metadata tag 单值精确筛选和 cursor 分页，标签可直接点击并清除；本地/
+在线当前模式有明确主色选中态。覆盖 modified/unmanaged 词典前必须确认，已安装版本不可重复安装，
+presentation 跟随 effective UI locale。离线只影响目录模式，本地 Library、Workflow 与 Runtime
 不受影响。全 Rust workspace、Clippy、fmt、架构扫描、Desktop 35 项 Playwright 与生产构建通过；
 6 项要求明确本机授权宿主或预构建 Native DLL 的测试保持 ignored。构建只保留既有的单入口 chunk
 体积提示，真实在线 endpoint/key policy 仍是后续部署配置。

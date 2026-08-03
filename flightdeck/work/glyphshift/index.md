@@ -30,9 +30,13 @@ codec、校验与 mutation，Desktop Backend 只保留产品 DTO facade；
 `glyphshift-dictionary-distribution` 已提供 query/install/installations 深接口、强类型 Catalog 与签名
 合同，以及不冒充生产网络/密钥策略的 ports。文件型 Install Store 已闭合内容寻址制品、Installation
 Record、pending transaction、原子 active copy 与重开恢复；四个中断点只会收敛到完整旧版或完整
-新版。Desktop API v14 和 Backend Summary 已接入安装状态，Dictionary 页以本地/在线目录双模式
-展示 provenance、后端搜索、cursor 分页、离线空态与安全覆盖确认。生产仍显式离线，等待真实
-endpoint、publisher key policy 与部署配置。
+新版。Desktop API v15 和 Backend Summary 已接入安装状态，Dictionary 页以本地/在线目录双模式
+展示 provenance、后端搜索、metadata tag 精确筛选、cursor 分页、离线空态与安全覆盖确认；当前
+模式使用明确主色选中态。生产仍显式离线，等待真实 endpoint、publisher key policy 与部署配置。
+
+标准 Dictionary `/2` JSON 文件交换已完成：本地词典页可导入当前 schema，并逐行导出可重新导入
+的发布文件。重复 ID、非法 JSON 和旧 schema 明确拒绝；流程不包含账号、上传、审批、证书管理或
+额外包格式。授权继续由用户显式选择程序并启动工作流/探针表达。
 
 Dictionary 详情已按真实使用反馈完成信息降噪，Dictionary `/2` 也已收敛为纯
 `source + translation`：Location、Context、keep 与逐词条字体均已从 payload、DTO、编辑器和
@@ -67,8 +71,8 @@ Identity / Binding、Transform Profile、OCR 和 Overlay 分别保留在运行�
 
 ## Next
 
-- 推进生产 Extension/Runtime Bundle、词典导入发布流程与授权实机验收；真实 Catalog 接入需要先
-  冻结 endpoint、publisher key policy 与部署配置。
+- 推进生产 Runtime Bundle 和授权实机验收。授权复用用户显式选择程序并启动工作流/探针的现有
+  路径；不增加账号、审批或权限数据库。真实 Catalog 接入仍等待 endpoint 与 publisher key policy。
 
 ## Progress
 
@@ -90,9 +94,13 @@ Identity / Binding、Transform Profile、OCR 和 Overlay 分别保留在运行�
   size/digest/signature/publisher/payload identity 拒绝、幂等安装和四类 installation state 有合同覆盖。
 - 文件型 Dictionary Install Store 已交付；SHA-256 内容寻址制品、Installation Record、pending
   transaction、原子 active copy 与四个中断点重开恢复有 tempdir 合同覆盖，完整仓库验证通过。
-- Dictionary Catalog 与可信安装 Slice 完成；Desktop API v14、installation summary、同页
-  Library/Catalog 模式、provenance、cursor 分页、离线空态和 modified/unmanaged 覆盖确认已闭合。
-  全 Rust workspace、35 项 Playwright、生产构建、Clippy、fmt 与架构检查通过。
+- Dictionary Catalog 与可信安装 Slice 完成；当前 Desktop API v15、installation summary、同页
+  Library/Catalog 模式、metadata tag 搜索与精确筛选、provenance、cursor 分页、离线空态和
+  modified/unmanaged 覆盖确认已闭合；模式选中态完成视觉复核。全 Rust workspace、36 项
+  Playwright、生产构建、Clippy、fmt 与架构检查通过。
+- 简化词典文件交换完成；Desktop API v15 支持标准 Dictionary `/2` JSON 导入与逐行导出，非法
+  格式和重复 ID 明确拒绝。没有引入发布中心、账号、审批、额外包格式或授权存储；36 项
+  Playwright 与完整仓库验证通过。
 - Dictionary 详情完成渐进披露重构；设置与规则 Modal 单列化，矮窗口可滚动，Playwright 22 项及
   1160×527/960×640/1440×900 视觉检查通过。
 - 完成 Location/Context 可观测性复核：当前 GDI/GDI+ 回调没有区域信号，同一 Hook 无法区分主

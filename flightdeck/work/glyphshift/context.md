@@ -32,6 +32,8 @@
   Dictionary metadata。
 - Dictionary Release、Artifact Presentation、Installation Record 与 active working copy 分别拥有
   发布、展示、来源和本地内容事实；本地编辑后安装状态派生为 modified。
+- 首个词典发布流程只导出可重新导入的标准 Dictionary `/2` JSON；不建立账号、审批、证书管理、
+  远程发布后台或额外包格式。同 ID 导入明确拒绝，不静默覆盖。
 - requested state、Runtime actual state 与 applied generation 分别报告。
 
 ## 架构决定
@@ -53,6 +55,8 @@
 - 创建与编辑复用 Nuxt UI Modal；管理页复用页头、表格框架、分页和确认 Module。
 - 软件页不展示文字/字体功能；词典页不展示 Hook、Adapter 或字体配置。
 - 词典详情主表和单行 Modal 只编辑原文与译文；便携 metadata 在单列设置 Modal 中渐进披露。
+- Dictionary metadata tags 是本地搜索与在线 Catalog 分类筛选的同一套语义；Catalog 支持点击标签
+  进行单值精确筛选，不新增重复的 category 字段。本地/在线模式必须保留清晰的主色选中态。
 - 探针管理与详情是明确的列表/返回导航；管理页复用页头、顶部搜索/多选工具条、表格与底部分页，
   创建与导出设置进入 Modal。
 - 探针详情只有一张 Dictionary + Observation Index 联合表；行内译文直接写绑定 Dictionary，忽略

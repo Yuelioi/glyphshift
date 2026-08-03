@@ -1,6 +1,6 @@
 # LunaTranslator 产品与运行时调研
 
-调研时间：2026-08-03  
+调研时间：2026-08-03
 上游基线：LunaTranslator 官方仓库
 [`aaef4d0cff03e54654a5428716fa3a75a659b84a`](https://github.com/HIllya51/LunaTranslator/tree/aaef4d0cff03e54654a5428716fa3a75a659b84a)
 
