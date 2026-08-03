@@ -2,16 +2,17 @@
 
 ## Stage 1：多进程目标
 
-- [ ] 定义 Process Family 授权、发现、身份、退出和部分失败合同。
-- [ ] 用合成 Controller/Target Instance 验证一个软件的主进程与子进程状态聚合。
-- [ ] 在授权目标软件上保存本地证据并决定首个生产 Extension。
+- [x] [定义 Process Family 授权、发现、身份、退出和部分失败合同](slices/process-family-controller-inventory.md)。
+- [x] 用合成 Controller/Target Instance 验证一个软件的主进程与子进程状态聚合。
+- [x] 在授权目标软件上保存本地证据并决定首个生产 Extension。
 
 ## Stage 2：执行与观察复用
 
-- [ ] 将当前独占规则评估为单一 Target Execution、一个 Publication Owner 与多个只读 Subscriber。
-- [ ] 证明 Probe、诊断和 Workflow 共享 Hook 时不会重复注入、竞争写回或提升错误 Feature 状态。
+- [x] 将当前独占规则评估为单一 Target Execution、一个 Publication Owner 与多个只读 Subscriber；
+  在多游标 Observation Stream 交付前保留现有互斥。
 - [ ] 定义 Adapter 提供的 Observation Stream Identity、样本历史、匹配置信度与持久 Binding 合同。
 - [ ] 验证目标重启后按当前实例重匹配 Stream，并分别报告 matched、degraded 与 unmatched。
+- [ ] 证明 Probe、诊断和 Workflow 共享 Hook 时不会重复注入、竞争写回或提升错误 Feature 状态。
 
 ## Stage 3：Windows Adapter 覆盖
 

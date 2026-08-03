@@ -13,8 +13,13 @@
 
 ### Process Family
 
-- Software Extension 描述授权的进程关系和发现规则，Controller 解析实际实例。
-- 子进程必须继承明确授权，独立报告生命周期和 Feature 状态；部分失败不能覆盖其他实例事实。
+- Software Extension 以授权根可执行文件和显式 `descendant_executables` 描述进程关系；Controller
+  只接纳当前进程树中命中 allowlist 的后代，不从窗口标题、安装目录邻近或品牌名称猜测成员。
+- Controller 内部以 PID 与进程创建时间识别一次进程实例，对外分配跨 inventory 稳定且永不复用的
+  opaque token；PID 和创建时间都不跨 Controller seam。
+- 已接纳成员在根先退出后可继续存活，并可授权自己新产生且命中 allowlist 的后代；成员退出会删除
+  自己的 target/runtime 状态，不影响仍存活的兄弟实例。
+- 无法取得稳定实例身份的单个进程不进入 inventory，但不能让其他可识别实例一起失败。
 - PID、窗口标题和本机路径只属于短期 Runtime actual state，不进入持久字典或通用 UI。
 
 ### Target Execution
@@ -28,6 +33,9 @@ Target Execution
 - 一个目标实例只维护一套注入、Adapter Host 和 Hook，避免 Workflow 与 Probe 竞争或重复注入。
 - Publication Owner 独占文字/字体写回；Observation Subscriber 只能消费有界观察流。
 - 只有真实的并发探针、诊断或协作需求证明价值后，才替换当前简单所有权规则。
+- 当前 Target Runtime 的 capture 是 activation-time 单一 FileCaptureSink，diagnostics query 是取走式
+  批次；在独立 cursor 的 Observation Stream 交付前，Owner/Subscriber 注册表不能提供真实共享，
+  Workflow/Probe 软件级互斥继续保留。
 
 ### Observation Stream
 

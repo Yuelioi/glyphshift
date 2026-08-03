@@ -9,29 +9,44 @@ Status: Open
 
 ## Current
 
-外部评审和通用升级方案中可用的未来方向已经被重写为 GlyphShift 的 Capability Adapter 路线。
-Roadmap 不承诺一次支持 DirectWrite、UIA、OCR、Direct2D、Direct3D、OpenGL 和 Vulkan；每项能力
-必须先证明目标软件存在稳定信号、可验证写回或明确的 observe-only 价值。
+Process Family Stage 已交付。Software Extension 现在可声明显式后代可执行文件 allowlist，并经
+Desktop Runtime Spec、Controller Host 配置进入 Windows Controller；工作流和 Dictionary 不承担
+进程关系。授权根仍优先使用用户选择的完整路径，后代必须同时命中 allowlist 且位于已授权进程树。
 
-当前所有目标进程仍遵守一个 Software 同时由一个 enabled Workflow 拥有、同一软件同一时刻只有一个
-Probe Run 占用 Target Runtime 的规则。未来希望把这一限制深化为单一 Target Execution：最多一个
-Publication Owner，允许多个只读 Observation Subscriber，共享同一套注入和 Hook。
+Windows Controller 使用 PID + 创建时间作为不跨 seam 的实例身份，输出稳定且永不复用的 opaque
+token。合成 inventory 已覆盖嵌套后代、重排、根先退出、成员部分退出、身份不可得和 PID 复用；
+退出实例的 Runtime 记录随之清理，仍存活实例继续可用。授权 AE 的本地快照证明一个根进程拥有
+8 个后代、3 类辅助可执行文件；参数化实机合同发现 9 个目标实例。结论是首个生产 Process Family
+应由独立 AE Software Extension 显式声明这些成员，Core 不增加品牌分支。
 
-LunaTranslator 固定源码版本调研进一步确认：Adapter 不能代替“选择哪一条候选文本流”。Roadmap
-因此把 Observation Stream Identity / Binding 与 Process Family 并列为高优先级，并新增有界
-Transform Profile；OCR、剪贴板、Overlay 和外部事件 API 保持较低优先级、按真实缺口立项。
+当前 Desktop Runtime 仍只选择 inventory 的第一个目标，并把 Controller Connection 转移给单个
+SessionManager；Workflow 与 Probe 继续以软件级互斥避免重复注入。下一阶段要判断是否把它深化为
+单一 Target Execution：最多一个 Publication Owner，允许多个只读 Observation Subscriber，共享
+同一套注入和 Hook。
+
+Target Execution 盘点已完成并否决立即增加租约注册表：SessionManager 本身已经能管理多 Session，
+真正缺口是 Target Runtime 只有 activation-time 单一 FileCaptureSink，Runtime diagnostics 也是
+取走最近批次的单消费者语义。没有稳定 Observation Stream Identity 与多游标读取，Owner/Subscriber
+Module 只会搬运现有互斥状态，不能减少注入或提供安全共享。因此当前互斥保留，执行顺序调整为先
+冻结 Observation Stream 合同，再回到共享执行。
 
 ## Next
 
-- 本主题被提升为 Focus 后，先以合成 Controller inventory 冻结 Process Family 的授权、发现、退出
-  和部分失败合同；从[稳定约束](context.md)、[阶段计划](plan.md)和
-  [Controller Windows Module](../../../crates/glyphshift-controller-windows/src/lib.rs)开始。
+- 冻结 Observation Stream Identity、样本历史、有界多游标读取与重启重匹配合同。从
+  [当前切片](slices/observation-stream-identity.md)、
+  [Target Runtime](../../../crates/glyphshift-target-runtime/src/lib.rs)和
+  [Capture Module](../../../crates/glyphshift-capture/src/lib.rs)开始；不把 surface token 或调用地址
+  直接升级为持久 Binding。
 
 ## Progress
 
-- 已完成 AI 评审路由，建立采纳门槛和明确的非目标；尚未授权实现 Roadmap 能力。
+- 已完成 AI 评审路由，建立采纳门槛和明确的非目标；Roadmap 按真实证据逐 Stage 推进。
 - 已完成 LunaTranslator 产品与运行时一手资料调研，冻结 Observation Stream、Transform Profile
   及可选输入/输出能力的路由边界。
+- Process Family Stage 完成：Extension → Runtime Spec → Controller 配置贯通显式后代 allowlist；
+  合成生命周期与授权 AE 的 9 实例 inventory 合同通过，全 workspace、Clippy、fmt 与架构检查全绿。
+- Target Execution seam 盘点完成：确认当前缺少的是可多读、可重匹配的 Observation Stream，而不是
+  另一层租约 Map；在该前置合同完成前保留 Workflow/Probe 软件级互斥。
 
 ## References
 
@@ -41,3 +56,6 @@ Transform Profile；OCR、剪贴板、Overlay 和外部事件 API 保持较低�
 - [产品领域语言](../../../CONTEXT.md)
 - [Capability Adapter 调研](../glyphshift/references/adapter-registry-and-cross-platform-interception-research.md)
 - [LunaTranslator 产品与运行时调研](../glyphshift/references/lunatranslator-product-runtime-research.md)
+- [Process Family Controller Inventory](slices/process-family-controller-inventory.md)
+- [Target Execution 所有权](slices/target-execution-ownership.md)
+- [Observation Stream Identity](slices/observation-stream-identity.md)

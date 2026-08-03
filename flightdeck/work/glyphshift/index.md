@@ -67,6 +67,16 @@ SHA-256 且不含测试宿主的 Release 文件集；本地 Tauri override 已�
 candidate。未安装 Release 桌面 smoke 通过，授权 AE 可见验收证明 `File` 可翻译为 `文件` 并在
 停止后恢复。安装器尚未执行，代码签名与公共发布也不在当前实现中。
 
+工作流 Runtime 错误反馈已完成首轮 UI 修复：后端原有结构化错误不再被表格压缩成“需要处理”。
+`runtime.target_not_found` 明确显示为“软件未启动”并使用警告色；权限、组件加载/兼容、超时等错误
+分别显示具体状态。点击状态可展开逐软件完整原因与恢复动作，工作流的持久启用期望保持不变。
+添加软件仍只校验可访问、绝对路径的 `.exe`；Hook 覆盖属于软件运行后的 Adapter 证据，不做静态猜测。
+
+后续实机验收发现两项底层缺陷：桌面重启后，目标内仍 active 的 Runtime 被再次激活并以
+`AlreadyActive(10)` 拒绝，但后端误报“组件不兼容”；多进程目标存在多个同路径实例时，Desktop
+固定选 inventory 第一项，可能选中无窗口 utility 并导致 Runtime 加载失败。当前架构已保留原始
+Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 整体损坏已经排除。
+
 旧 AE 与 Premiere 词典仅作为未接入 Runtime 的源数据保存在 `archive/dictionary-sources/`；
 架构检查禁止生产代码引用归档路径或旧 schema。原仓库保持不变，继续作为只读回退来源。
 
@@ -76,9 +86,10 @@ candidate。未安装 Release 桌面 smoke 通过，授权 AE 可见验收证明
 
 ## Next
 
-- 当前交付阶段已闭合到 unsigned NSIS candidate 和授权目标软件验收。本 Work 后续只在用户明确
-  授权后执行 installer smoke；未授权前不执行安装器。能力扩展从
-  [运行时能力升级 Roadmap](../runtime-capability-roadmap/index.md)继续。
+- 从[工作流 Runtime 错误反馈](slices/workflow-runtime-error-feedback.md)继续：先保留具体 Runtime
+  拒绝码并实现 `AlreadyActive` 幂等接管，再把多进程目标选择缺陷接入
+  [运行时能力升级 Roadmap](../runtime-capability-roadmap/index.md)。installer smoke 仍只在用户明确
+  授权后执行。
 
 ## Progress
 
@@ -142,6 +153,8 @@ candidate。未安装 Release 桌面 smoke 通过，授权 AE 可见验收证明
   Rust 门禁通过。安装器未执行。
 - 运行时诊断与字体安全完成：授权 AE 同时覆盖 GDI/GDI+ 字体写回，修复 `ETO_GLYPH_INDEX` 在换
   字体时复用旧 glyph ID 导致的乱码；Release Bundle 真实宿主合同和停止恢复通过，安装器仍未执行。
+- 工作流 Runtime 错误反馈首轮完成：删除“需要处理”汇总并提供逐软件详情；实机随后确认
+  `AlreadyActive` 被误报为组件不兼容，且多进程目标固定取第一项会选错实例，底层修复待完成。
 
 ## References
 
@@ -159,3 +172,4 @@ candidate。未安装 Release 桌面 smoke 通过，授权 AE 可见验收证明
 - [Workflow Editor 四 Tab 任务流](slices/workflow-editor-vertical-flow.md)
 - [LunaTranslator 产品与运行时调研](references/lunatranslator-product-runtime-research.md)
 - [Probe Adapter 筛选与持续作业验收](slices/probe-adapter-filter-and-recovery-acceptance.md)
+- [工作流 Runtime 错误反馈](slices/workflow-runtime-error-feedback.md)

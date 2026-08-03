@@ -35,6 +35,8 @@
 - 首个词典发布流程只导出可重新导入的标准 Dictionary `/2` JSON；不建立账号、审批、证书管理、
   远程发布后台或额外包格式。同 ID 导入明确拒绝，不静默覆盖。
 - requested state、Runtime actual state 与 applied generation 分别报告。
+- 添加软件只验证可访问、绝对路径的 `.exe` 绑定；Adapter/Hook 是否覆盖真实绘制路径必须在软件
+  运行后由激活或探针证据确认，不按软件名称静态猜测。
 - 可分发桌面候选通过本地 Tauri override 嵌入已验证的 Release Runtime Bundle；跟踪的基础配置不
   保存本机路径。未配置代码签名时只称 unsigned candidate，不冒充公共发行版，也不自动执行安装器。
 
@@ -54,6 +56,8 @@
 ## UI 决定
 
 - 默认页面是 Workflow 管理表；Software、Dictionary 与 Probe 是独立管理页，字体不占顶级导航。
+- 工作流实际状态直接区分软件未启动、权限、组件加载/兼容和超时等原因；错误状态可展开逐软件
+  完整解释与恢复动作，不使用“需要处理”一类笼统汇总。
 - 创建与编辑复用 Nuxt UI Modal；管理页复用页头、表格框架、分页和确认 Module。
 - 软件页不展示文字/字体功能；词典页不展示 Hook、Adapter 或字体配置。
 - 词典详情主表和单行 Modal 只编辑原文与译文；便携 metadata 在单列设置 Modal 中渐进披露。
