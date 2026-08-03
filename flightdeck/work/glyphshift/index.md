@@ -1,6 +1,6 @@
 # Glyphshift 通用产品交付
 
-Status: Open
+Status: Finished
 
 ## Goal
 
@@ -93,10 +93,11 @@ Dictionary、Probe Run 一样进入占满模块内容区的独立页，并复用
 Esc 返回一级，可见浮层优先处理 Esc；Workflow、Software 与 Dictionary 的未保存修改在返回、
 顶部导航和关闭窗口前统一确认。生产构建、48 项 Playwright、宽屏与 960×640 视觉复核通过。
 
-后续实机验收发现两项底层缺陷：桌面重启后，目标内仍 active 的 Runtime 被再次激活并以
-`AlreadyActive(10)` 拒绝，但后端误报“组件不兼容”；多进程目标存在多个同路径实例时，Desktop
-固定选 inventory 第一项，可能选中无窗口 utility 并导致 Runtime 加载失败。当前架构已保留原始
-Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 整体损坏已经排除。
+后续实机验收发现的两项底层缺陷已经闭合。目标内 active 的同版本 Runtime 现在接受同一 generation
+和 publication 的幂等重连，并允许更高 generation 原子接管；同 generation 的冲突 publication
+明确拒绝。Windows Controller 会先折叠同一可执行文件的祖先/后代关系，再把真正的顶层根进程排在
+utility 后代之前，Desktop 继续消费稳定 opaque target，不在 UI 猜窗口或进程角色。独立的多个根实例
+仍属于后续 Target Selection 能力；已经加载旧 Runtime 的目标需要完整重启一次才能获得新语义。
 
 旧 AE 与 Premiere 词典仅作为未接入 Runtime 的源数据保存在 `archive/dictionary-sources/`；
 架构检查禁止生产代码引用归档路径或旧 schema。原仓库保持不变，继续作为只读回退来源。
@@ -107,8 +108,7 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
 
 ## Next
 
-- 继续[工作流 Runtime 错误反馈](slices/workflow-runtime-error-feedback.md)：修复 `AlreadyActive` 误报
-  与多进程目标选择，并完成实机回归。
+None
 
 ## Progress
 
@@ -177,8 +177,10 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
   Rust 门禁通过。安装器未执行。
 - 运行时诊断与字体安全完成：授权 AE 同时覆盖 GDI/GDI+ 字体写回，修复 `ETO_GLYPH_INDEX` 在换
   字体时复用旧 glyph ID 导致的乱码；Release Bundle 真实宿主合同和停止恢复通过，安装器仍未执行。
-- 工作流 Runtime 错误反馈首轮完成：删除“需要处理”汇总并提供逐软件详情；实机随后确认
-  `AlreadyActive` 被误报为组件不兼容，且多进程目标固定取第一项会选错实例，底层修复待完成。
+- 工作流 Runtime 错误反馈完成：删除“需要处理”汇总并提供逐软件详情；Runtime 同版本部署支持幂等
+  重连与新 generation 接管，Controller 将同路径顶层根进程稳定排在后代 utility 前。目标 Runtime
+  合同、Controller 合同、全 workspace、Clippy、fmt、架构检查、生产构建、49 项 Playwright 与两项
+  真实原生 Runtime 合同全部通过。
 - 软件接入预检与快速捕获完成：Windows Controller 提供 PE/架构/运行状态和前台进程检查，Tauri
   注册 `Ctrl+Shift+F8` 两段式快捷键，软件 Modal 必须检查通过才允许保存。Desktop build、41 项
   Playwright、相关 Rust 测试、Clippy、fmt 与 UI detector 全部通过。

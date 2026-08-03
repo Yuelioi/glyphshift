@@ -17,6 +17,9 @@
 ## Stage 3：Windows Adapter 覆盖
 
 - [ ] 先研究并原型验证 DirectWrite Adapter 的 observe/replace Seam。
+- [ ] 按[软件支持分级与 Console 缺口](references/windows-software-support-and-console-gap.md)评估
+  Console client 输出、Process Family 与 ConPTY-owned session；不把客户端成功注入等同于终端
+  可见文字覆盖。
 - [ ] 评估 UI Automation observe-only Adapter 与绘制观察的去重关系。
 - [ ] 只在结构化 Adapter 无法覆盖且用户明确选择时评估 Window Capture、OCR observe-only 与
   Change Trigger Policy 组成的兜底。

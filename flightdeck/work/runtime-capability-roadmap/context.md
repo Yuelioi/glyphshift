@@ -49,6 +49,9 @@ Target Execution
 ### Adapter 扩展
 
 - 优先验证 DirectWrite；只有能稳定观察且具备安全写回 Seam 时才声明 TextReplace。
+- Console client 与 Console/Terminal host 是独立技术边界；当前四个目标进程内 GDI/GDI+ Adapter
+  在隔离 CMD 持续输出中为零信号。Console 输出、Process Family 与 ConPTY-owned session 单独评估，
+  不把成功注入或 PE 子系统当作文字覆盖证明。
 - UI Automation 优先作为 observe-only Adapter，不把可访问性树等同于实际绘制文字。
 - OCR 是无法取得结构化文字时的显式兜底，必须标明延迟、置信度和隐私影响，不进入目标进程热路径。
 - Direct2D、Direct3D、OpenGL 和 Vulkan 仅在目标软件证据显示真实缺口后分别立项，不创建万能图形

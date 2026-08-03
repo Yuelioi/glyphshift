@@ -33,7 +33,7 @@
 - [x] 建立生产 Extension/Runtime Bundle。[Slice](slices/production-runtime-bundle.md)
 - [x] 完成授权实机可见验收与首个可分发桌面构建。
   [Slice](slices/distributable-desktop-and-visible-acceptance.md)
-- [ ] 将工作流 Runtime 汇总状态改为具体、可恢复的逐软件错误反馈。
+- [x] 将工作流 Runtime 汇总状态改为具体、可恢复的逐软件错误反馈。
   [Slice](slices/workflow-runtime-error-feedback.md)
 - [x] 将 Dictionary 编辑器收敛为受保护的单一行内草稿。
   [Slice](slices/dictionary-inline-draft-editing.md)

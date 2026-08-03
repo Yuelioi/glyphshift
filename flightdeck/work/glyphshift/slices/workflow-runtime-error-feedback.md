@@ -7,14 +7,13 @@ state 与软件兼容事实相互独立。
 
 ## Current
 
-首轮 UI 已删除“需要处理”，并能展开 Backend 的逐软件 `CommandError/1`；但实机验收证明后端错误
-分类仍然过度压缩，本 Slice 重新进入实现阶段。
+本 Slice 已完成。UI 不再把逐软件错误压缩成“需要处理”；软件未启动、访问失败、组件加载、协议、
+超时和停止未确认均保留具体状态与恢复动作。
 
-授权目标中，AE 进程已载入当前 Runtime 与全部四个 Adapter，远程诊断控制返回 active，但桌面仍
-显示“组件不兼容”。这与桌面重启后再次激活已存活 Runtime 得到 `AlreadyActive(10)`、随后被统一
-映射为 `runtime.component_incompatible` 完全吻合。另一个多进程目标存在 9 个同路径、同架构实例，
-首个 inventory 候选是无窗口 utility 进程；Desktop 固定取第一个目标，最终 Runtime 未载入任何实例。
-位数不匹配和 Bundle 整体损坏均已排除，正常对照目标能载入同一 Runtime。
+底层实机回归的两个根因也已修复：Target Runtime 对完全等价的 active deployment 返回成功，对更高
+generation 原子更新，对同 generation 冲突 publication 明确拒绝；Windows Controller 只把没有同路径
+匹配祖先的候选标记为根，将真正的顶层目标稳定排在同可执行文件 utility 后代之前。目标软件若仍
+载入修复前的 Runtime，需要完整退出并重开一次；多个彼此独立的顶层实例仍留给后续 Target Selection。
 
 ## Decisions
 
@@ -37,9 +36,11 @@ state 与软件兼容事实相互独立。
 - 桌面生产构建通过；38 项 Playwright 全部通过；Impeccable 机械检测无问题。
 - 实机只读探针确认 Runtime、Controller 与目标均为同一架构；AE Runtime/四 Adapter 已载入且
   Runtime active；多进程目标的首候选为无窗口 utility，所有实例均未载入 Runtime。
+- 红绿合同先复现 active Runtime 返回 `AlreadyActive`，再通过实际 C ABI 验证等价重连、冲突拒绝与
+  新 generation 接管；Controller 合同先复现同路径后代排在根进程前，再验证根优先和独立根保留。
+- `cargo test -p glyphshift-target-runtime -p glyphshift-controller-windows`、全仓测试、Clippy、fmt、
+  架构检查、Desktop 生产构建和 49/49 Playwright 全部通过；两项 ignored 真实原生 Runtime 合同通过。
 
 ## Next
 
-- 先为 `AlreadyActive` 和具体 `TargetRuntimeRejected(status)` 建立红绿合同，再实现 Desktop 重启后的
-  幂等接管；同时把多进程“固定取第一项”作为 Target Selection 缺陷接入
-  [运行时能力升级 Roadmap](../../runtime-capability-roadmap/index.md)。不先修改表层文案掩盖底层状态。
+None

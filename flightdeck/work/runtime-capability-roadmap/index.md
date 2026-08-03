@@ -20,23 +20,22 @@ token。合成 inventory 已覆盖嵌套后代、重排、根先退出、成员�
 应由独立 AE Software Extension 显式声明这些成员，Core 不增加品牌分支。
 
 当前 Desktop Runtime 仍只选择 inventory 的第一个目标，并把 Controller Connection 转移给单个
-SessionManager；Workflow 与 Probe 继续以软件级互斥避免重复注入。下一阶段要判断是否把它深化为
-单一 Target Execution：最多一个 Publication Owner，允许多个只读 Observation Subscriber，共享
-同一套注入和 Hook。
+SessionManager；Controller 已将同路径顶层根进程稳定排在后代 utility 前，因此常见的“选中辅助
+进程”缺陷已修复。多个彼此独立的顶层实例仍需要显式 Target Selection；Workflow 与 Probe 继续以
+软件级互斥避免重复注入。下一阶段仍需判断是否把它深化为单一 Target Execution：最多一个
+Publication Owner，允许多个只读 Observation Subscriber，共享同一套注入和 Hook。
 
 Target Execution 盘点已完成并否决立即增加租约注册表：SessionManager 本身已经能管理多 Session，
 真正缺口是 Target Runtime 只有 activation-time 单一 FileCaptureSink，Runtime diagnostics 也是
 取走最近批次的单消费者语义。没有稳定 Observation Stream Identity 与多游标读取，Owner/Subscriber
-Module 只会搬运现有互斥状态，不能减少注入或提供安全共享。因此当前互斥保留，执行顺序调整为先
-冻结 Observation Stream 合同，再回到共享执行。
+Module 只会搬运现有互斥状态，不能减少注入或提供安全共享。因此当前互斥保留。Observation Stream
+合同仍是共享执行的前置条件，但不阻塞独立 Adapter 扩展；根据当前产品优先级，下一实施阶段先验证
+DirectWrite，再回到流身份与多读复用。
 
 ## Next
 
-- 冻结 Observation Stream Identity、样本历史、有界多游标读取与重启重匹配合同。从
-  [当前切片](slices/observation-stream-identity.md)、
-  [Target Runtime](../../../crates/glyphshift-target-runtime/src/lib.rs)和
-  [Capture Module](../../../crates/glyphshift-capture/src/lib.rs)开始；不把 surface token 或调用地址
-  直接升级为持久 Binding。
+- 研究并原型验证 DirectWrite Adapter 的 observe/replace Seam；先用合成宿主证明文字观察、替换、
+  fail-open 和生命周期，再决定是否进入生产 Bundle。Console、UI Automation 与 OCR 不并入首个原型。
 
 ## Progress
 
@@ -47,6 +46,11 @@ Module 只会搬运现有互斥状态，不能减少注入或提供安全共享�
   合成生命周期与授权 AE 的 9 实例 inventory 合同通过，全 workspace、Clippy、fmt 与架构检查全绿。
 - Target Execution seam 盘点完成：确认当前缺少的是可多读、可重匹配的 Observation Stream，而不是
   另一层租约 Map；在该前置合同完成前保留 Workflow/Probe 软件级互斥。
+- 完成 Windows 软件支持分级与 CMD 隔离诊断：当前四个目标进程内 GDI/GDI+ Adapter 在持续输出的
+  CMD 客户端中连续两轮均为零信号；Console client/host 是独立技术边界，进入 Adapter Roadmap，
+  不按可执行文件名增加特例。
+- 修复 Target Runtime 等价部署重连与 Controller 同路径根优先排序；完整回归通过。独立多根实例
+  的显式选择继续保留在本 Roadmap，不把窗口标题或进程品牌写入通用 Controller。
 
 ## References
 
@@ -59,3 +63,4 @@ Module 只会搬运现有互斥状态，不能减少注入或提供安全共享�
 - [Process Family Controller Inventory](slices/process-family-controller-inventory.md)
 - [Target Execution 所有权](slices/target-execution-ownership.md)
 - [Observation Stream Identity](slices/observation-stream-identity.md)
+- [Windows 软件支持分级与 Console 缺口](references/windows-software-support-and-console-gap.md)

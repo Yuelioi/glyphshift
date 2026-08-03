@@ -2,10 +2,8 @@
 
 ## Open Work
 
-- **Focus:** [Glyphshift 通用产品交付](work/glyphshift/index.md) — 当前继续修复 Runtime
-  `AlreadyActive` 误报与多进程目标选择。
-- [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — 后续按证据推进 Process Family、
-  单写多读 Target Execution、新 Adapter 与原生稳定性能力。
+- **Focus:** [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — 当前按真实软件证据
+  优先推进 DirectWrite Adapter observe/replace Seam；Observation Stream 与共享执行保留为后续阶段。
 
 ## Project links
 
