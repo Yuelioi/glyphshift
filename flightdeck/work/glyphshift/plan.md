@@ -30,5 +30,6 @@
   [Slice](slices/dictionary-catalog-and-installation.md)
 - [x] 建立标准 Dictionary `/2` JSON 导入与发布文件流程。
   [Slice](slices/simple-dictionary-file-exchange.md)
-- [ ] 建立生产 Extension/Runtime Bundle。
-- [ ] 完成授权实机可见验收与首个可分发桌面构建。
+- [x] 建立生产 Extension/Runtime Bundle。[Slice](slices/production-runtime-bundle.md)
+- [x] 完成授权实机可见验收与首个可分发桌面构建。
+  [Slice](slices/distributable-desktop-and-visible-acceptance.md)

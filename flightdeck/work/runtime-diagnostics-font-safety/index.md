@@ -1,6 +1,6 @@
 # 运行时诊断与字体安全收敛
 
-Status: Open
+Status: Finished
 
 ## Goal
 
@@ -30,17 +30,18 @@ message，而是把目标进程访问、远程内存、Runtime 模块/导出、�
 映射为稳定失败类别。失败的 Capture Runtime 会立即从 Pool 丢弃，因此“连接并继续”会真正重新发现，
 不会复用半失效会话；Desktop 提示对应的重启、权限或安装修复动作。
 
-当前唯一剩余交付缺口是授权目标软件的符号字体和 GDI+ 风险实机验收；真实路径、进程与证据必须
-继续留在本机忽略目录。当前本机私有授权变量尚未配置；即使发现候选进程，也不得反推出路径或
-进程标识替代显式授权输入。
+完整 Native 注入像素合同已补齐：同一 `all_observations` Font Policy 下，普通 GDI 文字使用替换
+字体，GDI `SYMBOL_CHARSET` 保持原像素，GDI+ Symbol 字体则发生像素变化；停止 Runtime 后三者
+全部恢复。这把 GDI 保护和 GDI+ 剩余风险从纯函数提升为真实进程/DLL 合同。
+
+授权 AE 的真实字体写回验收已完成：`all_observations` 下普通 GDI 菜单与 GDI+ 面板均使用替换
+字体，诊断同时观测到两条路径；菜单中的 `ETO_GLYPH_INDEX` 在换字体前恢复为 Unicode，避免旧字体
+glyph ID 被新字体误解。停止 Runtime 后截图与基线逐像素一致，图标保持完整。原始路径、进程、
+截图和日志全部留在本机忽略目录。
 
 ## Next
 
-- 使用当前构建完整重启 Glyphshift 与授权目标软件后重连探针，确认新提示报告的稳定失败类别或成功
-  激活；随后完成 GDI 符号字体与 GDI+ 剩余风险验收。从
-  [当前切片](slices/decision-trace-and-font-safety.md)和
-  [Windows Runtime 合同](../../../crates/glyphshift-desktop-runtime/tests/windows_runtime_contract.rs)
-  开始。先在被忽略的本机配置中提供授权可执行文件，再把原始证据只写入本机测试目录。
+None.
 
 ## Progress
 
@@ -51,6 +52,11 @@ message，而是把目标进程访问、远程内存、Runtime 模块/导出、�
   Windows 注入、stdio 传输、Tauri 映射、视觉检查和 28 项 Playwright。
 - 探针激活拒绝类别、失败会话重试与可操作错误提示已通过 Controller 进程合同、Runtime Pool 回归、
   Desktop 命令合同和第 29 项 Playwright；全 workspace、Clippy、fmt、架构与生产构建继续全绿。
+- Native 字体安全像素合同已通过：普通 GDI 字体替换、GDI Symbol 保持、GDI+ Symbol 风险和停止
+  恢复均由真实 DLL 注入验证；全 workspace、Clippy、fmt 与架构检查继续通过。
+- 授权 AE 的 Debug 可见验收发现并修复 GDI glyph-index 换字体乱码；Release Runtime Bundle 随后
+  通过同一真实宿主合同，诊断覆盖 GDI/GDI+，停止后恢复与基线完全一致。完整 workspace、Clippy、
+  fmt、架构检查和 36 项 Playwright 均通过。
 
 ## References
 

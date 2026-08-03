@@ -115,7 +115,9 @@ Agent 的分层很值得借鉴：稳定执行引擎与快速变化的逐目标�
 
 ### 5.2 UI label 的硬编码来源
 
-[`scripts/dev-app.ps1`](../../../../scripts/dev-app.ps1)生成 `glyphshift.runtime-bundle/1`，在两个 adapter artifact 上手写 `label = 'GDI'` 和 `label = 'GDI+'`。[`glyphshift-desktop-runtime`](../../../../crates/glyphshift-desktop-runtime/src/lib.rs)的 `ArtifactManifest.label` 读取该值，若缺失才回退到 Adapter ID；随后 Tauri [`HookTypeView`](../../../../apps/glyphshift-desktop/src-tauri/src/lib.rs)只向 UI 暴露 `{id, label}`。
+该历史观察对应旧构建入口；当前 [`build-runtime-bundle.ps1`](../../../../scripts/build-runtime-bundle.ps1)
+生成 `glyphshift.runtime-bundle/2`，展示信息来自独立 presentation 数据，Loader 固定第一方 authority
+并在 Native artifact 加载前验证路径与 SHA-256。
 
 因此当前 UI 名称：
 

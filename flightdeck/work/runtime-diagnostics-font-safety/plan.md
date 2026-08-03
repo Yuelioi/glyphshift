@@ -7,4 +7,4 @@
 - [x] 收敛 `all_observations` 文案，并以真实 GDI charset 信号保护符号字体。
 - [x] 以合成合同覆盖正常替换、保护、溢出、陈旧发布原子性和 fail-open 行为。
 - [x] 完成 Playwright、Rust workspace、fmt、Clippy、架构检查和生产构建。
-- [ ] 完成授权目标软件的符号字体与 GDI+ 风险验收。
+- [x] 完成授权目标软件的符号字体与 GDI+ 风险验收。

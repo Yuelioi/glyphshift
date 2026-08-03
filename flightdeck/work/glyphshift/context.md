@@ -35,6 +35,8 @@
 - 首个词典发布流程只导出可重新导入的标准 Dictionary `/2` JSON；不建立账号、审批、证书管理、
   远程发布后台或额外包格式。同 ID 导入明确拒绝，不静默覆盖。
 - requested state、Runtime actual state 与 applied generation 分别报告。
+- 可分发桌面候选通过本地 Tauri override 嵌入已验证的 Release Runtime Bundle；跟踪的基础配置不
+  保存本机路径。未配置代码签名时只称 unsigned candidate，不冒充公共发行版，也不自动执行安装器。
 
 ## 架构决定
 

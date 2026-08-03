@@ -20,6 +20,10 @@
   Policy 和 Generation；Controller ACK 必须同时匹配 Generation 与 identity。
 - GDI Adapter 在实际 `LOGFONT` 报告 `SYMBOL_CHARSET` 时保留原字体；GDI+ 目前没有等价的可靠
   原字体类别信号。
+- 完整 Native 注入合同以同一 `all_observations` Font Policy 验证：普通 GDI 文字换字体、GDI
+  `SYMBOL_CHARSET` 像素保持、GDI+ Symbol 字体像素改变，停止 Runtime 后三类绘制全部恢复。
+- GDI `ExtTextOutW` 使用 `ETO_GLYPH_INDEX` 时，输入是当前字体的 glyph ID 而不是 Unicode；只有在
+  新字体实际选入后，Adapter 才能使用已解码原文、清除 glyph-index 标记与旧 spacing 重新绘制。
 - Target Runtime 诊断使用固定上限 JSON 输出缓冲；Controller 每次查询只取走最近有界批次，
   dropped 数跨层保留。Desktop 仅在用户打开工作流诊断期间开启采集，每秒读取并在前端保留最近
   256 条。
@@ -39,6 +43,8 @@
   Workflow 是持续期望状态。
 - 图标或符号字体保护必须建立在 Adapter 可观察、可测试的字体身份上；没有真实信号时只诚实提示，
   不以猜测黑名单伪装保护能力。
+- 字体未成功替换、glyph-index 无法可靠解码或原字体受到保护时，GDI Adapter 必须保留原参数
+  fail-open；不得让新字体解释旧字体的 glyph ID。
 - 已有 digest 不再复制成第二套 Snapshot Artifact；只有当它能区分 Generation 相同但内容异常时，
   才把 publication identity 扩展到 Runtime ACK 和桌面诊断。
 - 普通产品 UI 不展示 PID、内部 Adapter ID、Route、DLL 路径或原始调用信息；详细 Trace 只进入本地

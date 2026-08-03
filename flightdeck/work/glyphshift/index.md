@@ -62,6 +62,11 @@ LunaTranslator 的官方文档和固定源码版本调研已完成。它验证�
 只影响后端分页视图，Dictionary、Observation Index 和完整导出保持不变。Observation Stream
 Identity / Binding、Transform Profile、OCR 和 Overlay 分别保留在运行时能力升级 Roadmap。
 
+生产 Runtime Bundle `/2` 与桌面交付候选已闭合：共用构建器生成固定第一方 authority、逐文件
+SHA-256 且不含测试宿主的 Release 文件集；本地 Tauri override 已将其嵌入 unsigned NSIS
+candidate。未安装 Release 桌面 smoke 通过，授权 AE 可见验收证明 `File` 可翻译为 `文件` 并在
+停止后恢复。安装器尚未执行，代码签名与公共发布也不在当前实现中。
+
 旧 AE 与 Premiere 词典仅作为未接入 Runtime 的源数据保存在 `archive/dictionary-sources/`；
 架构检查禁止生产代码引用归档路径或旧 schema。原仓库保持不变，继续作为只读回退来源。
 
@@ -71,8 +76,9 @@ Identity / Binding、Transform Profile、OCR 和 Overlay 分别保留在运行�
 
 ## Next
 
-- 推进生产 Runtime Bundle 和授权实机验收。授权复用用户显式选择程序并启动工作流/探针的现有
-  路径；不增加账号、审批或权限数据库。真实 Catalog 接入仍等待 endpoint 与 publisher key policy。
+- 当前交付阶段已闭合到 unsigned NSIS candidate 和授权目标软件验收。本 Work 后续只在用户明确
+  授权后执行 installer smoke；未授权前不执行安装器。能力扩展从
+  [运行时能力升级 Roadmap](../runtime-capability-roadmap/index.md)继续。
 
 ## Progress
 
@@ -129,6 +135,13 @@ Identity / Binding、Transform Profile、OCR 和 Overlay 分别保留在运行�
   调研，并把无需协议扩展的 Probe 闭环与后续 Runtime 升级能力分开路由。
 - Probe Adapter 筛选与持续作业验收完成：多选条件贯通 Rust 分页与 Tauri/Vue，查询/筛选/分页状态
   按 Run 恢复；暂停编辑、完整导出、运行/暂停重启恢复和 5,000 条边界已有合同与 Playwright 覆盖。
+- 生产 Runtime Bundle 完成：`/2` 清单使用固定第一方 authority 和逐文件 SHA-256，Release 精确包含
+  Controller、Target Runtime 与四个 Adapter，不包含测试宿主；共用构建器同时服务开发桌面。
+- 可分发桌面与可见验收完成：生成并检查 unsigned NSIS candidate，未安装 Release 桌面 smoke
+  通过；授权 AE 中 `File` → `文件` → `File` 的启用/恢复可见链路闭合，36 项 Playwright 与完整
+  Rust 门禁通过。安装器未执行。
+- 运行时诊断与字体安全完成：授权 AE 同时覆盖 GDI/GDI+ 字体写回，修复 `ETO_GLYPH_INDEX` 在换
+  字体时复用旧 glyph ID 导致的乱码；Release Bundle 真实宿主合同和停止恢复通过，安装器仍未执行。
 
 ## References
 
