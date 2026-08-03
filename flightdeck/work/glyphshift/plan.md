@@ -16,6 +16,12 @@
   [Slice](slices/dictionary-hooks-and-probe.md)
 - [x] 建立目标进程捕获会话、Capture Catalog 与 Dictionary Draft 导出。
   [Slice](slices/dictionary-hooks-and-probe.md)
+- [x] 把一次性捕获升级为可恢复 Probe Workspace、实时 Draft、后端分页和管理表 UI。
+  [Slice](slices/capture-workspaces-and-live-drafts.md)
+- [x] 把 Probe Workspace 收敛为绑定唯一 Dictionary 的 Probe Run，并以 Observation Index
+  sidecar 提供单表联合视图。[Slice](slices/dictionary-owned-probe-runs.md)
+- [x] 把独立 Font Profile 与 Location Binding 收敛为 Workflow Target 内联 Font Policy。
+  [Slice](slices/inline-workflow-font-policy.md)
 - [ ] 建立 Dictionary Catalog、可信安装与本地 provenance seam。
   [Slice](slices/dictionary-catalog-and-installation.md)
 - [ ] 建立生产 Extension/Runtime Bundle 与词典导入发布流程。

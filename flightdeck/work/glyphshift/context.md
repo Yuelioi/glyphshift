@@ -10,16 +10,21 @@
 ## 产品决定
 
 - 工作流是持久 Runtime Intent；软件只管理身份和程序绑定；词典是独立可复用资产。
-- 每个 Workflow Target 分别组合 parallel Adapter Plan、有序 Dictionary 集合和 Font Profile
-  Bindings，Feature 从完整编译结果推导。
+- 每个 Workflow Target 分别组合 parallel Adapter Plan、有序 Dictionary 集合和至多一个内联
+  Font Policy，Feature 从完整编译结果推导。
 - 一个软件同一时间最多由一个 enabled Workflow 拥有；冲突需要显式替换。
 - Dictionary `/2` 是纯 `source + translation` 映射；不包含 Location、Context、keep、字体、平台、
   技术、Adapter、Hook 或保护策略。同一 Dictionary 内 source 唯一。
-- 未来区域能力由 Workflow Target 的 Region Binding 组合 Dictionary；只有真实 Runtime 信号才能
-  定义区域，当前 Adapter 首版只支持 `all`。
-- 捕获会话只监听一个已授权目标进程和显式 Adapter Plan；输出保留 source、Adapter 与计数等技术
-  事实的 Capture Catalog，再派生不含技术字段的 Dictionary Draft。
-- 字体方案是独立可复用资产，保存有序字体候选；Target Binding 决定其 Location 范围。
+- 未来区域能力只有在 Runtime 能提供真实区域信号后才建立独立 Region Binding；当前产品不暴露
+  Location、`main-ui`、全部位置或指定位置。
+- Probe Run 只监听一个已授权目标进程，必须且只绑定一个 Dictionary 和一组显式 Adapter；一个软件
+  可保存多个命名任务，但同一时刻只有一个任务占用目标 Runtime。
+- Dictionary 是唯一翻译内容资产。Probe Run 文档只保存任务状态和 Dictionary 引用；内部
+  Observation Index sidecar 保存 source、Adapter、计数与时间等证据，绝不持久化译文。
+- Probe Run 是持续作业资产：支持 running/paused/ready/interrupted、重启恢复、搜索分页、批量
+  处理和导出；支持 TextReplace 的 Adapter 可从绑定 Dictionary 发布 Live Preview。
+- Font Policy 只属于 Workflow Target，保存有序字体候选和 `dictionary_matches` /
+  `all_observations` coverage；不具有独立 CRUD 生命周期。
 - 在线字典使用纯 payload 与外部 Artifact Descriptor；下载来源、摘要、签名和安装状态不进入
   Dictionary metadata。
 - Dictionary Release、Artifact Presentation、Installation Record 与 active working copy 分别拥有
@@ -34,19 +39,25 @@
 - Route Program 无代码、无 I/O、执行有界；写回只能通过 Adapter Registry。
 - Translation Snapshot 与 Font Policy 正交发布，由 Decision Engine 产生最终 RenderDecision。当前
   纯 Dictionary 条目编译到 Software 已声明的所有内部路由；内部路由不是 Dictionary 字段。
-- 当前产品未发布；Dictionary `/2`、Font Profile `/1`、Workflow `/2` 与 Target Runtime
+- 当前产品未发布；Dictionary `/2`、Workflow `/3` 与 Target Runtime
   Deployment `/2` 直接替换旧结构，不读取、迁移或双写旧 schema。
 - 所有失败路径 fail-open；不终止、不重启、不远程卸载用户正在工作的目标进程。
 - Catalog、HTTP、签名和安装状态不得进入 Runtime、Decision、Workflow resolve 或 Native Adapter。
 
 ## UI 决定
 
-- 默认页面是 Workflow 管理表；Software、Dictionary 与 Font Profile 是独立管理页。
+- 默认页面是 Workflow 管理表；Software、Dictionary 与 Probe 是独立管理页，字体不占顶级导航。
 - 创建与编辑复用 Nuxt UI Modal；管理页复用页头、表格框架、分页和确认 Module。
 - 软件页不展示文字/字体功能；词典页不展示 Hook、Adapter 或字体配置。
 - 词典详情主表和单行 Modal 只编辑原文与译文；便携 metadata 在单列设置 Modal 中渐进披露。
-- 探针 UI 把进程选择、监听状态和技术捕获记录放在独立产品表面，不塞进 Dictionary 编辑器。
-- Workflow Editor 按 Target 独立配置 Adapter 多选、Dictionary 栈和 Font Profile Bindings。
+- 探针管理与详情是明确的列表/返回导航；管理页复用页头、顶部搜索/多选工具条、表格与底部分页，
+  创建与导出设置进入 Modal。
+- 探针详情只有一张 Dictionary + Observation Index 联合表；行内译文直接写绑定 Dictionary，忽略
+  只修改证据 sidecar。长表在独立滚动区中滚动，表头和底部分页保持可见。
+- Probe 表格以 5,000 条为基准由 Rust 搜索分页，Vue 只持有当前页；1 秒 revision 轮询只在变化时
+  重取当前页，分页模式不叠加虚拟滚动。
+- 管理表内容区保持连续表面色；空态铺满表头与分页之间空间，非空表最后一行保留底边界。
+- Workflow Editor 按 Target 独立配置 Adapter 多选、Dictionary 栈和一个紧凑 Font Policy。
 - 标题栏提供 Help 与 Settings 图标，不展示桌面服务连接状态；真实桌面后端不可用是阻断错误。
 - Help 从 Runtime Bundle Catalog 展示公开 Adapter 信息；Settings 不保存在线翻译服务地址，只导航
   到本地资产与工作流页面，并说明未来网站/字典市场的下载方向。

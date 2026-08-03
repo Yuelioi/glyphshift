@@ -2,9 +2,9 @@
 
 ## Open Work
 
-- **Focus:** [Glyphshift 通用产品交付](work/glyphshift/index.md) — 纯 Dictionary、四个常用 Windows
-  文字 Adapter 与 Capture Probe 已交付；下一步用真实软件捕获证据决定后续 seam，或继续
-  Dictionary Catalog 内容寻址安装。
+- **Focus:** [Glyphshift 通用产品交付](work/glyphshift/index.md) — 内联 Workflow Font Policy 已交付：
+  顶级字体资产与用户 Location 已删除，每个 Target 支持词典命中或 Hook 全量两种 coverage；下一步
+  继续 Dictionary Catalog、生产 Runtime Bundle 与授权实机验收。
 
 ## Project links
 
