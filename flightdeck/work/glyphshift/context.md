@@ -28,6 +28,8 @@
   的不透明证据，属于 Probe/Workflow 运行范围，不能冒充 Region 或进入 Dictionary。
 - Font Policy 只属于 Workflow Target，保存有序字体候选和 `dictionary_matches` /
   `all_observations` coverage；不具有独立 CRUD 生命周期。
+- 本机字体目录属于应用级机器缓存，不进入 Workflow、Dictionary 或 AppSettings；普通启动读取
+  持久缓存，只有用户显式刷新才重新扫描系统字体并替换缓存。
 - 在线字典使用纯 payload 与外部 Artifact Descriptor；下载来源、摘要、签名和安装状态不进入
   Dictionary metadata。
 - Dictionary Release、Artifact Presentation、Installation Record 与 active working copy 分别拥有
@@ -60,7 +62,8 @@
   完整解释与恢复动作，不使用“需要处理”一类笼统汇总。
 - 创建与编辑复用 Nuxt UI Modal；管理页复用页头、表格框架、分页和确认 Module。
 - 软件页不展示文字/字体功能；词典页不展示 Hook、Adapter 或字体配置。
-- 词典详情主表和单行 Modal 只编辑原文与译文；便携 metadata 在单列设置 Modal 中渐进披露。
+- 词典详情用一份显式草稿统管 metadata 与词条；主表直接编辑原文和译文并常驻空白新增行，便携
+  metadata 在单列设置 Modal 中渐进披露。任何修改立即进入未保存状态，离开前必须保护草稿。
 - Dictionary metadata tags 是本地搜索与在线 Catalog 分类筛选的同一套语义；Catalog 支持点击标签
   进行单值精确筛选，不新增重复的 category 字段。本地/在线模式必须保留清晰的主色选中态。
 - 探针管理与详情是明确的列表/返回导航；管理页复用页头、顶部搜索/多选工具条、表格与底部分页，
@@ -76,6 +79,8 @@
   Dictionary 栈与 Font Policy 仍按 Target 完全隔离，通过当前 Target 选择器切换配置上下文。
   编辑 Modal 使用受视口约束的稳定工作区高度；顶部紧凑分段导航不滚动，当前 Tab 内容是主滚动区，
   软件、词典和字体等大集合目录再使用有界局部滚动。
+- Font Policy 的 coverage 使用紧凑“应用范围”选择器；字体目录标题显示缓存数量和显式刷新动作，
+  不用两个满宽按钮承载二选一状态。
 - 标题栏提供 Help 与 Settings 图标，不展示桌面服务连接状态；真实桌面后端不可用是阻断错误。
 - Help 从 Runtime Bundle Catalog 展示公开 Adapter 信息；Settings 不保存在线翻译服务地址，只导航
   到本地资产与工作流页面，并说明未来网站/字典市场的下载方向。

@@ -30,7 +30,7 @@ codec、校验与 mutation，Desktop Backend 只保留产品 DTO facade；
 `glyphshift-dictionary-distribution` 已提供 query/install/installations 深接口、强类型 Catalog 与签名
 合同，以及不冒充生产网络/密钥策略的 ports。文件型 Install Store 已闭合内容寻址制品、Installation
 Record、pending transaction、原子 active copy 与重开恢复；四个中断点只会收敛到完整旧版或完整
-新版。Desktop API v15 和 Backend Summary 已接入安装状态，Dictionary 页以本地/在线目录双模式
+新版。Desktop API v16 和 Backend Summary 已接入安装状态，Dictionary 页以本地/在线目录双模式
 展示 provenance、后端搜索、metadata tag 精确筛选、cursor 分页、离线空态与安全覆盖确认；当前
 模式使用明确主色选中态。生产仍显式离线，等待真实 endpoint、publisher key policy 与部署配置。
 
@@ -41,13 +41,18 @@ Record、pending transaction、原子 active copy 与重开恢复；四个中断
 Dictionary 详情已按真实使用反馈完成信息降噪，Dictionary `/2` 也已收敛为纯
 `source + translation`：Location、Context、keep 与逐词条字体均已从 payload、DTO、编辑器和
 Workflow compile 删除。Runtime 内部路由不回流到 Dictionary；当前 Adapter 无法识别主界面、
-弹窗或面板，因此没有伪造 Region/Location 配置。
+弹窗或面板，因此没有伪造 Region/Location 配置。当前编辑器进一步收敛为一份显式草稿：metadata
+设置、已有词条行内修改、末行新增和删除共享未保存状态，离开编辑器或关闭窗口前统一保护。
+生产构建与完整 Playwright 39 项通过，960×640 紧凑视口已完成视觉复核。
 
 Workflow Editor 已从固定左右主从栏和连续长表单，改为“基础配置 / 软件与拦截 / 翻译词典 /
 字体策略”四个任务 Tab。每页内部保持单列；软件与 Adapter 是一个连续阶段，Dictionary 与 Font
 各自使用单一可搜索列表并行内调整优先级。编辑 Modal 使用稳定工作区高度，紧凑分段导航固定在
 顶部，只有当前 Tab 内容滚动；大集合目录继续使用有界局部滚动。合成 10 个软件、100 份词典的
 回归证明搜索、切换、优先级与 Target 隔离仍稳定。
+
+Font Policy 已收紧最后一处高占宽交互：coverage 已从两个满宽按钮改为“应用范围”选择器；本机
+字体目录改为跨启动持久缓存，普通启动不再重复扫描，目录标题显示缓存数量并提供显式刷新动作。
 
 Runtime Bundle 现提供 `ExtTextOutW`、`TextOutW`、`DrawTextW/DrawTextExW` 与 `GdipDrawString`
 四个独立 Adapter，中文 presentation 在 Windows PowerShell 5.1 下按 UTF-8 稳定读取。可恢复
@@ -86,10 +91,9 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
 
 ## Next
 
-- 从[工作流 Runtime 错误反馈](slices/workflow-runtime-error-feedback.md)继续：先保留具体 Runtime
-  拒绝码并实现 `AlreadyActive` 幂等接管，再把多进程目标选择缺陷接入
-  [运行时能力升级 Roadmap](../runtime-capability-roadmap/index.md)。installer smoke 仍只在用户明确
-  授权后执行。
+- 等待用户一并验收[Dictionary 行内草稿编辑](slices/dictionary-inline-draft-editing.md)和
+  [字体目录缓存与紧凑策略控件](slices/font-catalog-cache-and-compact-policy.md)，随后回到
+  [工作流 Runtime 错误反馈](slices/workflow-runtime-error-feedback.md)的 `AlreadyActive` 幂等接管。
 
 ## Progress
 
@@ -120,6 +124,11 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
   Playwright 与完整仓库验证通过。
 - Dictionary 详情完成渐进披露重构；设置与规则 Modal 单列化，矮窗口可滚动，Playwright 22 项及
   1160×527/960×640/1440×900 视觉检查通过。
+- Dictionary 编辑器完成单一草稿收敛；设置应用与表格修改立即标记未保存，现有词条直接编辑，
+  末行常驻新增入口，返回/导航/关闭统一保护。生产构建与 39 项 Playwright 通过。
+- Font Policy coverage 改为紧凑“应用范围”选择器；Desktop API v16 增加显式字体刷新命令，系统
+  字体目录跨启动持久缓存。Shell/Backend 38 项 Rust 测试、Clippy、fmt、生产构建和 40 项
+  Playwright 通过，1180×760 与 1440×900 视觉复核完成。
 - 完成 Location/Context 可观测性复核：当前 GDI/GDI+ 回调没有区域信号，同一 Hook 无法区分主
   界面与弹窗；决定从 Dictionary 删除伪区域字段，未来只通过独立 Region Binding 使用真实信号。
 - 纯 Dictionary、常用 Adapter 与捕获探针 Slice 完成；本机 2285 条词条升级，四个 Adapter Bundle、

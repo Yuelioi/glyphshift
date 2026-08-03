@@ -35,3 +35,7 @@
   [Slice](slices/distributable-desktop-and-visible-acceptance.md)
 - [ ] 将工作流 Runtime 汇总状态改为具体、可恢复的逐软件错误反馈。
   [Slice](slices/workflow-runtime-error-feedback.md)
+- [x] 将 Dictionary 编辑器收敛为受保护的单一行内草稿。
+  [Slice](slices/dictionary-inline-draft-editing.md)
+- [x] 缓存本机字体目录并收紧 Workflow Font Policy 的应用范围控件。
+  [Slice](slices/font-catalog-cache-and-compact-policy.md)
