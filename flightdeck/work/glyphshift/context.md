@@ -57,7 +57,11 @@
 - Probe 表格以 5,000 条为基准由 Rust 搜索分页，Vue 只持有当前页；1 秒 revision 轮询只在变化时
   重取当前页，分页模式不叠加虚拟滚动。
 - 管理表内容区保持连续表面色；空态铺满表头与分页之间空间，非空表最后一行保留底边界。
-- Workflow Editor 按 Target 独立配置 Adapter 多选、Dictionary 栈和一个紧凑 Font Policy。
+- Workflow Editor 按“基础配置 / 软件与拦截 / 翻译词典 / 字体策略”四个任务 Tab 组织；每页内部
+  保持单列，Dictionary 与 Font 各自只有一个可搜索目录并在行内处理选择和优先级。Adapter、
+  Dictionary 栈与 Font Policy 仍按 Target 完全隔离，通过当前 Target 选择器切换配置上下文。
+  编辑 Modal 使用受视口约束的稳定工作区高度；顶部紧凑分段导航不滚动，当前 Tab 内容是主滚动区，
+  软件、词典和字体等大集合目录再使用有界局部滚动。
 - 标题栏提供 Help 与 Settings 图标，不展示桌面服务连接状态；真实桌面后端不可用是阻断错误。
 - Help 从 Runtime Bundle Catalog 展示公开 Adapter 信息；Settings 不保存在线翻译服务地址，只导航
   到本地资产与工作流页面，并说明未来网站/字典市场的下载方向。

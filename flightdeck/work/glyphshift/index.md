@@ -35,6 +35,12 @@ Dictionary 详情已按真实使用反馈完成信息降噪，Dictionary `/2` �
 Workflow compile 删除。Runtime 内部路由不回流到 Dictionary；当前 Adapter 无法识别主界面、
 弹窗或面板，因此没有伪造 Region/Location 配置。
 
+Workflow Editor 已从固定左右主从栏和连续长表单，改为“基础配置 / 软件与拦截 / 翻译词典 /
+字体策略”四个任务 Tab。每页内部保持单列；软件与 Adapter 是一个连续阶段，Dictionary 与 Font
+各自使用单一可搜索列表并行内调整优先级。编辑 Modal 使用稳定工作区高度，紧凑分段导航固定在
+顶部，只有当前 Tab 内容滚动；大集合目录继续使用有界局部滚动。合成 10 个软件、100 份词典的
+回归证明搜索、切换、优先级与 Target 隔离仍稳定。
+
 Runtime Bundle 现提供 `ExtTextOutW`、`TextOutW`、`DrawTextW/DrawTextExW` 与 `GdipDrawString`
 四个独立 Adapter，中文 presentation 在 Windows PowerShell 5.1 下按 UTF-8 稳定读取。可恢复
 Probe Run 已完成：每个任务绑定一个软件、一个 Dictionary 与一组 Adapter；Dictionary 是唯一翻译
@@ -51,7 +57,8 @@ Rust 分页，Vue 只渲染当前页；1 秒双 revision 轮询只在变化时�
 
 ## Next
 
-- 继续 Dictionary Catalog、生产 Runtime Bundle 与授权实机验收。
+- 请用户在当前热更新桌面窗口验收 Workflow Editor 的四 Tab 任务流；如无新的布局调整，继续
+  Dictionary Catalog、生产 Runtime Bundle 与授权实机验收。
 
 ## Progress
 
@@ -85,6 +92,10 @@ Rust 分页，Vue 只渲染当前页；1 秒双 revision 轮询只在变化时�
   新建空 Dictionary、联合查询、直接编辑、暂停恢复、导出及双 revision 刷新已闭合。管理表空态
   连续铺满且末行保留边界；Desktop build、27 项 Playwright、全 Rust workspace、Clippy、fmt 与
   架构检查通过。
+- Workflow Editor 四 Tab 化完成：基础信息、软件与拦截、翻译词典、字体策略按任务隔离；各页删除
+  左右主从栏和重复资产列表，以 Target 选择器保持多软件配置上下文；Modal 高度和顶部导航保持
+  稳定，切换 Tab 不再引起窗口跳动或让导航共用内容滚动条。10 软件/100 词典合成边界、生产构建、
+  设计扫描与 30 项 Playwright 全部通过。
 - 桌面生产构建与 GUI 回归覆盖双词典排序、内联字体候选排序与 coverage、多 Target 暂存隔离、
   完整 metadata 保存及 960×640/1440×900 稳定帧。
 - 完成同类产品、现有 Adapter Registry 与 macOS 拦截边界的一手资料调研。
@@ -105,3 +116,4 @@ Rust 分页，Vue 只渲染当前页；1 秒双 revision 轮询只在变化时�
 - [纯字典、常用 Adapter 与捕获探针](slices/dictionary-hooks-and-probe.md)
 - [可恢复探针工作区与实时草稿](slices/capture-workspaces-and-live-drafts.md)
 - [Dictionary-owned Probe Run](slices/dictionary-owned-probe-runs.md)
+- [Workflow Editor 四 Tab 任务流](slices/workflow-editor-vertical-flow.md)

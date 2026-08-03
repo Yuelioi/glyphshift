@@ -22,6 +22,8 @@
   sidecar 提供单表联合视图。[Slice](slices/dictionary-owned-probe-runs.md)
 - [x] 把独立 Font Profile 与 Location Binding 收敛为 Workflow Target 内联 Font Policy。
   [Slice](slices/inline-workflow-font-policy.md)
+- [x] 把 Workflow Editor 收敛为适配多软件与大词典库的四 Tab 任务流，各页保持单列。
+  [Slice](slices/workflow-editor-vertical-flow.md)
 - [ ] 建立 Dictionary Catalog、可信安装与本地 provenance seam。
   [Slice](slices/dictionary-catalog-and-installation.md)
 - [ ] 建立生产 Extension/Runtime Bundle 与词典导入发布流程。

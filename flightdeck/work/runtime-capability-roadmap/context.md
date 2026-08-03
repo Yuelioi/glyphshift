@@ -1,0 +1,65 @@
+# Work Context
+
+## 保持不变的核心
+
+- Dictionary 保持纯 `source + translation`；探针证据、字体、平台、技术和运行路由不进入 Entry。
+- Workflow Target 继续组合 Software、Adapter Plan、Dictionary 和内联 Font Policy。
+- Capability Adapter 是观察或写回能力的执行单元；Platform 是兼容事实，Technology 只用于分类。
+- 最小 `TextObservation`、Adapter Descriptor 和完整 Runtime Publication 是稳定 Interface；平台富信息
+  只能进入可选且有界的证据 envelope。
+- 所有失败路径 fail-open；Core、Desktop 和 GUI 不按软件品牌、可执行文件名或 Adapter ID 分支。
+
+## 候选升级方向
+
+### Process Family
+
+- Software Extension 描述授权的进程关系和发现规则，Controller 解析实际实例。
+- 子进程必须继承明确授权，独立报告生命周期和 Feature 状态；部分失败不能覆盖其他实例事实。
+- PID、窗口标题和本机路径只属于短期 Runtime actual state，不进入持久字典或通用 UI。
+
+### Target Execution
+
+```text
+Target Execution
+├─ Publication Owner      0..1
+└─ Observation Subscriber 0..n
+```
+
+- 一个目标实例只维护一套注入、Adapter Host 和 Hook，避免 Workflow 与 Probe 竞争或重复注入。
+- Publication Owner 独占文字/字体写回；Observation Subscriber 只能消费有界观察流。
+- 只有真实的并发探针、诊断或协作需求证明价值后，才替换当前简单所有权规则。
+
+### Adapter 扩展
+
+- 优先验证 DirectWrite；只有能稳定观察且具备安全写回 Seam 时才声明 TextReplace。
+- UI Automation 优先作为 observe-only Adapter，不把可访问性树等同于实际绘制文字。
+- OCR 是无法取得结构化文字时的显式兜底，必须标明延迟、置信度和隐私影响，不进入目标进程热路径。
+- Direct2D、Direct3D、OpenGL 和 Vulkan 仅在目标软件证据显示真实缺口后分别立项，不创建万能图形
+  Renderer。
+
+### 原生稳定性与布局
+
+- 在现有 reentry/panic fail-open 基础上，单独研究 Windows SEH/VEH、Adapter Watchdog 和熔断；必须
+  先确认故障能在宿主退出前被可靠观察。
+- `LayoutAdjust` 已是 Feature 候选，只有字体度量、截断或控件布局的真实案例与合成 Host 测试齐备后
+  才实现。
+- 分裂 text run 由具体 Adapter 做观察重组并携带证据，Decision Engine 不做全局 substring fallback。
+
+### 匹配与辅助创作
+
+- Runtime 默认继续精确匹配。大小写、空白或 Unicode normalization 只有在字典级显式策略和编译期
+  冲突诊断同时成立时才考虑。
+- 模糊匹配和 AI 语义能力最多用于 Probe 的离线翻译建议，不进入目标进程实时决策。
+
+## 明确拒绝
+
+- 富 `TextEvent` 成为包含进程、窗口、控件、坐标、上下文和缓存字段的核心 ABI。
+- Dictionary Context、逐条字体、Probe Metadata、Overlay/Draft 双写和通用 Renderer。
+- 硬编码 UI Region、窗口句柄、DC 或调用栈 hash 作为稳定 Route。
+- 事件溯源重建产品状态，以及没有深度/删除测试依据的 Module 合并。
+
+## 立项门槛
+
+- 每个升级项必须有目标软件证据或合成 Fixture、明确 Interface owner、失败语义和可见验收。
+- 新能力应通过新增 Extension、Descriptor 或 Adapter 落地；若必须修改 Core 品牌分支，说明 Seam 不合格。
+- 真实软件输入输出全部位于 `target/local-test/`，仓库只保留确定性 harness 和合成 Fixture。

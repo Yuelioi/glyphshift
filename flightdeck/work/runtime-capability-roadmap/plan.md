@@ -1,0 +1,29 @@
+# 运行时能力升级计划
+
+## Stage 1：多进程目标
+
+- [ ] 定义 Process Family 授权、发现、身份、退出和部分失败合同。
+- [ ] 用合成 Controller/Target Instance 验证一个软件的主进程与子进程状态聚合。
+- [ ] 在授权目标软件上保存本地证据并决定首个生产 Extension。
+
+## Stage 2：执行与观察复用
+
+- [ ] 将当前独占规则评估为单一 Target Execution、一个 Publication Owner 与多个只读 Subscriber。
+- [ ] 证明 Probe、诊断和 Workflow 共享 Hook 时不会重复注入、竞争写回或提升错误 Feature 状态。
+
+## Stage 3：Windows Adapter 覆盖
+
+- [ ] 先研究并原型验证 DirectWrite Adapter 的 observe/replace Seam。
+- [ ] 评估 UI Automation observe-only Adapter 与绘制观察的去重关系。
+- [ ] 只在结构化 Adapter 无法覆盖且用户明确选择时评估 OCR 兜底。
+- [ ] 按真实缺口分别决定 Direct2D、Direct3D、OpenGL 或 Vulkan 是否立项。
+
+## Stage 4：原生稳定性与布局
+
+- [ ] 研究 SEH/VEH、Watchdog、熔断和运行成本，选择能保持 fail-open 的最小方案。
+- [ ] 以真实截断案例验证字体度量和 `LayoutAdjust`，不建立万能 Renderer。
+
+## Stage 5：可选匹配与创作辅助
+
+- [ ] 只有精确匹配出现可复现缺口时才设计 Dictionary Match Policy 和冲突诊断。
+- [ ] 将模糊/AI 能力限制为 Probe 离线建议，并保留人工确认与确定性 Runtime Publication。
