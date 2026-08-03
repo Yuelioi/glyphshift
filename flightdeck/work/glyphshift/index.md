@@ -192,6 +192,10 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
 - Workflow 独立编辑页根据实机视觉反馈改为 176px 左侧单层分区栏与右侧任务内容；返回收紧为
   详情头标准箭头，基础表单限制阅读宽度，大集合继续占用完整右区。完整 Playwright 48/48、
   1440×900/960×640 视觉证据与 UI detector 通过。
+- 桌面 UI 视觉系统深化完成：Software、Settings 与 Workflow 复用同一工作表面，四类详情共享全宽
+  详情头；主题改用钴蓝焦点与石墨暗色层级，浅色 Table 内容面使用纯白并由冷灰框架、表头和边界
+  分层，暗色主按钮使用低亮度蓝底白字。生产构建、49 项 Playwright、双主题双尺寸视觉证据与
+  UI detector 全部通过。
 
 ## References
 
@@ -210,3 +214,5 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
 - [LunaTranslator 产品与运行时调研](references/lunatranslator-product-runtime-research.md)
 - [Probe Adapter 筛选与持续作业验收](slices/probe-adapter-filter-and-recovery-acceptance.md)
 - [工作流 Runtime 错误反馈](slices/workflow-runtime-error-feedback.md)
+- [桌面 UI 深化调研](references/ui-system-deepening-research.md)
+- [桌面 UI 视觉系统深化](slices/ui-system-deepening.md)

@@ -47,3 +47,5 @@
   [Slice](slices/management-row-double-click-and-dictionary-export.md)
 - [x] 将 Workflow、Software、Dictionary 与 Probe Run 统一为独立详情页，并补齐 Esc 返回和未保存保护。
   [Slice](slices/independent-management-detail-pages.md)
+- [x] 统一桌面页面骨架、工作表面与明暗主题层级。
+  [Slice](slices/ui-system-deepening.md)
