@@ -196,6 +196,12 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
   详情头；主题改用钴蓝焦点与石墨暗色层级，浅色 Table 内容面使用纯白并由冷灰框架、表头和边界
   分层，暗色主按钮使用低亮度蓝底白字。生产构建、49 项 Playwright、双主题双尺寸视觉证据与
   UI detector 全部通过。
+- 轻量配置表面统一完成：Settings 外观、Workflow 基础配置与 Software 编辑复用分组标题和字段行；
+  三页共享水平居中的 980px 配置面板、184px 标签轨、compact/fill 控件宽度和容器级折叠，同时
+  保留各自真实导航与保存语义。详情层级进一步收敛为主背景画布上的真实内容面板，删除满高空
+  Card 与嵌套表面；Settings 也改用与 Workflow、Software 相同的全宽详情标题带，仅省略无语义的
+  返回按钮。面板化修正通过明暗主题与 1440×900/960×640 视觉复核，完整 Playwright 继续保持
+  49/49，UI detector 0 项。
 
 ## References
 
@@ -216,3 +222,4 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
 - [工作流 Runtime 错误反馈](slices/workflow-runtime-error-feedback.md)
 - [桌面 UI 深化调研](references/ui-system-deepening-research.md)
 - [桌面 UI 视觉系统深化](slices/ui-system-deepening.md)
+- [轻量配置表面统一](slices/configuration-form-unification.md)

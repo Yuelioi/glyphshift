@@ -49,3 +49,5 @@
   [Slice](slices/independent-management-detail-pages.md)
 - [x] 统一桌面页面骨架、工作表面与明暗主题层级。
   [Slice](slices/ui-system-deepening.md)
+- [x] 统一 Settings、Workflow 基础配置与 Software 编辑的配置表单语法。
+  [Slice](slices/configuration-form-unification.md)
