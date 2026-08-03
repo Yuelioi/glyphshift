@@ -23,6 +23,9 @@
   Observation Index sidecar 保存 source、Adapter、计数与时间等证据，绝不持久化译文。
 - Probe Run 是持续作业资产：支持 running/paused/ready/interrupted、重启恢复、搜索分页、批量
   处理和导出；支持 TextReplace 的 Adapter 可从绑定 Dictionary 发布 Live Preview。
+- Adapter ID 只标识执行能力，不等于同一 Adapter 内的候选文本流。当前 Work 可按已有 Adapter
+  证据筛选 Probe 联合表；未来 Observation Stream Identity / Binding 必须由 Adapter 提供可重匹配
+  的不透明证据，属于 Probe/Workflow 运行范围，不能冒充 Region 或进入 Dictionary。
 - Font Policy 只属于 Workflow Target，保存有序字体候选和 `dictionary_matches` /
   `all_observations` coverage；不具有独立 CRUD 生命周期。
 - 在线字典使用纯 payload 与外部 Artifact Descriptor；下载来源、摘要、签名和安装状态不进入
@@ -54,6 +57,7 @@
   创建与导出设置进入 Modal。
 - 探针详情只有一张 Dictionary + Observation Index 联合表；行内译文直接写绑定 Dictionary，忽略
   只修改证据 sidecar。长表在独立滚动区中滚动，表头和底部分页保持可见。
+- Probe 的 Adapter 筛选继续位于同一联合表工具区；不为筛选重新建立“技术目录”或第二张内容表。
 - Probe 表格以 5,000 条为基准由 Rust 搜索分页，Vue 只持有当前页；1 秒 revision 轮询只在变化时
   重取当前页，分页模式不叠加虚拟滚动。
 - 管理表内容区保持连续表面色；空态铺满表头与分页之间空间，非空表最后一行保留底边界。

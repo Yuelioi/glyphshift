@@ -24,7 +24,9 @@
   [Slice](slices/inline-workflow-font-policy.md)
 - [x] 把 Workflow Editor 收敛为适配多软件与大词典库的四 Tab 任务流，各页保持单列。
   [Slice](slices/workflow-editor-vertical-flow.md)
-- [ ] 建立 Dictionary Catalog、可信安装与本地 provenance seam。
+- [x] 增加 Probe Adapter 筛选并完成暂停、重启与恢复的持续作业发布验收。
+  [Slice](slices/probe-adapter-filter-and-recovery-acceptance.md)
+- [x] 建立 Dictionary Catalog、可信安装与本地 provenance seam。
   [Slice](slices/dictionary-catalog-and-installation.md)
 - [ ] 建立生产 Extension/Runtime Bundle 与词典导入发布流程。
 - [ ] 完成授权实机可见验收与首个可分发桌面构建。

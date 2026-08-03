@@ -28,7 +28,11 @@ copy 分权；深 `DictionaryDistribution` Module 隐藏查询、下载、验证
 继续完全离线。首个实现边界已落地：`glyphshift-dictionary-package` 独立拥有 Dictionary `/2`
 codec、校验与 mutation，Desktop Backend 只保留产品 DTO facade；
 `glyphshift-dictionary-distribution` 已提供 query/install/installations 深接口、强类型 Catalog 与签名
-合同，以及不冒充生产网络/密钥策略的内存 ports。
+合同，以及不冒充生产网络/密钥策略的 ports。文件型 Install Store 已闭合内容寻址制品、Installation
+Record、pending transaction、原子 active copy 与重开恢复；四个中断点只会收敛到完整旧版或完整
+新版。Desktop API v14 和 Backend Summary 已接入安装状态，Dictionary 页以本地/在线目录双模式
+展示 provenance、后端搜索、cursor 分页、离线空态与安全覆盖确认。生产仍显式离线，等待真实
+endpoint、publisher key policy 与部署配置。
 
 Dictionary 详情已按真实使用反馈完成信息降噪，Dictionary `/2` 也已收敛为纯
 `source + translation`：Location、Context、keep 与逐词条字体均已从 payload、DTO、编辑器和
@@ -48,6 +52,12 @@ Probe Run 已完成：每个任务绑定一个软件、一个 Dictionary 与一�
 表支持搜索、多选、行内编辑、批量处理、分页、导出、暂停/继续和 Live Preview。5,000 条基准下由
 Rust 分页，Vue 只渲染当前页；1 秒双 revision 轮询只在变化时重取页面。
 
+LunaTranslator 的官方文档和固定源码版本调研已完成。它验证了持续 Hook 作业需要候选文本流的
+采样、选择、持久化和重匹配，也证明该身份属于运行流而不是 Dictionary `location`。当前产品交付
+已完成无需扩展 Runtime 协议的 Probe Adapter 筛选与暂停/重启/恢复验收；筛选状态按 Run 恢复且
+只影响后端分页视图，Dictionary、Observation Index 和完整导出保持不变。Observation Stream
+Identity / Binding、Transform Profile、OCR 和 Overlay 分别保留在运行时能力升级 Roadmap。
+
 旧 AE 与 Premiere 词典仅作为未接入 Runtime 的源数据保存在 `archive/dictionary-sources/`；
 架构检查禁止生产代码引用归档路径或旧 schema。原仓库保持不变，继续作为只读回退来源。
 
@@ -57,8 +67,8 @@ Rust 分页，Vue 只渲染当前页；1 秒双 revision 轮询只在变化时�
 
 ## Next
 
-- 请用户在当前热更新桌面窗口验收 Workflow Editor 的四 Tab 任务流；如无新的布局调整，继续
-  Dictionary Catalog、生产 Runtime Bundle 与授权实机验收。
+- 推进生产 Extension/Runtime Bundle、词典导入发布流程与授权实机验收；真实 Catalog 接入需要先
+  冻结 endpoint、publisher key policy 与部署配置。
 
 ## Progress
 
@@ -78,6 +88,11 @@ Rust 分页，Vue 只渲染当前页；1 秒双 revision 轮询只在变化时�
   mutation 收归独立 Module，仓库测试、fmt 与 Clippy 通过。
 - `glyphshift-dictionary-distribution` 已交付深接口与内存 adapters；locale fallback、镜像降级、
   size/digest/signature/publisher/payload identity 拒绝、幂等安装和四类 installation state 有合同覆盖。
+- 文件型 Dictionary Install Store 已交付；SHA-256 内容寻址制品、Installation Record、pending
+  transaction、原子 active copy 与四个中断点重开恢复有 tempdir 合同覆盖，完整仓库验证通过。
+- Dictionary Catalog 与可信安装 Slice 完成；Desktop API v14、installation summary、同页
+  Library/Catalog 模式、provenance、cursor 分页、离线空态和 modified/unmanaged 覆盖确认已闭合。
+  全 Rust workspace、35 项 Playwright、生产构建、Clippy、fmt 与架构检查通过。
 - Dictionary 详情完成渐进披露重构；设置与规则 Modal 单列化，矮窗口可滚动，Playwright 22 项及
   1160×527/960×640/1440×900 视觉检查通过。
 - 完成 Location/Context 可观测性复核：当前 GDI/GDI+ 回调没有区域信号，同一 Hook 无法区分主
@@ -102,6 +117,10 @@ Rust 分页，Vue 只渲染当前页；1 秒双 revision 轮询只在变化时�
 - 完成字典、字体、在线 metadata 和插件 Catalog 的主流实践终审；技术方案与测试 seam 已固定。
 - 完成 PowerToys、VS Code、Docker Desktop、OBS、Zotero 设置作用域与 Vue/Tauri i18n 一手资料
   调研，否决跨 IPC 直接传 vue-i18n key，推荐语义错误码与前端映射。
+- 完成 LunaTranslator 产品、Hook 文本流、处理管线、字体/覆盖、输入源、恢复与多进程的一手资料
+  调研，并把无需协议扩展的 Probe 闭环与后续 Runtime 升级能力分开路由。
+- Probe Adapter 筛选与持续作业验收完成：多选条件贯通 Rust 分页与 Tauri/Vue，查询/筛选/分页状态
+  按 Run 恢复；暂停编辑、完整导出、运行/暂停重启恢复和 5,000 条边界已有合同与 Playwright 覆盖。
 
 ## References
 
@@ -117,3 +136,5 @@ Rust 分页，Vue 只渲染当前页；1 秒双 revision 轮询只在变化时�
 - [可恢复探针工作区与实时草稿](slices/capture-workspaces-and-live-drafts.md)
 - [Dictionary-owned Probe Run](slices/dictionary-owned-probe-runs.md)
 - [Workflow Editor 四 Tab 任务流](slices/workflow-editor-vertical-flow.md)
+- [LunaTranslator 产品与运行时调研](references/lunatranslator-product-runtime-research.md)
+- [Probe Adapter 筛选与持续作业验收](slices/probe-adapter-filter-and-recovery-acceptance.md)

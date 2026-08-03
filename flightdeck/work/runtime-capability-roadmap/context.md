@@ -29,6 +29,15 @@ Target Execution
 - Publication Owner 独占文字/字体写回；Observation Subscriber 只能消费有界观察流。
 - 只有真实的并发探针、诊断或协作需求证明价值后，才替换当前简单所有权规则。
 
+### Observation Stream
+
+- Adapter 与同一 Adapter 内的候选文本流是两层身份；候选流属于 Runtime Observation，不是
+  Dictionary location，也不能用 PID、绝对地址或窗口标题充当持久语义。
+- Adapter 可提供不透明 Stream Fingerprint、样本历史和重匹配证据；Probe 保存 Stream Binding，
+  目标重启后解析当前实例并分别报告 matched、degraded 或 unmatched。
+- 只有 Adapter 证明指纹跨启动稳定且可诊断后，Workflow 才能引用 Stream Binding；会话内调用点
+  不自动升级为 Region Binding。
+
 ### Adapter 扩展
 
 - 优先验证 DirectWrite；只有能稳定观察且具备安全写回 Seam 时才声明 TextReplace。
@@ -50,6 +59,12 @@ Target Execution
 - Runtime 默认继续精确匹配。大小写、空白或 Unicode normalization 只有在字典级显式策略和编译期
   冲突诊断同时成立时才考虑。
 - 模糊匹配和 AI 语义能力最多用于 Probe 的离线翻译建议，不进入目标进程实时决策。
+
+### Transform Profile
+
+- 捕获正规化、保护/排除和结果修正是独立、有序、版本化且有执行预算的规则资产，由 Probe 或
+  Workflow 显式组合；它们不进入 Dictionary Entry。
+- 首版只允许声明式、可预览和可测试的 Operator，不允许任意 Python、WASM 或脚本进入 Runtime。
 
 ## 明确拒绝
 
