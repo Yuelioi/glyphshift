@@ -37,8 +37,11 @@
 - 首个词典发布流程只导出可重新导入的标准 Dictionary `/2` JSON；不建立账号、审批、证书管理、
   远程发布后台或额外包格式。同 ID 导入明确拒绝，不静默覆盖。
 - requested state、Runtime actual state 与 applied generation 分别报告。
-- 添加软件只验证可访问、绝对路径的 `.exe` 绑定；Adapter/Hook 是否覆盖真实绘制路径必须在软件
-  运行后由激活或探针证据确认，不按软件名称静态猜测。
+- 添加软件验证可访问的 Windows PE、正在运行、非重复/自身目标、当前 `x86_64` Runtime 与文字
+  观察 Adapter 可用；Adapter/Hook 是否覆盖真实绘制路径仍须在添加后由激活或探针证据确认，
+  不按软件名称静态猜测。
+- 软件删除在停止 Runtime 前检查 Workflow 与 Probe Run 引用；有引用时保留软件和运行状态，并以
+  结构化数量参数在软件表显示解除方法。单项与批量删除复用同一命令，只有真实消失的行才清除选择。
 - 可分发桌面候选通过本地 Tauri override 嵌入已验证的 Release Runtime Bundle；跟踪的基础配置不
   保存本机路径。未配置代码签名时只称 unsigned candidate，不冒充公共发行版，也不自动执行安装器。
 
@@ -60,8 +63,13 @@
 - 默认页面是 Workflow 管理表；Software、Dictionary 与 Probe 是独立管理页，字体不占顶级导航。
 - 工作流实际状态直接区分软件未启动、权限、组件加载/兼容和超时等原因；错误状态可展开逐软件
   完整解释与恢复动作，不使用“需要处理”一类笼统汇总。
-- 创建与编辑复用 Nuxt UI Modal；管理页复用页头、表格框架、分页和确认 Module。
+- Workflow 创建/编辑、Software 编辑、Dictionary 详情与 Probe Run 详情使用共享头部的独立页；
+  简单创建和低频设置继续使用 Nuxt UI Modal。管理页复用页头、表格框架、分页和确认 Module。
+- 独立详情页支持 Esc 返回；可见 Modal、菜单或选择器优先消费 Esc。Workflow、Software 与
+  Dictionary 的未保存修改在返回、顶部导航和关闭窗口前统一保护。
 - 软件页不展示文字/字体功能；词典页不展示 Hook、Adapter 或字体配置。
+- 软件页提供浏览路径和 `Ctrl+Shift+F8` 两段式前台快速捕获，两条入口共享接入预检；捕获只预填
+  新增 Modal，不直接创建记录。等待捕获可取消，第二次按键后才读取前台进程并返回 Glyphshift。
 - 词典详情用一份显式草稿统管 metadata 与词条；主表直接编辑原文和译文并常驻空白新增行，便携
   metadata 在单列设置 Modal 中渐进披露。任何修改立即进入未保存状态，离开前必须保护草稿。
 - Dictionary metadata tags 是本地搜索与在线 Catalog 分类筛选的同一套语义；Catalog 支持点击标签
@@ -74,10 +82,12 @@
 - Probe 表格以 5,000 条为基准由 Rust 搜索分页，Vue 只持有当前页；1 秒 revision 轮询只在变化时
   重取当前页，分页模式不叠加虚拟滚动。
 - 管理表内容区保持连续表面色；空态铺满表头与分页之间空间，非空表最后一行保留底边界。
-- Workflow Editor 按“基础配置 / 软件与拦截 / 翻译词典 / 字体策略”四个任务 Tab 组织；每页内部
+- 本地 Workflow、Software、Dictionary 和 Probe Run 行可双击非交互区域进入编辑或详情，但显式
+  行级操作继续保留作为可发现和键盘可达的入口；复选框、开关、链接与按钮不触发该捷径。
+- Workflow Editor 按“基础配置 / 软件与拦截 / 翻译词典 / 字体策略”四个任务分区组织；每页内部
   保持单列，Dictionary 与 Font 各自只有一个可搜索目录并在行内处理选择和优先级。Adapter、
   Dictionary 栈与 Font Policy 仍按 Target 完全隔离，通过当前 Target 选择器切换配置上下文。
-  编辑 Modal 使用受视口约束的稳定工作区高度；顶部紧凑分段导航不滚动，当前 Tab 内容是主滚动区，
+  编辑页占满模块内容区；窄左栏只提供单层分区导航与问题徽标，右侧当前分区是主滚动区，
   软件、词典和字体等大集合目录再使用有界局部滚动。
 - Font Policy 的 coverage 使用紧凑“应用范围”选择器；字体目录标题显示缓存数量和显式刷新动作，
   不用两个满宽按钮承载二选一状态。

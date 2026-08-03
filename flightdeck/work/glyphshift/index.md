@@ -30,7 +30,7 @@ codec、校验与 mutation，Desktop Backend 只保留产品 DTO facade；
 `glyphshift-dictionary-distribution` 已提供 query/install/installations 深接口、强类型 Catalog 与签名
 合同，以及不冒充生产网络/密钥策略的 ports。文件型 Install Store 已闭合内容寻址制品、Installation
 Record、pending transaction、原子 active copy 与重开恢复；四个中断点只会收敛到完整旧版或完整
-新版。Desktop API v16 和 Backend Summary 已接入安装状态，Dictionary 页以本地/在线目录双模式
+新版。Desktop API 当前为 v17，Backend Summary 已接入安装状态，Dictionary 页以本地/在线目录双模式
 展示 provenance、后端搜索、metadata tag 精确筛选、cursor 分页、离线空态与安全覆盖确认；当前
 模式使用明确主色选中态。生产仍显式离线，等待真实 endpoint、publisher key policy 与部署配置。
 
@@ -45,10 +45,10 @@ Workflow compile 删除。Runtime 内部路由不回流到 Dictionary；当前 A
 设置、已有词条行内修改、末行新增和删除共享未保存状态，离开编辑器或关闭窗口前统一保护。
 生产构建与完整 Playwright 39 项通过，960×640 紧凑视口已完成视觉复核。
 
-Workflow Editor 已从固定左右主从栏和连续长表单，改为“基础配置 / 软件与拦截 / 翻译词典 /
-字体策略”四个任务 Tab。每页内部保持单列；软件与 Adapter 是一个连续阶段，Dictionary 与 Font
-各自使用单一可搜索列表并行内调整优先级。编辑 Modal 使用稳定工作区高度，紧凑分段导航固定在
-顶部，只有当前 Tab 内容滚动；大集合目录继续使用有界局部滚动。合成 10 个软件、100 份词典的
+Workflow Editor 已删除旧的软件主从栏和连续长表单，改为“基础配置 / 软件与拦截 / 翻译词典 /
+字体策略”四个任务分区。窄左栏只负责单层分区导航与问题提示，右侧保持一块完整任务内容；软件与
+Adapter 是一个连续阶段，Dictionary 与 Font 各自使用单一可搜索列表并行内调整优先级。独立编辑页
+占满模块内容区，只有右侧当前分区滚动；大集合目录继续使用有界局部滚动。合成 10 个软件、100 份词典的
 回归证明搜索、切换、优先级与 Target 隔离仍稳定。
 
 Font Policy 已收紧最后一处高占宽交互：coverage 已从两个满宽按钮改为“应用范围”选择器；本机
@@ -75,7 +75,23 @@ candidate。未安装 Release 桌面 smoke 通过，授权 AE 可见验收证明
 工作流 Runtime 错误反馈已完成首轮 UI 修复：后端原有结构化错误不再被表格压缩成“需要处理”。
 `runtime.target_not_found` 明确显示为“软件未启动”并使用警告色；权限、组件加载/兼容、超时等错误
 分别显示具体状态。点击状态可展开逐软件完整原因与恢复动作，工作流的持久启用期望保持不变。
-添加软件仍只校验可访问、绝对路径的 `.exe`；Hook 覆盖属于软件运行后的 Adapter 证据，不做静态猜测。
+软件接入预检与快速捕获已完成：新增前检查 Windows PE、当前运行状态、`x86_64` 架构、重复/自身
+目标和 Runtime 文本观察能力；后端在实际添加时再次校验，避免检查后目标状态变化。软件页可浏览
+程序后自动检查，也可用 `Ctrl+Shift+F8` 两段式捕获前台软件并返回确认。预检不宣称 Hook 已覆盖，
+真实绘制兼容仍由添加后的 Probe 或 Runtime 证据确认。Desktop API 已提升到 v17。
+
+软件删除入口与失败反馈已闭合：表格提供行级删除，单项与批量操作共享确认；无引用记录按最新
+后端快照移除，被 Workflow 或 Probe Run 引用的记录保留并显示具体数量和解除方法。失败项继续
+保持选择，引用拒绝发生在停止 Runtime 前，不会因一次无效删除改变运行状态。
+
+Dictionary 导出按钮已补齐 Tauri 保存窗口权限，原生保存窗口失败时在词典页显示可恢复错误。
+Workflow、Software、Dictionary 与 Probe Run 本地管理表统一支持双击非交互单元格进入编辑或详情；
+行级按钮继续保留，复选框、开关、链接和操作按钮不会误触双击捷径。
+
+四类本地管理对象的详情交互已统一：Workflow 创建/编辑与 Software 编辑不再使用 Modal，和
+Dictionary、Probe Run 一样进入占满模块内容区的独立页，并复用同一返回/标题/状态/动作头部。
+Esc 返回一级，可见浮层优先处理 Esc；Workflow、Software 与 Dictionary 的未保存修改在返回、
+顶部导航和关闭窗口前统一确认。生产构建、48 项 Playwright、宽屏与 960×640 视觉复核通过。
 
 后续实机验收发现两项底层缺陷：桌面重启后，目标内仍 active 的 Runtime 被再次激活并以
 `AlreadyActive(10)` 拒绝，但后端误报“组件不兼容”；多进程目标存在多个同路径实例时，Desktop
@@ -91,9 +107,8 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
 
 ## Next
 
-- 等待用户一并验收[Dictionary 行内草稿编辑](slices/dictionary-inline-draft-editing.md)和
-  [字体目录缓存与紧凑策略控件](slices/font-catalog-cache-and-compact-policy.md)，随后回到
-  [工作流 Runtime 错误反馈](slices/workflow-runtime-error-feedback.md)的 `AlreadyActive` 幂等接管。
+- 继续[工作流 Runtime 错误反馈](slices/workflow-runtime-error-feedback.md)：修复 `AlreadyActive` 误报
+  与多进程目标选择，并完成实机回归。
 
 ## Progress
 
@@ -141,8 +156,8 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
   新建空 Dictionary、联合查询、直接编辑、暂停恢复、导出及双 revision 刷新已闭合。管理表空态
   连续铺满且末行保留边界；Desktop build、27 项 Playwright、全 Rust workspace、Clippy、fmt 与
   架构检查通过。
-- Workflow Editor 四 Tab 化完成：基础信息、软件与拦截、翻译词典、字体策略按任务隔离；各页删除
-  左右主从栏和重复资产列表，以 Target 选择器保持多软件配置上下文；Modal 高度和顶部导航保持
+- Workflow Editor 四分区完成：基础信息、软件与拦截、翻译词典、字体策略按任务隔离；各页删除
+  旧软件主从栏和重复资产列表，以 Target 选择器保持多软件配置上下文；编辑区高度和左侧导航保持
   稳定，切换 Tab 不再引起窗口跳动或让导航共用内容滚动条。10 软件/100 词典合成边界、生产构建、
   设计扫描与 30 项 Playwright 全部通过。
 - 桌面生产构建与 GUI 回归覆盖双词典排序、内联字体候选排序与 coverage、多 Target 暂存隔离、
@@ -164,6 +179,19 @@ Runtime status，但 Tauri 错误映射将其丢弃；位数不匹配与 Bundle 
   字体时复用旧 glyph ID 导致的乱码；Release Bundle 真实宿主合同和停止恢复通过，安装器仍未执行。
 - 工作流 Runtime 错误反馈首轮完成：删除“需要处理”汇总并提供逐软件详情；实机随后确认
   `AlreadyActive` 被误报为组件不兼容，且多进程目标固定取第一项会选错实例，底层修复待完成。
+- 软件接入预检与快速捕获完成：Windows Controller 提供 PE/架构/运行状态和前台进程检查，Tauri
+  注册 `Ctrl+Shift+F8` 两段式快捷键，软件 Modal 必须检查通过才允许保存。Desktop build、41 项
+  Playwright、相关 Rust 测试、Clippy、fmt 与 UI detector 全部通过。
+- 软件删除反馈完成：新增行级删除；被 Workflow/Probe 引用时保留记录、选择与 Runtime，并显示
+  可执行原因。完整 Playwright 44 项、Desktop Shell 34 项、生产构建、Clippy、fmt 与 UI detector 通过。
+- Dictionary 导出与管理表快捷编辑完成：补齐 `dialog:allow-save` 和保存窗口失败反馈；四类本地
+  管理表支持安全双击，显式操作入口保持不变。生产构建、完整 Playwright 46/46 与 UI detector 通过。
+- 本地管理详情页统一完成：Workflow/Software 编辑改为独立页，四类详情复用返回标题；Esc、顶部
+  导航和窗口关闭遵守浮层优先与未保存保护。生产构建、完整 Playwright 48/48、宽/紧凑视觉证据与
+  UI detector 通过。
+- Workflow 独立编辑页根据实机视觉反馈改为 176px 左侧单层分区栏与右侧任务内容；返回收紧为
+  详情头标准箭头，基础表单限制阅读宽度，大集合继续占用完整右区。完整 Playwright 48/48、
+  1440×900/960×640 视觉证据与 UI detector 通过。
 
 ## References
 

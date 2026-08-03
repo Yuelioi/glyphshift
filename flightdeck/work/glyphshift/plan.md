@@ -39,3 +39,11 @@
   [Slice](slices/dictionary-inline-draft-editing.md)
 - [x] 缓存本机字体目录并收紧 Workflow Font Policy 的应用范围控件。
   [Slice](slices/font-catalog-cache-and-compact-policy.md)
+- [x] 为软件接入增加前置检查与两段式前台程序快速捕获。
+  [Slice](slices/software-preflight-and-quick-capture.md)
+- [x] 修复软件行级删除与被引用删除的可见反馈。
+  [Slice](slices/software-deletion-feedback.md)
+- [x] 修复 Dictionary 导出保存窗口并统一本地管理表双击编辑捷径。
+  [Slice](slices/management-row-double-click-and-dictionary-export.md)
+- [x] 将 Workflow、Software、Dictionary 与 Probe Run 统一为独立详情页，并补齐 Esc 返回和未保存保护。
+  [Slice](slices/independent-management-detail-pages.md)
