@@ -1,6 +1,6 @@
 # Observation Stream Identity
 
-Status: In progress
+Status: Deferred
 
 ## Outcome
 
@@ -30,7 +30,10 @@ unmatched，而不是依赖 PID、绝对地址、窗口标题或 Dictionary loca
 时绑定一个输出路径；diagnostics query 返回并取走最近批次。它们都不能表达候选流身份或安全的
 多消费者进度。
 
+该能力不直接增加任何软件的实时翻译覆盖，当前从主线撤下。只有真实软件出现“同一 Adapter 必须区分
+多个文字来源、且该区分需要跨重启保持”的可复现需求时才恢复；此前 Dictionary、Probe 和 Workflow
+继续不暴露 location 或 Stream Binding。
+
 ## Next
 
-沿 Adapter Native ABI → Target Runtime `TextObservation` → Capture/diagnostics 保存链列出可用与
-缺失信号，先用合成 evidence 设计最小 fingerprint 和 cursor 合同，不修改 Dictionary 或 UI。
+等待真实翻译覆盖工作提供具体需求和可验证的 Adapter 证据；当前不实现。

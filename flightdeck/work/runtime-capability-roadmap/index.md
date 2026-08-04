@@ -9,6 +9,10 @@ Status: Open
 
 ## Current
 
+优先级已纠正：本 Work 现在只保存后续运行时能力 Roadmap，不再是当前执行主线。Observation Stream、
+跨启动 Binding 与 Probe/诊断/Workflow 共享 Hook 都不能直接增加实时翻译覆盖，已延后到真实软件案例
+证明必要时再恢复。当前 Focus 转到[通用实时翻译覆盖](../real-time-translation-coverage/index.md)。
+
 Process Family Stage 已交付。Software Extension 现在可声明显式后代可执行文件 allowlist，并经
 Desktop Runtime Spec、Controller Host 配置进入 Windows Controller；工作流和 Dictionary 不承担
 进程关系。授权根仍优先使用用户选择的完整路径，后代必须同时命中 allowlist 且位于已授权进程树。
@@ -80,9 +84,8 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 
 ## Next
 
-- 按 [Observation Stream Identity](slices/observation-stream-identity.md)盘点 Native ABI、Runtime
-  observation、Capture catalog 与 diagnostics 的现有信号，冻结最小 Stream fingerprint、独立 cursor
-  和跨重启匹配合同；不修改 Dictionary 或 UI。
+- 等待[通用实时翻译覆盖](../real-time-translation-coverage/index.md)产生具体阻塞；只有真实软件必须区分
+  多个文字流、共享同一 Hook 或跨启动恢复选择时，才恢复对应 Slice。
 
 ## Progress
 

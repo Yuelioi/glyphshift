@@ -31,7 +31,9 @@ Session，TargetProcessHost 也能登记多个 target；缺口不是再包一层
 query 会取走最近批次。现在增加 Owner/Subscriber Interface 无法提供真实多读，只会复制
 DesktopRuntimePool 已有的软件级互斥。
 
+该优化不增加新的可翻译软件，也不改善现有端到端翻译成功率，当前从主线撤下。现有软件级互斥继续
+保留，其限制可以接受，直到真实并发使用场景证明共享 Hook 的用户价值。
+
 ## Next
 
-先完成 Observation Stream Identity、有界多游标读取和重启重匹配合同。具备真实可共享的数据源后，
-再从本 Slice 恢复，证明 Owner/Subscriber 生命周期而不重复注入。
+等待真实产品场景证明必须让 Probe、诊断和 Workflow 同时连接同一软件；当前不实现。
