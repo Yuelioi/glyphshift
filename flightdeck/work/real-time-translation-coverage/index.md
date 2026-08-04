@@ -14,21 +14,54 @@ Status: Open
 桌面工具的部分界面得到写回证据。Console 与 UI Automation 目前只有采集价值，不能作为实时翻译
 成功。Direct2D `DrawText` 已通过合成写回，但在当前授权目标中零命中，因此尚未进入生产 Bundle。
 
+DirectWrite TextLayout 的两种常见绘制入口也完成过窄原型：合成目标可以观察、替换，并让同一布局在
+停用后恢复、重新启用后再次替换；复杂多段格式会安全放行。但 AE 与 WPF 授权测试均为零命中，所以
+实验实现已从工作区撤回，只保留否决结论，不进入生产 Bundle，也不计入软件支持范围。
+
+当前已补齐两段实时更新合同：Probe 内编辑译文会保存到绑定 Dictionary 并发布下一代预览；GDI+
+确定性 Windows 宿主在不重启目标的情况下能从首版译文切换到第二代，诊断确认两代均为
+`Matched + Replaced`，停止后恢复原文。既有软件上的补充可见验收不再占用当前主线，后续只在明确
+需要补充发布证据时恢复。
+
+Qt Widgets `QPainter::drawText` 绘制链现已完成。Qt 5/6 MSVC x64 ABI 分支均通过本地 QImage 合成
+宿主的像素替换、同进程第二代 Dictionary 更新与停用恢复；首个授权目标因静态链接 Qt 在注入前被
+安全拒绝，没有退化成软件专用签名扫描。随后动态链接 Qt 6 Widgets 真实目标完成可见验收：菜单原文
+按 Qt 助记符语义命中字典，首版译文、第二代热更新译文和停用后的原文恢复均可见，诊断同时记录
+`Matched + Replaced`。Adapter 已进入正式 Runtime Bundle 与中文目录，边界明确为动态链接 Qt 5/6
+Widgets；QML、静态 Qt、富文本与静态文字缓存仍不在承诺内。
+
 此前运行时 Roadmap 将 Observation Stream、跨启动 Binding 和共享 Hook 提到当前主线；这些工作不能
 增加可翻译软件数量，现已退回后续 Roadmap。尚未提交的 Observation Stream 实现已撤回，现有简单
 Workflow/Probe 互斥继续保留。
 
 ## Next
 
-- 完成[下一种实时写回 Adapter 选择](slices/next-writeback-adapter.md)：按现有 Bundle、真实证据与通用
-  Windows 文字路径建立支持矩阵，选择一个有明确目标软件和可见写回验收的 Adapter，不先扩建观察
-  平台。
+- Qt Painter 切片已完成；按既有候选顺序进入
+  [WinUI/MRT 文字路径诊断](slices/winui-mrt-path-diagnostic.md)，先回答声明式 `x:Uid` 是否真实命中
+  可安全替换的 MRT 原生入口。
+- 只有显式 API、`ResourceLoader` 与 `x:Uid` 三层合同中代表性声明式路径成立，才继续真实软件 smoke；
+  否则记录否决结论，不建设 CLR Profiler 或按软件写特例。
 
 ## Progress
 
 - 已重新确认产品主线是“探针发现原文 → Dictionary 提供译文 → Adapter 实时写回”，而不是通用观察
   数据平台。
 - 已将采集能力与实时翻译能力分级；UIA、Console 等 observe-only 能力保留，但不计入实时翻译覆盖。
+- 已用合成目标验证 DirectWrite 两种布局绘制入口，并在授权真实目标上完成零命中否决；没有把成功
+  注入或加载模块误报成翻译支持。
+- 已验证 Probe 译文编辑会产生下一代预览发布；桌面 Shell 单元测试 38/38 通过。
+- 已验证 GDI+ Dictionary 在同一目标进程内发布第二代并立即替换，停止后恢复原文。
+- 已比较 Qt、WinUI/MRT、WPF 与 Web 桌面壳入口；Qt 绘制链进入下一有界原型，其余候选保留在
+  调研结论中，不并行扩张实现面。
+- Qt Painter 纯逻辑 6/6 通过；既有 Native Host 常规合同 8/8 通过，另有 1 项无 Qt 模块 fail-open 通过；
+  显式配置的 Qt 5 与 Qt 6 本地像素合同各 1/1 通过，并逐一覆盖 4 个核心 overload。原始本机日志只
+  保留在本地证据目录。
+- 首个授权 Qt 6 目标在注入前确认为静态链接 Qt；没有动态 Qt 模块或文字导出，因此按既定边界安全
+  否决，没有把产品适配器降级成单软件、单版本签名扫描。
+- 动态链接 Qt 6 Widgets 目标完成真实可见验收：首版与热更新译文各有 2 次
+  `Matched + Replaced`，停用后恢复原文；正式 Bundle 复测捕获 40 次绘制并命中替换 2 次。
+- Qt Painter 已加入正式 Bundle 构建与 Adapter 中文目录；完整仓库测试通过，本机截图与原始日志仍只
+  位于忽略的本地证据目录。
 
 ## References
 
@@ -36,3 +69,4 @@ Workflow/Probe 互斥继续保留。
 - [领域语言](../../../CONTEXT.md)
 - [Windows 软件支持分级](../runtime-capability-roadmap/references/windows-software-support-and-console-gap.md)
 - [后续运行时能力 Roadmap](../runtime-capability-roadmap/index.md)
+- [下一 Adapter 第一方资料评审](references/next-adapter-primary-source-review.md)
