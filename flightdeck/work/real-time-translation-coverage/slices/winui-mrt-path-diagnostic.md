@@ -1,6 +1,6 @@
 # WinUI/MRT 文字路径诊断
 
-Status: Planned
+Status: Complete
 
 ## Outcome
 
@@ -9,11 +9,30 @@ Status: Planned
 
 ## Delivery
 
-- [ ] 建立三层确定性宿主：显式 MRT C API、`ResourceLoader.GetString`、声明式 XAML `x:Uid`。
-- [ ] 对每层记录入口命中、原文取得、返回值内存所有权、Dictionary 替换和停用恢复；无法证明内存
+- [x] 建立三层确定性宿主：显式 MRT C API、`ResourceLoader.GetString`、声明式 XAML `x:Uid`。
+- [x] 对每层记录入口命中、原文取得、返回值内存所有权、Dictionary 替换和停用恢复；无法证明内存
   所有权时只观察并否决写回。
-- [ ] 只有声明式 `x:Uid` 代表性路径也命中同一安全入口，才选择一个授权、小型真实目标做可见 smoke。
-- [ ] 真实目标仍须同时满足入口命中、Dictionary 匹配、可见译文和停用恢复，之后才允许进入 Bundle。
+- [x] 已判断声明式 `x:Uid` 不命中显式字符串的同一入口，因此按既定闸门停止在合成原型，不进入真实
+  目标 smoke。
+- [x] 未进入 Runtime Bundle，也未把加载时替换计入实时翻译覆盖。
+
+## Result
+
+- 微软第一方源码与合成宿主实测闭合了两条不同调用链：`ResourceLoader.GetString` 和显式字符串读取
+  命中 `MrmLoadStringResource`，默认 WinUI 3 `x:Uid` 属性包命中
+  `MrmLoadStringOrEmbeddedResourceByIndex`。
+- 两个入口均可在精确字典命中时使用 `MrmAllocateBuffer` / `MrmFreeResource` 对称替换；声明式入口还须
+  同时满足字符串类型和 `Text` / `Content` 等文本属性白名单。合成窗口中的三类原文均得到可见译文。
+- 停用 Hook 后重新创建窗口，三类资源均恢复原文；已经加载进控件的值不会被通用 MRT API 主动刷新或
+  回滚。因此这条能力只能定义为“WinUI 3 / MRT Core 加载时字典替换”，不符合当前 Work 对立即更新与
+  停用恢复的完整实时翻译承诺。
+- 原始命中日志、宿主二进制与本机运行证据只保留在本地测试目录；仓库仅记录可移植结论。
+
+## Decision
+
+本切片对“生产级实时翻译 Adapter”作 **No-Go**，不继续真实目标与 Bundle 集成。若后续产品明确接受
+“新页面或重新加载后生效、旧界面不自动恢复”的独立能力，可在 Roadmap 中以加载时资源 Adapter 重新立项，
+并补齐属性包来源追踪、版本闸门和真实目标验收。
 
 ## Boundaries
 
@@ -24,3 +43,4 @@ Status: Planned
 ## References
 
 - [下一 Adapter 第一方资料评审](../references/next-adapter-primary-source-review.md)
+- [WinUI 3 / MRT Core 原生入口诊断](../references/winui-mrt-primary-source-diagnostic.md)

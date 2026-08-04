@@ -35,17 +35,29 @@ Qt Widgets `QPainter::drawText` 绘制链现已完成。Qt 5/6 MSVC x64 ABI 分�
 `Matched + Replaced`。Adapter 已进入正式 Runtime Bundle 与中文目录，边界明确为动态链接 Qt 5/6
 Widgets；QML、静态 Qt、富文本与静态文字缓存仍不在承诺内。
 
+WinUI 3 / MRT Core 三层诊断也已完成。显式 `ResourceLoader.GetString` 与声明式 `x:Uid` 分别命中
+`MrmLoadStringResource` 和 `MrmLoadStringOrEmbeddedResourceByIndex`，合成宿主可按 MRM 配对分配器完成
+精确替换，并在停用后重新加载窗口恢复原文。但 `x:Uid` 是加载时赋值，已显示控件不能通用地即时刷新或
+回滚；同时两条路径并不存在一个共同的窄入口。因此它不进入当前实时翻译 Bundle，只保留为未来可选的
+“加载时资源替换”能力。
+
+动态 GTK 3 / Pango 绘制链也已完成。Adapter 只挂公开 `gtk_render_layout`，读取原始 UTF-8 后复制
+`PangoLayout` 并在副本上应用 Dictionary 译文；普通文本与全范围样式可替换，markup、mnemonic、link 等
+局部 byte-index 样式安全放行。离屏像素合同、第一代/第二代热更新、停用恢复、无模块拒绝激活和正式控制器
+注入链均通过，Adapter 已进入正式 Runtime Bundle 与中文目录。GTK 4 标准控件依赖私有 snapshot 入口，
+继续维持 No-Go。
+
 此前运行时 Roadmap 将 Observation Stream、跨启动 Binding 和共享 Hook 提到当前主线；这些工作不能
 增加可翻译软件数量，现已退回后续 Roadmap。尚未提交的 Observation Stream 实现已撤回，现有简单
 Workflow/Probe 互斥继续保留。
 
 ## Next
 
-- Qt Painter 切片已完成；按既有候选顺序进入
-  [WinUI/MRT 文字路径诊断](slices/winui-mrt-path-diagnostic.md)，先回答声明式 `x:Uid` 是否真实命中
-  可安全替换的 MRT 原生入口。
-- 只有显式 API、`ResourceLoader` 与 `x:Uid` 三层合同中代表性声明式路径成立，才继续真实软件 smoke；
-  否则记录否决结论，不建设 CLR Profiler 或按软件写特例。
+- [WinUI/MRT 文字路径诊断](slices/winui-mrt-path-diagnostic.md)已完成并对生产实时 Adapter 作 No-Go；
+  不建设 CLR Profiler、PRI 修改或按软件写特例。
+- [GTK 3 Pango 绘制时写回](slices/gtk3-pango-draw-writeback.md)已完成并进入正式 Bundle；GTK 4 维持
+  No-Go。下一步重新按“可取得原文、同链安全写回、跨软件复用、停用恢复”排序剩余候选，不默认扩张到
+  CLR Profiler 或 Web 调试连接。
 
 ## Progress
 
@@ -69,6 +81,12 @@ Workflow/Probe 互斥继续保留。
   `Matched + Replaced`，停用后恢复原文；正式 Bundle 复测捕获 40 次绘制并命中替换 2 次。
 - Qt Painter 已加入正式 Bundle 构建与 Adapter 中文目录；完整仓库测试通过，本机截图与原始日志仍只
   位于忽略的本地证据目录。
+- WinUI 3 合成宿主确认 `ResourceLoader.GetString` / 显式 C API 命中 `MrmLoadStringResource`，默认
+  `x:Uid` 命中 `MrmLoadStringOrEmbeddedResourceByIndex`；三类文本均完成精确替换，停用后重新加载恢复
+  原文。由于旧控件不能即时刷新或回滚，该能力未进入真实目标 smoke 与正式 Bundle。
+- GTK 3 / Pango 纯逻辑 6/6 与无模块拒绝激活 1/1 通过；真实 Pango 属性范围、普通/全范围样式替换、
+  局部样式放行和停用恢复均由像素合同确认。正式 Bundle 的后台注入复测中，第一代与第二代 Dictionary
+  各命中替换 31 次，停止后恢复原文。
 
 ## References
 
@@ -77,3 +95,5 @@ Workflow/Probe 互斥继续保留。
 - [Windows 软件支持分级](../runtime-capability-roadmap/references/windows-software-support-and-console-gap.md)
 - [后续运行时能力 Roadmap](../runtime-capability-roadmap/index.md)
 - [下一 Adapter 第一方资料评审](references/next-adapter-primary-source-review.md)
+- [WinUI 3 / MRT Core 原生入口诊断](references/winui-mrt-primary-source-diagnostic.md)
+- [GTK/Pango 实时写回候选评审](references/gtk-pango-adapter-primary-source-review.md)
