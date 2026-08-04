@@ -45,10 +45,10 @@ UIA 候选不再只是 Registry 中的 `IsolatedWorker` 标签。仓库已具备
   重启。真实 UIA Provider 卡顿后的目标恢复和明确用户可见 reason code 尚未验证。
 - grant payload 是受信本地进程间的临时能力描述，不是持久 token；真实 Worker 仍必须校验 PID start time，
   防止 PID reuse。
-- UIA Descriptor 未加入 Runtime Bundle、构建脚本或 Desktop Adapter catalog。
+- UIA Descriptor 与 Worker artifact 已由后续
+  [UIA Runtime Bundle 集成](uia-runtime-bundle-integration.md)加入正式构建脚本和 Desktop catalog。
 
 ## Next
 
-通用 transport 无剩余交付；元素/窗口重建也已由真实 Client 合同覆盖。继续从
-[Windows UIA MTA Client](windows-uia-mta-client.md)追踪高完整性权限、永久阻塞 Provider 后的目标恢复
-与人工恢复入口。
+通用 transport 无剩余交付；元素/窗口重建、永久阻塞 Provider 恢复、高完整性权限与正式 Bundle /
+catalog 集成都已由后续切片覆盖。

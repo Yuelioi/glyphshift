@@ -37,21 +37,24 @@
   不再把同一个 checkpoint 路径传入多个目标进程。
 - [x] [评估 UI Automation observe-only Seam](slices/uia-observer-seam.md)：确认其应为独立 MTA
   Worker；该评估确定的 Observation Ingress、单写入聚合与 Worker/IPC 前置现均已由后续切片交付，
-  UIA 仍不进入 Bundle。
+  生产提升由后续安全与 Bundle 切片完成。
 - [x] [交付 Isolated Worker/IPC 与合成 UIA Provider 策略](slices/uia-isolated-worker-transport.md)：
   Controller grant、Hybrid Host、generation、暂停、health、deactivate tail 与 Desktop 单写入 owner 均有
   进程合同；Name、TextPattern、ValuePattern、密码拒绝和变化去重有确定性合同。
 - [x] [实现真实 Windows MTA UIA Client 与事件 handler](slices/windows-uia-mta-client.md)：标准 Win32
   控件合同覆盖初始 Name/Text/Value、属性/文本变化、结构失效触发、handler 移除、进程实例 grant 校验、
-  有界队列和密码内容拒绝；仍不进入正式 Bundle。
+  有界队列和密码内容拒绝。
 - [x] 补齐元素销毁重建后的真实 UIA 恢复：确定性目标销毁并重建顶层窗口和四类控件，同一 Worker
   重新发现新 RuntimeId、失效旧元素并继续采集，重建后的密码内容仍不进入 capture。
 - [x] 在授权 AE 完成两轮 observe-only smoke：每轮 5 秒均得到 21 条唯一公开文本，Worker health 为
   Healthy 且无降级码；原文只保存在本地 evidence。
-- [ ] 补齐高完整性目标和永久阻塞 Provider 合同；密码属性读取已失败关闭，Worker health 已能稳定
-  报告 `uia_permission_denied`，Host 和 Desktop command 会分别上送权限拒绝与超时。通用 Worker
-  超时立即回收、新 generation 恢复、60 秒最多 3 次限频与预算耗尽诊断合同已完成。两个安全合同
-  完成后再决定是否进入正式 Bundle。
+- [x] 补齐高完整性合成目标权限合同；真实 Provider 永久阻塞后的 Worker 回收、目标解除阻塞后的
+  新 generation 重连，以及预算耗尽后的停止/重新连接恢复已完成。密码属性读取已失败关闭，Worker
+  health 已能稳定报告 `uia_permission_denied`，Host 和 Desktop command 会分别上送权限拒绝与超时。
+  授权 UAC 合同证明更高完整性目标在任何 observation 发布前稳定拒绝，测试进程也能有界退出。
+- [x] [将 `windows.uia.observe` 接入正式 Runtime Bundle / Desktop catalog](slices/uia-runtime-bundle-integration.md)：
+  只进入 Probe 的 observe-only 候选，Workflow 仍只接纳 `TextReplace`；Worker artifact 缺件、正式
+  Desktop capture、密码排除和初始 generation `0` 均有合同。
 - [ ] 只在结构化 Adapter 无法覆盖且用户明确选择时评估 Window Capture、OCR observe-only 与
   Change Trigger Policy 组成的兜底。
 - [ ] 按真实缺口分别决定 Direct2D、Direct3D、OpenGL 或 Vulkan 是否立项。
@@ -71,3 +74,15 @@
 
 - [ ] 只有精确匹配出现可复现缺口时才设计 Dictionary Match Policy 和冲突诊断。
 - [ ] 将模糊/AI 能力限制为 Probe 离线建议，并保留人工确认与确定性 Runtime Publication。
+
+## Stage 7：引擎感知扩展（后续）
+
+- [ ] 依据[引擎翻译能力调研汇总](references/engine-translation-capability-summary.md)定义正式
+  Support Matrix：Engine/runtime、build mode、观察来源、应用方式、版本、证据与失败语义分别记录。
+- [ ] 用授权真实目标验证首个 Engine-aware Extension；优先调查与桌面工具相关的
+  V8/Chromium/WebView 或托管运行时结构化 Seam，不按游戏类型或宣传覆盖数量选择目标。
+- [ ] Unity Mono 与 IL2CPP 等差异明显的构建后端分别立证，不发布无版本边界的引擎级支持声明。
+- [ ] 评估隔离的通用进程内文字观察器：只声明 `TextObserve`，并先固定候选流选择、跨启动 Binding、
+  权限与崩溃恢复合同；不把原文提取成功等同于实时写回。
+- [ ] 若确认项目文件/资源汉化需求，另开 Content Adapter / Importer Work；Dictionary 只承接可复用的
+  `source + translation`，不承接资源定位和回写状态。

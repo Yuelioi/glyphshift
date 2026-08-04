@@ -49,10 +49,18 @@ handler，以 1 秒有界扫描弥补 Provider 漏事件，并在读取文本前
 失败关闭，Worker health 也能报告 `uia_permission_denied`；Host 和 Desktop command 已将权限拒绝与
 超时分类为现有用户错误。确定性合同也已证明顶层窗口和完整标准控件树销毁重建后，同一 Worker 会注册
 新 root、失效旧元素并继续采集。授权 AE 已连续两轮在 5 秒内观察到 21 条唯一公开文本，health 均为
-Healthy，因此真实收益门槛已通过。当前剩余门槛只有高完整性权限合同与人为永久阻塞 Provider 后的
-目标恢复。通用 Host 已能立即回收超时 Worker，并以新 producer generation 按每 60 秒最多 3 次限频
-重启；预算耗尽后 health 会稳定报告 `isolated_worker_restart_exhausted`。这些仍不能替代真实 UIA
-安全证据，因此暂不进入 Bundle。
+Healthy，因此真实收益门槛已通过。人为永久阻塞真实 Provider 后的目标恢复也已通过：Worker 超时会
+被立即回收，解除目标阻塞后可用新 producer generation 重新连接；预算耗尽后现有停止/重新连接入口
+也能移除终态 supervisor 并恢复 Healthy。显式授权 UAC 合同进一步证明：目标完整性高于 Worker 时，
+激活会在任何 observation 发布前稳定返回 `uia_permission_denied`，不会把部分可见 UIA 根误报为
+Healthy。UIA 的生产安全门已完成；Descriptor 与 Worker artifact 也已进入正式 Bundle / Desktop
+catalog。Desktop 只为包含隔离 Adapter 的 recipe 签发临时 grant，UIA 只在 Probe capture 中启动；
+Workflow 的翻译候选仍只接纳 `TextReplace`。正式合成目标合同已证明公开标准控件可采集且密码不入库。
+
+同类工具的引擎翻译能力汇总已完成。公开清单可用作市场覆盖地图，但公开资料不足以证明逐项技术接入点；
+Glyphshift 因此新增后续 Engine-aware Integration Stage，以 build mode、观察来源、应用方式、版本、
+证据和失败语义定义支持。项目文件/资源改写将来另走 Content Adapter Work，不混入 Runtime Adapter
+或 Dictionary。
 
 Capture seam 已完整贯通：`CaptureIngress` 热路径非阻塞并区分 accepted、paused 与 dropped；Target
 Runtime 只拥有 batch producer，Controller 跨进程 drain，Desktop TargetProcessHost 为每个 target 校验
@@ -72,14 +80,14 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 
 ## Next
 
-- 按 [Windows UIA MTA Client](slices/windows-uia-mta-client.md)继续验证高完整性目标和人为永久阻塞
-  Provider 后的目标释放/重启；授权真实目标 smoke 已通过，但在两个安全门槛完成前不修改 Dictionary，
-  也不提前加入正式 Bundle。
+- 按 [Observation Stream Identity](slices/observation-stream-identity.md)盘点 Native ABI、Runtime
+  observation、Capture catalog 与 diagnostics 的现有信号，冻结最小 Stream fingerprint、独立 cursor
+  和跨重启匹配合同；不修改 Dictionary 或 UI。
 
 ## Progress
 
 - 已完成 AI 评审路由，建立采纳门槛和明确的非目标；Roadmap 按真实证据逐 Stage 推进。
-- 已完成 LunaTranslator 产品与运行时一手资料调研，冻结 Observation Stream、Transform Profile
+- 已完成同类 Hook/翻译工具的一手资料汇总，冻结 Observation Stream、Transform Profile
   及可选输入/输出能力的路由边界。
 - Process Family Stage 完成：Extension → Runtime Spec → Controller 配置贯通显式后代 allowlist；
   合成生命周期与授权 AE 的 9 实例 inventory 合同通过，全 workspace、Clippy、fmt 与架构检查全绿。
@@ -100,8 +108,7 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 - 完成 Console 真实进程 parent/child 合同：父 Hook 不继承到子进程，Controller 逐 target 部署后
   观察与诊断隔离；因捕获 checkpoint 仍是单目标写入模型，不在 Desktop Runtime 中盲目全家族扇出。
 - 完成 UI Automation observe-only Seam 评估：固定独立 MTA Worker、事件生命周期、最小文本通道、
-  会话内去重和权限降级；单写入聚合、Worker/IPC 与真实 MTA Client 前置现均已完成，仍因缺少权限和
-  卡顿回收合同而暂不进入正式 Bundle。
+  会话内去重和权限降级；单写入聚合、Worker/IPC、真实 MTA Client、权限与卡顿回收合同均已完成。
 - 修复真实 Desktop Adapter 目录遗漏 observe-only 能力的问题；Console Observer 现可进入 Probe
   选择，但仍不会出现在 Workflow 的翻译 Adapter 列表。
 - 交付进程内 `CaptureIngress` Interface：两个并发 producer 合流到唯一 checkpoint owner，旧 ingress
@@ -121,7 +128,7 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
   `windows-process-v1` 进程实例 grant，UI 与 Dictionary 不接触 PID 或平台 payload。
 - 完成 `HybridAdapterHost` Placement 路由以及 UIA 纯策略：`windows.uia.observe` 仅声明
   `TextObserve + ObserveOnly + IsolatedWorker`；Name、TextPattern、ValuePattern 优先级、密码拒绝、
-  UTF-16 上限、A→B→A 变化和元素失效均通过合成合同。Descriptor 未进入正式 Bundle。
+  UTF-16 上限、A→B→A 变化和元素失效均通过合成合同。Descriptor 后续已进入正式 Bundle。
 - 完成真实 Windows MTA UIA Client 最小链路：Worker 校验 PID + 创建时间 grant，只注册授权进程的
   可见窗口；标准 Win32 控件合同证明初始 Name/Text/Value、变化观察、handler 移除和密码拒绝。事件
   队列、单次树宽和文本均有界，并用 1 秒全量扫描弥补 Provider 不发送 Name 变化事件。
@@ -136,6 +143,15 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
   新 root、失效旧 RuntimeId 并继续采集公开文本，重建后的密码仍被拒绝；所有等待均有超时边界。
 - 完成参数化授权真实目标 UIA smoke：授权 AE 连续两轮 5 秒采集均得到 21 条唯一公开文本，Worker
   health 为 Healthy 且无降级码；原文和机器身份只保存在本地 evidence。
+- 完成真实 UIA Provider 阻塞恢复：标准控件窗口线程永久阻塞时 Worker 在有界时间内被回收；解除阻塞
+  后新 Worker 重新采集。Supervisor 预算耗尽后，现有停止/重新连接生命周期也能恢复 Healthy。
+- 增加同完整性显式断言和默认忽略的高完整性权限合同；授权 UAC 运行证明更高完整性目标在 observation
+  发布前被稳定拒绝，capture 为空且测试目标有界退出。UIA 与 Host 专项保持全绿。
+- 完成 [UIA Runtime Bundle 集成](slices/uia-runtime-bundle-integration.md)：Bundle 泛化验证
+  observe-only Worker artifact，Desktop 按 recipe 最小化签发 grant；Probe catalog、缺件拒绝和正式
+  Desktop capture 合同通过，初始空 publication generation `0` 不再误拒绝握手。
+- 完成引擎翻译能力汇总：确认同类公开清单适合作为覆盖参考而非实现证明；新增后续 Engine-aware
+  Support Matrix 路线，并将文件/资源汉化明确路由到独立 Content Adapter Work。
 
 ## References
 
@@ -144,7 +160,6 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 - [AI 评审路由结论](references/ai-review-assessment.md)
 - [产品领域语言](../../../CONTEXT.md)
 - [Capability Adapter 调研](../glyphshift/references/adapter-registry-and-cross-platform-interception-research.md)
-- [LunaTranslator 产品与运行时调研](../glyphshift/references/lunatranslator-product-runtime-research.md)
 - [Process Family Controller Inventory](slices/process-family-controller-inventory.md)
 - [Target Execution 所有权](slices/target-execution-ownership.md)
 - [Observation Stream Identity](slices/observation-stream-identity.md)
@@ -157,3 +172,5 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 - [UI Automation observe-only Seam](slices/uia-observer-seam.md)
 - [UIA Isolated Worker transport 与合成 Provider](slices/uia-isolated-worker-transport.md)
 - [Windows UIA MTA Client](slices/windows-uia-mta-client.md)
+- [UIA Runtime Bundle 集成](slices/uia-runtime-bundle-integration.md)
+- [引擎翻译能力调研汇总](references/engine-translation-capability-summary.md)

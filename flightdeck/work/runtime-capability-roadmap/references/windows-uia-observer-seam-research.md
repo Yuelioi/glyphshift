@@ -1,5 +1,8 @@
 # Windows UI Automation observe-only Adapter seam 调研
 
+Delivery update: 本文记录的是立项时的门槛；真实 MTA Client、权限、阻塞恢复与 Bundle 集成现均已完成，
+当前交付状态以 [UIA Runtime Bundle 集成](../slices/uia-runtime-bundle-integration.md)为准。
+
 ## 结论
 
 Windows UI Automation（UIA）适合补充 GlyphShift 的**结构化文字观察能力**，但它不是绘制 Hook，
@@ -21,7 +24,7 @@ UIA Core 和兼容代理连接原生 UIA、MSAA 与其他框架 Provider。
   `FileCaptureSink`；若 UIA worker 或多个 Process Family 成员直接写同一 checkpoint，会产生覆盖、
   revision 竞争和重复数据。UIA worker 只能经 IPC 发出有界 Observation，由中央聚合器负责排序、去重
   和一次性写入。
-- 当前仓库虽已有 `Placement::IsolatedWorker`、`ObserveOnly` 和 Registry 绑定能力，但没有生产可用的
+- 调研当时仓库虽已有 `Placement::IsolatedWorker`、`ObserveOnly` 和 Registry 绑定能力，但没有生产可用的
   isolated worker process、IPC host 与中央聚合数据面；Target Runtime 也只加载目标进程 native DLL。
   因此本轮只确定技术合同与合成验证计划，**不把 UIA Adapter 加入正式 Runtime Bundle**。
 - UIA 只能作为 GDI、DirectWrite、Console 等绘制/输出 seam 的补充观察源，不能被描述成
@@ -295,14 +298,13 @@ Provider 可能为同一次 UI 更新发出 Name change、Text change、Structur
    Worker rejection code。
 3. **中央 Observation/Capture Aggregator（已完成）**：Target Runtime 只产生有界 batch，Desktop
    为多个 producer 维护独立 cursor，并由一个进程外 `FileCaptureSink` owner 串行写 checkpoint。
-4. **权限与能力 Probe（部分完成）**：无窗口、权限不足、Provider 超时和 worker 崩溃已有独立内部
-   reason；权限拒绝与超时可上送为现有用户错误，仍缺高完整性实测。
-5. **Worker Watchdog 与资源预算（基础完成）**：事件量、树宽度、文本长度和重启频率已有明确上限；
-   仍缺人为永久阻塞 Provider 与重启预算耗尽后的真实恢复合同。
+4. **权限与能力 Probe（已完成）**：无窗口、权限不足、Provider 超时和 worker 崩溃已有独立内部
+   reason；权限拒绝与超时可上送为现有用户错误，授权 UAC 合同已覆盖更高完整性失败关闭。
+5. **Worker Watchdog 与资源预算（已完成）**：事件量、树宽度、文本长度和重启频率已有明确上限；
+   真实 Provider 永久阻塞、Worker 回收、目标释放、新 generation 重连和预算耗尽后的人工恢复均有合同。
 
-真实 MTA UIA Client、标准控件事件、密码拒绝、窗口树重建、基础 watchdog 与资源预算现已完成；在
-高完整性和永久阻塞 Provider 合同完成前，把 UIA descriptor 塞进正式 Bundle 仍会制造支持程度不完整的
-Adapter。
+真实 MTA UIA Client、标准控件事件、密码拒绝、窗口树重建、watchdog、资源预算、高完整性与永久阻塞
+Provider 合同均已完成。UIA descriptor 可以进入独立的 observe-only Bundle / catalog 集成切片。
 
 ### 6.3 不进入首版的能力
 
@@ -347,15 +349,15 @@ Adapter。
 - 固化本文的 Placement、线程、内容优先级、权限、identity 和失败语义。
 - 为 isolated worker handshake、generation 与 bounded observation batch 写协议合同，不加载真实 UIA。
 - 复用已完成的多 producer / 单 writer Aggregator 合同，把合成 IsolatedWorker producer 接入同一 owner。
-- UIA descriptor 仅存在于测试 fixture 或 research slice，不进入构建脚本、catalog 或正式 Bundle。
+- UIA descriptor 在该阶段仅存在于测试 fixture 或 research slice，不进入构建脚本、catalog 或正式 Bundle。
 
-### 阶段 B：技术原型
+### 阶段 B：技术原型（已完成）
 
 - 实现最小独立 MTA worker，只支持显式 top-level root、`Name` 与合成 Text/Value Provider。
 - 通过生命周期、事件洪水、卡死 watchdog、x86/x64 和完整性诊断矩阵。
 - 真实目标 smoke 只产生 local evidence，用来判断 UIA 对现有 GDI/DirectWrite 缺口是否有实际增益。
 
-### 阶段 C：生产候选门槛
+### 阶段 C：生产候选门槛（已完成）
 
 - Isolated Worker Host、IPC、中央 Aggregator、Watchdog 与诊断状态全部已有生产合同。
 - 至少一个明确目标软件证明 UIA 能稳定补充高价值文字，且跨重启 fingerprint 的 degraded/unmatched 行为
@@ -367,6 +369,6 @@ Adapter。
 
 UIA 值得保留为后续 observe-only Adapter，但它的价值在于“从可访问性 Provider 取得结构化候选”，不是
 替代所有绘制 Hook。GlyphShift 已建立**进程外 Observation/Capture Aggregator 单写入数据面**，并完成
-通用 Isolated Worker、有界 IPC 与合成 Provider 策略合同。当前最合适的下一步是实现**真实 Windows MTA
-UIA Client、事件 handler、权限 Probe 与 watchdog 回收**。在这些能力通过合成标准控件验证前，UIA 不进入
-正式 Bundle；通过后再以 `IsolatedWorker / ObserveOnly / TextObserve` 的窄能力发布。
+通用 Isolated Worker、有界 IPC 与合成 Provider 策略合同。真实 Windows MTA UIA Client、事件 handler、
+权限 Probe、watchdog 回收与正式 Bundle 集成也已交付；发布边界保持
+`IsolatedWorker / ObserveOnly / TextObserve`。当前下一步是 Observation Stream Identity。

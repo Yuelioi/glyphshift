@@ -1,14 +1,14 @@
 # UI Automation observe-only Seam
 
-Status: Real Windows client and reconstruction complete; production promotion deferred
+Status: Complete; production promotion delivered
 
 ## Outcome
 
 UI Automation 被确认是标准 Windows 控件的高价值结构化观察来源，但不作为目标进程 DLL Hook。
 正式实现必须运行在独立 MTA Worker 中，经有界 Observation Ingress 交给 Desktop 侧单写入者聚合。
 Ingress、跨进程 batch transport、单写入 owner、Worker/IPC、授权 grant、Host 生命周期、文本策略与真实
-Windows MTA Client 均已完成；标准控件、事件、密码拒绝和完整窗口树重建已有确定性合同。在高完整性与
-永久阻塞 Provider 合同完成前，不进入正式 Runtime Bundle。
+Windows MTA Client 均已完成；标准控件、事件、密码拒绝、完整窗口树重建、永久阻塞 Provider 恢复和
+更高完整性失败关闭均有确定性合同。正式 Runtime Bundle 接入也已由后续切片完成。
 
 ## Product Boundary
 
@@ -45,11 +45,8 @@ Windows MTA Client 均已完成；标准控件、事件、密码拒绝和完整�
 当前仓库已有 `Placement::IsolatedWorker`、observe-only Registry、有界 Observation batch transport、
 逐 producer cursor、Desktop 单写入 Capture owner、Isolated Worker 进程宿主/IPC、Worker Target Grant、
 Hybrid Host、真实 COM MTA Client、事件 handler、标准控件/重建 fixture、超时立即回收和限频重启。
-生产链仍缺少：
-
-1. 同完整性与高完整性目标的真实权限合同，不自动提权。
-2. 人为永久阻塞 Provider 后的目标释放、Worker 重建和超过重启预算后的人工恢复入口。
-3. UIA 与绘制 Hook 同时命中时的来源证据和可选短时呈现去重。
+生产安全门已完成；仍可独立改进 UIA 与绘制 Hook 同时命中时的来源证据和可选短时呈现去重，但它不
+阻止 observe-only Bundle 接入。
 
 因此不能把 UIA 临时标为 `TargetProcess`，也不能让它另开一个 `FileCaptureSink` 与现有 Hook 竞争同一
 探针文件。
@@ -65,5 +62,5 @@ Hybrid Host、真实 COM MTA Client、事件 handler、标准控件/重建 fixtu
 
 ## Next
 
-继续按 [Windows UIA MTA Client](windows-uia-mta-client.md)完成高完整性与永久阻塞 Provider 合同；
-授权 AE smoke 已证明稳定观察收益；继续验证高完整性与永久阻塞 Provider，再决定是否进入 Bundle。
+安全门与 [UIA Runtime Bundle 集成](uia-runtime-bundle-integration.md)均已完成；后续工作回到
+[Observation Stream Identity](observation-stream-identity.md)，Probe-only、observe-only 边界保持不变。

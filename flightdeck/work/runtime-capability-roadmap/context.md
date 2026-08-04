@@ -44,7 +44,9 @@ Target Execution
   失败关闭，并在 Worker health 中保留 `uia_permission_denied`；Host/Session/Desktop command 已将
   权限拒绝与 Worker 超时上送为稳定的现有用户错误，重启预算耗尽也会保留
   `isolated_worker_restart_exhausted`。完整窗口树销毁重建后的 root 重注册、旧元素失效和继续采集已有
-  真实合同；剩余前置是高完整性合同与人为永久阻塞 UIA Provider 后的目标恢复。
+  真实合同。真实 Provider 永久阻塞后的 Worker 回收、目标解除阻塞后的新 generation 重连，以及重启
+  预算耗尽后的停止/重新连接恢复均已通过。授权 UAC 合同也证明更高完整性目标会在发布任何 observation
+  前以稳定权限码失败关闭；UIA 的生产安全门已完成。
 
 ### Observation Stream
 
@@ -77,13 +79,29 @@ Target Execution
   属性/文本/结构事件、handler 移除和密码拒绝；Worker 超时也会立即回收并按每 60 秒最多 3 次重启。
   `IsPassword` 读取失败已失败关闭，`E_ACCESSDENIED` 已保留为 Worker health reason，并已分类上送到
   Desktop command；完整窗口树重建后的 root 重注册和旧 RuntimeId 失效已有真实合同。授权 AE 连续
-  两轮 5 秒 smoke 均观察到 21 条唯一公开文本且 health 为 Healthy。生产链仍缺高完整性目标与永久阻塞
-  Provider 恢复，因此暂不进入正式 Bundle。
+  两轮 5 秒 smoke 均观察到 21 条唯一公开文本且 health 为 Healthy。真实 Provider 阻塞恢复、预算耗尽
+  后人工重连与更高完整性失败关闭均已通过。Descriptor 与 Worker artifact 现已进入正式 Bundle /
+  Desktop catalog，但仍只作为 Probe 的 observe-only 候选，不扩大为 `TextReplace`。
 - UIA 会话内可用 Target Instance + RuntimeId + 文本通道去重；AutomationId、ControlType、父链和样本
   只能作为跨重启重匹配证据，不能把 RuntimeId 或窗口标题持久化成稳定 Region。
 - OCR 是无法取得结构化文字时的显式兜底，必须标明延迟、置信度和隐私影响，不进入目标进程热路径。
 - Direct2D、Direct3D、OpenGL 和 Vulkan 仅在目标软件证据显示真实缺口后分别立项，不创建万能图形
   Renderer。
+
+### Engine-aware Integration
+
+- 同类工具公开的引擎清单只作为市场覆盖参考，不作为 Glyphshift 的实现或支持证明；完整判断见
+  [引擎翻译能力调研汇总](references/engine-translation-capability-summary.md)。
+- 对外的“支持”必须拆成 Engine/runtime identity、build mode、观察来源、应用方式、已验证版本、
+  失败语义和证据；Unity Mono 与 IL2CPP 等构建模式不能合并成一个技术能力。
+- 引擎识别和能力组合属于 Software Extension / Adapter / Isolated Worker；Core、Dictionary 和 GUI
+  不按引擎品牌分支。Galgame、乙游等内容类型以及 Live2D 等中间件不能直接作为 Adapter taxonomy。
+- 项目文件、脚本或资源包的扫描与回写属于后续独立 Content Adapter / Importer Work，不复用实时
+  Runtime Adapter 的生命周期，也不把资源位置与改写证据塞入 Dictionary Entry。
+- 首个 Engine-aware 验证必须由授权真实目标和确定性 Fixture 驱动；对当前桌面工具方向，优先调研
+  V8/Chromium/WebView 等结构化接入，再按实际需求评估游戏专用引擎。
+- 公开实现抽样只证明通用进程内文字观察和文本流选择，没有证明通用译文写回；类似能力只能作为
+  隔离的 observe-only Adapter Pack 候选，不能提升为 `TextReplace`。
 
 ### 原生稳定性与布局
 
