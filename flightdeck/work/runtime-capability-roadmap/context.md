@@ -33,9 +33,18 @@ Target Execution
 - 一个目标实例只维护一套注入、Adapter Host 和 Hook，避免 Workflow 与 Probe 竞争或重复注入。
 - Publication Owner 独占文字/字体写回；Observation Subscriber 只能消费有界观察流。
 - 只有真实的并发探针、诊断或协作需求证明价值后，才替换当前简单所有权规则。
-- 当前 Target Runtime 的 capture 是 activation-time 单一 FileCaptureSink，diagnostics query 是取走式
-  批次；在独立 cursor 的 Observation Stream 交付前，Owner/Subscriber 注册表不能提供真实共享，
-  Workflow/Probe 软件级互斥继续保留。
+- Target Runtime capture 已改为 batch producer，Desktop TargetProcessHost 为每个 target 维护独立 cursor
+  并由唯一 `FileCaptureSink` 写 checkpoint；Process Family Probe 不再多写文件。Runtime diagnostics
+  仍是取走式单消费者，Workflow/Probe 也仍会重复注入，因此在独立多读 Observation Stream 交付前，
+  Publication Owner/Subscriber 注册表继续延后，软件级互斥保留。
+- Capture module 已提供可克隆、非阻塞的 `CaptureIngress`、有界 batch producer 与跨批次 cursor 校验；
+  Target Runtime callback 只持有 ingress。batch 经 Runtime drain export、Windows Controller 与 Host
+  跨进程返回，Desktop 已成为唯一 `FileCaptureSink` owner。UIA 已复用同一 ingress、Isolated Worker、
+  IPC 与生命周期 ack；通用 Host 已具备超时立即回收和限频重启。UIA 对密码属性读取失败会
+  失败关闭，并在 Worker health 中保留 `uia_permission_denied`；Host/Session/Desktop command 已将
+  权限拒绝与 Worker 超时上送为稳定的现有用户错误，重启预算耗尽也会保留
+  `isolated_worker_restart_exhausted`。完整窗口树销毁重建后的 root 重注册、旧元素失效和继续采集已有
+  真实合同；剩余前置是高完整性合同与人为永久阻塞 UIA Provider 后的目标恢复。
 
 ### Observation Stream
 
@@ -48,11 +57,30 @@ Target Execution
 
 ### Adapter 扩展
 
-- 优先验证 DirectWrite；只有能稳定观察且具备安全写回 Seam 时才声明 TextReplace。
+- DirectWrite/Direct2D 首个候选已收敛为 `ID2D1RenderTarget::DrawText`：只在每次绘制时替换 UTF-16，
+  仅声明 `TextObserve + TextReplace`；会保留译文的 `CreateTextLayout` 不满足停用恢复语义。合成
+  DCRenderTarget 与 WIC 合同通过，但授权 AE 为零命中，因此原型不进入当前生产 Bundle。
 - Console client 与 Console/Terminal host 是独立技术边界；当前四个目标进程内 GDI/GDI+ Adapter
-  在隔离 CMD 持续输出中为零信号。Console 输出、Process Family 与 ConPTY-owned session 单独评估，
-  不把成功注入或 PE 子系统当作文字覆盖证明。
+  在隔离 CMD 持续输出中为零信号。`windows.console.write-console` 已作为
+  `TextObserve + ObserveOnly + TargetProcess` 进入正式 Bundle，只观察被注入进程实际经过
+  `KernelBase!WriteConsoleW` 的 UTF-16 调用；不声明子进程、重定向、完整 Terminal session 或
+  `TextReplace` 覆盖。Adapter 在上报前剥离 ANSI/VT 控制序列：纯控制调用不生成候选，样式与 OSC
+  包裹的可见文字继续保留。Process Family 与 ConPTY-owned session 继续单独评估。
+- 真实进程合同已证明 TargetProcess Hook 不随父子关系继承；Controller 按 opaque target 对家族成员
+  独立部署。Workflow 仍只选择一个 target，Probe 未显式缩小时会激活全部已授权成员；各 target 只产
+  batch，Desktop 单写入 owner 串行写一个 checkpoint。
 - UI Automation 优先作为 observe-only Adapter，不把可访问性树等同于实际绘制文字。
+- UI Automation 固定为 `ObserveOnly + IsolatedWorker` 候选：专用无窗口 MTA 线程拥有 Client 与事件
+  handler，不能伪装为 TargetProcess DLL。中央 Observation Ingress 与单写入 Capture owner 已完成；
+  Isolated Worker `/1`、受监督进程 Host、Controller 签发的临时平台 grant、Hybrid Placement 路由、
+  health/deactivate ack、合成文本策略与真实 Windows MTA Client 已完成。标准控件合同覆盖初始扫描、
+  属性/文本/结构事件、handler 移除和密码拒绝；Worker 超时也会立即回收并按每 60 秒最多 3 次重启。
+  `IsPassword` 读取失败已失败关闭，`E_ACCESSDENIED` 已保留为 Worker health reason，并已分类上送到
+  Desktop command；完整窗口树重建后的 root 重注册和旧 RuntimeId 失效已有真实合同。授权 AE 连续
+  两轮 5 秒 smoke 均观察到 21 条唯一公开文本且 health 为 Healthy。生产链仍缺高完整性目标与永久阻塞
+  Provider 恢复，因此暂不进入正式 Bundle。
+- UIA 会话内可用 Target Instance + RuntimeId + 文本通道去重；AutomationId、ControlType、父链和样本
+  只能作为跨重启重匹配证据，不能把 RuntimeId 或窗口标题持久化成稳定 Region。
 - OCR 是无法取得结构化文字时的显式兜底，必须标明延迟、置信度和隐私影响，不进入目标进程热路径。
 - Direct2D、Direct3D、OpenGL 和 Vulkan 仅在目标软件证据显示真实缺口后分别立项，不创建万能图形
   Renderer。

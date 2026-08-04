@@ -10,17 +10,48 @@
 
 - [x] 将当前独占规则评估为单一 Target Execution、一个 Publication Owner 与多个只读 Subscriber；
   在多游标 Observation Stream 交付前保留现有互斥。
+- [x] [定义进程内有界 `CaptureIngress`](slices/observation-capture-ingress.md)：多个 producer 只持有
+  cloneable non-blocking ingress，唯一 `FileCaptureSink` owner 管理 checkpoint、revision 和暂停。
+- [x] 冻结 `glyphshift.capture-observation-batch/1` payload：producer generation、严格递增 sequence、
+  累计 dropped 与记录/字节硬上限均有确定性合同。
+- [x] 将 batch 接入 Target Runtime drain export 与 Controller transport；真实 Windows 注入合约证明
+  Console 观察可经 Controller Host 返回，现有文件式 capture 保持不变。
+- [x] 把唯一 Capture owner 移到 Desktop，并让多个 Target Runtime producer 串行写入同一 checkpoint；
+  pause/resume、成员退出隔离与 stop drain 已由真实 Windows 父子进程合同验证。
 - [ ] 定义 Adapter 提供的 Observation Stream Identity、样本历史、匹配置信度与持久 Binding 合同。
 - [ ] 验证目标重启后按当前实例重匹配 Stream，并分别报告 matched、degraded 与 unmatched。
 - [ ] 证明 Probe、诊断和 Workflow 共享 Hook 时不会重复注入、竞争写回或提升错误 Feature 状态。
 
 ## Stage 3：Windows Adapter 覆盖
 
-- [ ] 先研究并原型验证 DirectWrite Adapter 的 observe/replace Seam。
-- [ ] 按[软件支持分级与 Console 缺口](references/windows-software-support-and-console-gap.md)评估
-  Console client 输出、Process Family 与 ConPTY-owned session；不把客户端成功注入等同于终端
-  可见文字覆盖。
-- [ ] 评估 UI Automation observe-only Adapter 与绘制观察的去重关系。
+- [x] [研究并完成 DirectWrite / Direct2D `DrawText` 合成原型](slices/directwrite-adapter-prototype.md)。
+- [x] 在授权 AE 记录 `DrawText` 零命中，否决为 AE 或当前生产 Bundle 提升该原型。
+- [ ] 只有另一个授权目标先证明真实 `DrawText` 命中、render target 类型与可见替换，才重新评估
+  Direct2D 生产化。
+- [x] 按[Console Adapter Seam 调研](references/windows-console-adapter-seam-research.md)实现
+  [`WriteConsoleW` observe-only Adapter](slices/console-write-console-observer.md)，正式 Bundle 与授权 CMD
+  实测通过；不把客户端成功注入等同于 session 覆盖。
+- [x] 以真实 Windows 合成 parent/child 验证 Console Process Family：父进程 Hook 不观察子进程，
+  Controller 对子 target 单独部署后才观察且诊断流隔离；当前不立项 Controller-owned ConPTY。
+- [x] 生产 Process Family Probe 使用 Desktop 单写入者 aggregation；每个 target 独立 producer/cursor，
+  不再把同一个 checkpoint 路径传入多个目标进程。
+- [x] [评估 UI Automation observe-only Seam](slices/uia-observer-seam.md)：确认其应为独立 MTA
+  Worker；该评估确定的 Observation Ingress、单写入聚合与 Worker/IPC 前置现均已由后续切片交付，
+  UIA 仍不进入 Bundle。
+- [x] [交付 Isolated Worker/IPC 与合成 UIA Provider 策略](slices/uia-isolated-worker-transport.md)：
+  Controller grant、Hybrid Host、generation、暂停、health、deactivate tail 与 Desktop 单写入 owner 均有
+  进程合同；Name、TextPattern、ValuePattern、密码拒绝和变化去重有确定性合同。
+- [x] [实现真实 Windows MTA UIA Client 与事件 handler](slices/windows-uia-mta-client.md)：标准 Win32
+  控件合同覆盖初始 Name/Text/Value、属性/文本变化、结构失效触发、handler 移除、进程实例 grant 校验、
+  有界队列和密码内容拒绝；仍不进入正式 Bundle。
+- [x] 补齐元素销毁重建后的真实 UIA 恢复：确定性目标销毁并重建顶层窗口和四类控件，同一 Worker
+  重新发现新 RuntimeId、失效旧元素并继续采集，重建后的密码内容仍不进入 capture。
+- [x] 在授权 AE 完成两轮 observe-only smoke：每轮 5 秒均得到 21 条唯一公开文本，Worker health 为
+  Healthy 且无降级码；原文只保存在本地 evidence。
+- [ ] 补齐高完整性目标和永久阻塞 Provider 合同；密码属性读取已失败关闭，Worker health 已能稳定
+  报告 `uia_permission_denied`，Host 和 Desktop command 会分别上送权限拒绝与超时。通用 Worker
+  超时立即回收、新 generation 恢复、60 秒最多 3 次限频与预算耗尽诊断合同已完成。两个安全合同
+  完成后再决定是否进入正式 Bundle。
 - [ ] 只在结构化 Adapter 无法覆盖且用户明确选择时评估 Window Capture、OCR observe-only 与
   Change Trigger Policy 组成的兜底。
 - [ ] 按真实缺口分别决定 Direct2D、Direct3D、OpenGL 或 Vulkan 是否立项。

@@ -19,23 +19,62 @@ token。合成 inventory 已覆盖嵌套后代、重排、根先退出、成员�
 8 个后代、3 类辅助可执行文件；参数化实机合同发现 9 个目标实例。结论是首个生产 Process Family
 应由独立 AE Software Extension 显式声明这些成员，Core 不增加品牌分支。
 
-当前 Desktop Runtime 仍只选择 inventory 的第一个目标，并把 Controller Connection 转移给单个
-SessionManager；Controller 已将同路径顶层根进程稳定排在后代 utility 前，因此常见的“选中辅助
-进程”缺陷已修复。多个彼此独立的顶层实例仍需要显式 Target Selection；Workflow 与 Probe 继续以
-软件级互斥避免重复注入。下一阶段仍需判断是否把它深化为单一 Target Execution：最多一个
-Publication Owner，允许多个只读 Observation Subscriber，共享同一套注入和 Hook。
+Workflow 仍选择 inventory 的第一个目标，Controller 将同路径顶层根稳定排在后代 utility 前；多个
+独立顶层实例的写回仍需要显式 Target Selection。Probe 未显式缩小目标时现在会激活全部已授权
+Process Family 成员，每个 target 独立部署 Hook 与 batch producer，但所有批次由 Desktop 单写入 owner
+汇入一个 checkpoint。Workflow 与 Probe 继续以软件级互斥避免重复注入。
 
-Target Execution 盘点已完成并否决立即增加租约注册表：SessionManager 本身已经能管理多 Session，
-真正缺口是 Target Runtime 只有 activation-time 单一 FileCaptureSink，Runtime diagnostics 也是
-取走最近批次的单消费者语义。没有稳定 Observation Stream Identity 与多游标读取，Owner/Subscriber
-Module 只会搬运现有互斥状态，不能减少注入或提供安全共享。因此当前互斥保留。Observation Stream
-合同仍是共享执行的前置条件，但不阻塞独立 Adapter 扩展；根据当前产品优先级，下一实施阶段先验证
-DirectWrite，再回到流身份与多读复用。
+Target Execution 盘点已完成并否决立即增加租约注册表：Process Family capture 的多 producer/single
+writer 已解决，但 Runtime diagnostics 仍是取走最近批次的单消费者语义，Workflow 与 Probe 也仍会
+形成不同的 Publication 所有权。没有稳定 Observation Stream Identity 与多游标读取，Subscriber
+Module 仍不能减少注入或提供安全共享。因此当前互斥保留，Observation Stream 合同仍是共享执行前置。
+
+Direct2D `DrawText` 合成原型已完成，但授权 AE 中命中为零，未进入生产 Bundle。Windows Console
+`WriteConsoleW` 观察器已完成并作为第五个 Adapter 进入正式 Bundle：它只供探针采集当前被注入进程
+实际经过该 API 的 UTF-16 文本，不执行翻译写回，也不承诺子进程或完整 Terminal session 覆盖。授权
+隔离 CMD 场景得到 18 次命中和 `Open`、`File`、`Edit` 三类干净候选；后续 Clink 场景暴露的
+ANSI/VT 控制序列现已在 Adapter 边界剥离，纯控制调用不再污染观察索引。
+
+Console Process Family 边界也已用真实 Windows 父子进程合同固定：父进程部署不会观察子进程，必须
+对每个 target 独立部署。Desktop Probe 现会为全部已授权成员部署独立 batch producer，由进程外唯一
+owner 写同一 checkpoint；暂停、恢复、成员退出隔离和 stop drain 均通过真实父子进程合同。
+
+UI Automation Seam 调研已完成。它适合补充标准控件的结构化文字，但正确 Placement 是独立 MTA
+Worker，不是目标进程 DLL；可访问性语义也不等同于实际绘制。Observation Ingress 与 Desktop 单写入
+Capture owner 已完成。`glyphshift.isolated-worker/1`、受监督进程 Host、Controller Worker Target Grant、
+Hybrid Placement 路由与合成 Provider 文本策略现也已贯通；暂停、generation、health、deactivate tail
+和同一 checkpoint 均有跨进程合同。真实 Windows MTA UIA Client 现也已通过标准 Win32 控件进程合同：
+只枚举授权 PID 的可见顶层窗口，初始读取 Name/TextPattern/ValuePattern，注册属性、文字和结构变化
+handler，以 1 秒有界扫描弥补 Provider 漏事件，并在读取文本前拒绝密码控件。密码属性不可读时会
+失败关闭，Worker health 也能报告 `uia_permission_denied`；Host 和 Desktop command 已将权限拒绝与
+超时分类为现有用户错误。确定性合同也已证明顶层窗口和完整标准控件树销毁重建后，同一 Worker 会注册
+新 root、失效旧元素并继续采集。授权 AE 已连续两轮在 5 秒内观察到 21 条唯一公开文本，health 均为
+Healthy，因此真实收益门槛已通过。当前剩余门槛只有高完整性权限合同与人为永久阻塞 Provider 后的
+目标恢复。通用 Host 已能立即回收超时 Worker，并以新 producer generation 按每 60 秒最多 3 次限频
+重启；预算耗尽后 health 会稳定报告 `isolated_worker_restart_exhausted`。这些仍不能替代真实 UIA
+安全证据，因此暂不进入 Bundle。
+
+Capture seam 已完整贯通：`CaptureIngress` 热路径非阻塞并区分 accepted、paused 与 dropped；Target
+Runtime 只拥有 batch producer，Controller 跨进程 drain，Desktop TargetProcessHost 为每个 target 校验
+producer/generation/sequence/gap，并把记录串行送入唯一 `FileCaptureSink`。
+
+跨进程 observation payload 也已冻结为 `glyphshift.capture-observation-batch/1`：只包含受 supervisor
+管理的 producer、generation、累计 dropped 和严格递增 sequence，记录数、JSON 大小、标识符与原文
+均有硬上限，不携带 checkpoint 路径或翻译状态。Target Runtime 的互斥 batch producer、bounded drain
+export、Windows remote query、Controller SDK `/3` 与 Host transport 已贯通；真实 Windows Console
+注入合约证明观察可跨进程取回且不会与旧 file capture 双写。health/deactivate ack 留到
+IsolatedWorker 成为第二个真实 producer 时共同固定。
+
+另外修复了正式 Desktop 目录只暴露 `TextReplace` Adapter 的缺陷：App 现在会展示包含任一有效能力的
+Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只保留 `TextReplace`，观察型能力
+不会被误提升成翻译能力。Probe 选择器同时明确区分“可实时翻译”和“仅采集原文”；混合选择不会关闭
+实时预览，Translation Snapshot 只绑定具备 `TextReplace` 的 Adapter。
 
 ## Next
 
-- 研究并原型验证 DirectWrite Adapter 的 observe/replace Seam；先用合成宿主证明文字观察、替换、
-  fail-open 和生命周期，再决定是否进入生产 Bundle。Console、UI Automation 与 OCR 不并入首个原型。
+- 按 [Windows UIA MTA Client](slices/windows-uia-mta-client.md)继续验证高完整性目标和人为永久阻塞
+  Provider 后的目标释放/重启；授权真实目标 smoke 已通过，但在两个安全门槛完成前不修改 Dictionary，
+  也不提前加入正式 Bundle。
 
 ## Progress
 
@@ -51,6 +90,52 @@ DirectWrite，再回到流身份与多读复用。
   不按可执行文件名增加特例。
 - 修复 Target Runtime 等价部署重连与 Controller 同路径根优先排序；完整回归通过。独立多根实例
   的显式选择继续保留在本 Roadmap，不把窗口标题或进程品牌写入通用 Controller。
+- 完成窄 `ID2D1RenderTarget::DrawText` 原型：仅声明 `TextObserve + TextReplace`，真实 DCRenderTarget
+  与 WIC render target 均验证观察、像素级替换、失败开放、停用恢复和重新激活；授权 AE 为零命中，
+  因此未接入生产 Bundle。
+- 完成 `windows.console.write-console` observe-only Adapter：正式 Bundle、探针路由和授权隔离 CMD
+  18 次命中均通过；工作流不显示观察型 Adapter，换行符不会进入候选词条。
+- 修复真实 Clink 输出中的 ANSI/VT 控制序列污染：Console 边界剥离 CSI/OSC，纯控制调用丢弃、可见
+  正文保留；Probe 以能力分组展示 Adapter，混合观察/写回计划只向写回 Adapter 发布预览。
+- 完成 Console 真实进程 parent/child 合同：父 Hook 不继承到子进程，Controller 逐 target 部署后
+  观察与诊断隔离；因捕获 checkpoint 仍是单目标写入模型，不在 Desktop Runtime 中盲目全家族扇出。
+- 完成 UI Automation observe-only Seam 评估：固定独立 MTA Worker、事件生命周期、最小文本通道、
+  会话内去重和权限降级；单写入聚合、Worker/IPC 与真实 MTA Client 前置现均已完成，仍因缺少权限和
+  卡顿回收合同而暂不进入正式 Bundle。
+- 修复真实 Desktop Adapter 目录遗漏 observe-only 能力的问题；Console Observer 现可进入 Probe
+  选择，但仍不会出现在 Workflow 的翻译 Adapter 列表。
+- 交付进程内 `CaptureIngress` Interface：两个并发 producer 合流到唯一 checkpoint owner，旧 ingress
+  在 owner 结束后明确 dropped；现有 capture 与 Target Runtime 回归通过。
+- 冻结 `capture-observation-batch/1`：generation、sequence/gap 与 dropped 证据可诊断，所有输入有界且
+  deny-unknown；12 个 Capture 合同、完整 workspace、Clippy、fmt、架构与隐私门禁通过。
+- 贯通 observation transport：Target Runtime `/3` 以互斥 batch producer 模式导出有界批次，Windows
+  Controller 与 stdio SDK `/3` 拉取，Controller Host 重建受校验 Capture 对象；真实 Console 注入、
+  空批次心跳、独立进程 Host、完整 workspace、Clippy、fmt、架构与隐私门禁均通过。
+- 完成 Desktop 单写入 Process Family Probe：`CaptureObservationCursor` 校验跨批次 replay/gap，多个
+  target supervisor 共用一个 `FileCaptureSink`；真实父子 Console 合同覆盖暂停/恢复、统一 checkpoint、
+  子进程退出后父进程继续与 stop 收尾。pull 突然退出尾窗风险已明确记录。
+- 完成 Isolated Worker `/1` 与 Host：握手、独立 producer/publication generation、暂停、batch pull、
+  health、deactivate ack/tail 和隐藏进程退出均有合同；合成 Worker 与 TargetProcess producer 可复用
+  Desktop 拥有的同一 ingress/checkpoint。
+- Controller `/4` 新增 Worker Target Grant：Windows 只在已授权 opaque target 上签发临时
+  `windows-process-v1` 进程实例 grant，UI 与 Dictionary 不接触 PID 或平台 payload。
+- 完成 `HybridAdapterHost` Placement 路由以及 UIA 纯策略：`windows.uia.observe` 仅声明
+  `TextObserve + ObserveOnly + IsolatedWorker`；Name、TextPattern、ValuePattern 优先级、密码拒绝、
+  UTF-16 上限、A→B→A 变化和元素失效均通过合成合同。Descriptor 未进入正式 Bundle。
+- 完成真实 Windows MTA UIA Client 最小链路：Worker 校验 PID + 创建时间 grant，只注册授权进程的
+  可见窗口；标准 Win32 控件合同证明初始 Name/Text/Value、变化观察、handler 移除和密码拒绝。事件
+  队列、单次树宽和文本均有界，并用 1 秒全量扫描弥补 Provider 不发送 Name 变化事件。
+  `IsPassword` 读取失败时不再读文本，`E_ACCESSDENIED` 在 Worker health 中具有稳定 reason。
+- 完成 Worker timeout 最小 watchdog：超时立即终止进程，supervisor 以新 producer generation 恢复，
+  每 60 秒最多重启 3 次；合成卡顿 Worker 的恢复、继续采集和 deactivate 合同通过。
+- 保留并校验 Worker 拒绝码：UIA 权限拒绝与 Worker 超时已经 Host/Session/Desktop command 边界
+  上送为现有“目标访问失败”和“激活超时”语义，不向 UI 暴露任意 Worker 字符串。
+- 完成重启预算终态诊断：永久卡住的合成 Worker 耗尽每 60 秒最多 3 次重启后，Host health 稳定报告
+  `isolated_worker_restart_exhausted`，不再丢成泛化“Worker 不可用”。
+- 完成真实 UIA 窗口树重建合同：确定性目标销毁并重建顶层窗口和四类标准控件，同一 Worker 重新发现
+  新 root、失效旧 RuntimeId 并继续采集公开文本，重建后的密码仍被拒绝；所有等待均有超时边界。
+- 完成参数化授权真实目标 UIA smoke：授权 AE 连续两轮 5 秒采集均得到 21 条唯一公开文本，Worker
+  health 为 Healthy 且无降级码；原文和机器身份只保存在本地 evidence。
 
 ## References
 
@@ -63,4 +148,12 @@ DirectWrite，再回到流身份与多读复用。
 - [Process Family Controller Inventory](slices/process-family-controller-inventory.md)
 - [Target Execution 所有权](slices/target-execution-ownership.md)
 - [Observation Stream Identity](slices/observation-stream-identity.md)
+- [Observation / Capture Ingress](slices/observation-capture-ingress.md)
 - [Windows 软件支持分级与 Console 缺口](references/windows-software-support-and-console-gap.md)
+- [DirectWrite / Direct2D Adapter Seam 调研](references/directwrite-adapter-seam-research.md)
+- [Windows Console Adapter Seam 调研](references/windows-console-adapter-seam-research.md)
+- [Windows Console `WriteConsoleW` 观察适配器](slices/console-write-console-observer.md)
+- [Windows UI Automation Observer Seam 调研](references/windows-uia-observer-seam-research.md)
+- [UI Automation observe-only Seam](slices/uia-observer-seam.md)
+- [UIA Isolated Worker transport 与合成 Provider](slices/uia-isolated-worker-transport.md)
+- [Windows UIA MTA Client](slices/windows-uia-mta-client.md)
