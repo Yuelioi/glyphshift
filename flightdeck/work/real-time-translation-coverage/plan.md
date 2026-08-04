@@ -17,6 +17,8 @@
 
 - [x] 仅在真实写回验收通过后加入正式 Runtime Bundle、Adapter Catalog 与 Workflow 候选。
 - [x] Probe 编辑绑定 Dictionary 后保存并发布下一代预览；GDI+ 确定性目标无需重启即可使用新代次。
+- [x] [收敛探针与词典创建流程](slices/creation-flow-distillation.md)：创建时只询问必要信息，取消与
+  关闭完整丢弃未提交草稿，发布类元数据留在词典设置中维护。
 - [ ] 在干净重启的授权真实目标上完成
   [Probe 到 GDI+ 实时更新](slices/probe-gdiplus-live-update.md)的用户可见验收。
 - [ ] 对无信号、仅采集、字典未命中和写回失败分别返回清晰状态。
