@@ -64,3 +64,54 @@
   同时，编辑区由 DirectWrite 产生肉眼可见译文；只有两项证据同时成立才结束端到端验收。
 - [x] 复核真实级联菜单：一级与二级菜单均由既有 GDI/USER32 Adapter 捕获，并确认二级词条可生成
   `Matched + Replaced`；不为级联菜单另建 Adapter。
+
+## Stage 6：SDL3_ttf 技术门槛复核
+
+- [x] 完成 [SDL3_ttf 真实目标候选筛选](references/sdl3-ttf-real-target-candidates.md)：外部真实开源
+  目标仍缺，生产 Adapter 暂缓；官方 `showfont` 只作为确定性技术宿主。
+- [x] 完成 [SDL3_ttf `showfont` 技术 smoke](slices/sdl3-ttf-showfont-technology-smoke.md)：使用动态
+  SDL3_ttf 构建，确认 Renderer Text 绘制链、固定 UTF-8 原文以及首代、第二代与停用恢复的可实施性。
+- [x] 根据 smoke 结果收口：技术 seam 为 Go，但生产 Adapter 仍为 No-Go；在外部真实目标出现前不新增
+  生产 crate、Catalog 项、Runtime Bundle 或软件支持声明。
+
+## Stage 7：下一动态 C 绘制栈
+
+- [x] 完成 [SDL3_ttf 之后的动态 C 文字入口复核](references/post-sdl3-next-dynamic-c-seam-review.md)：
+  raylib 真实候选受 ASCII glyph atlas 阻断；Allegro/Open Surge 进入唯一下一实机 Go/No-Go。
+- [x] 完成 [Allegro / Open Surge 真实目标 smoke](slices/allegro-opensurge-real-target-smoke.md)：正式包
+  为静态/monolith；显式动态组合虽通过 PE、模块与导出检查，但无法形成健康运行目标，按门槛 No-Go。
+- [x] 只有动态 ABI、完整 UTF-8 segment 和可见写回同时通过，才进入 Allegro Adapter 实现；本轮运行
+  失败都以 No-Go 收口，不新增空置生产选项。
+
+## Stage 8：raylib fallback Font/atlas 原型
+
+- [x] 用 [raylib fallback Font/atlas 原型](slices/raylib-fallback-font-atlas-prototype.md) 明确资源状态机：
+  fallback atlas 只在有效 GPU context 的渲染线程创建、替换与销毁，停用立即恢复原字符串和原 Font。
+- [x] 在 Musializer 固定源码的 hot-reload Windows 构建中先确认 PE import、`raylib.dll` 实际加载与公开
+  文字入口命中，再验证首代中文、同进程第二代新增字形和停用恢复的可见像素。
+- [x] 状态机与真实目标四态均通过，判定技术与目标为 Go；默认 atlas 行式打包器被公开 skyline 路径
+  替代，缺字、零尺寸或重叠 rectangle 继续 fail-open。
+
+## Stage 9：raylib 生产 Adapter
+
+- [x] 完成 [raylib `DrawTextEx` 生产 Adapter](slices/raylib-draw-text-adapter.md)：实现描述符、Native ABI、
+  动态模块/导出门槛、Dictionary 决策与 fallback atlas 生命周期。
+- [x] 接入 workspace、架构约束、Native Host 合同、正式 Runtime Bundle 与中文目录；没有 `raylib.dll`
+  或兼容 fallback 字体时独立激活失败，不影响同进程其他健康 Adapter。
+- [x] 用正式 Bundle 在 Musializer 动态目标复测首代、第二代、停用和关闭清理；通过后才声明支持动态
+  raylib 5.5 兼容 `DrawTextEx`，不扩张到静态链接、复制绘制实现或纹理缓存文字。
+
+## Stage 10：raylib 之后的下一 Adapter
+
+- [x] 完成 [raylib 之后的下一写回 Adapter 选择](slices/post-raylib-next-writeback-adapter.md)：只比较有
+  外部真实目标、动态公开入口、完整原文与可恢复写回语义的候选，不把 UIA 观察或框架名称计入写回覆盖。
+- [x] 只选择一个候选进入有界 Go/No-Go；本轮没有候选越过真实目标与动态 ABI 门槛，已明确收口且未新增
+  空置 crate、目录选项或 Bundle 项。
+
+## Stage 11：Adapter 技术文档入口
+
+- [x] 完成 [Adapter 技术文档链接](slices/adapter-technical-documentation-links.md)：在清单、Runtime、
+  桌面快照和帮助页贯通可选 `documentationUrl`，旧 Bundle 缺字段时保持兼容。
+- [x] 为正式目录 10 个技术条目补齐官方 HTTPS 文档；桌面端只通过受限 Tauri Opener 在系统默认浏览器
+  打开，界面不显示裸 URL 或内部制品位置。
+- [x] 完成 Bundle、Rust、Clippy、架构、Playwright 和双尺寸视觉回归；缺文档时显示明确空状态。

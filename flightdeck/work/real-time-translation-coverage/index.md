@@ -100,10 +100,51 @@ DirectWrite 制品与清单摘要一致；既有 Probe Run 保留创建时的 Ad
 级联菜单不是新的 Adapter 缺口。开发期替换 Runtime DLL 后，如果目标进程仍加载旧 DLL，旧译文可能
 暂时可见但新观察不会继续回传；这种跨二进制版本升级仍要求重启目标软件，不能误判为二级菜单不支持。
 
+重新恢复覆盖主线后完成了有界本机候选盘点，但当前没有同时满足“已授权、可重复运行、属于尚未覆盖
+文字栈”的目标；已配置候选要么属于既有覆盖路线，要么当前不可用于测量。未经本机配置授权的运行软件
+不读取界面文字、不注入，也不为了推进议程扩大隐私边界。
+
+执行方向已再次确认：UI Automation 继续只作为 `ObserveOnly` 查看/取词能力，不进入实时写回成功；
+覆盖主线下一项必须由真实缺口驱动新的 `TextReplace` Adapter，交互式取词与外部呈现仍留在 Roadmap。
+
+SDL3_ttf 外部真实目标筛选与官方 `showfont` 技术 smoke 已完成。外部开源软件中仍未找到同时满足动态
+链接、公开 `TTF_Text` 绘制链与可重复 Windows 构建的目标；FreeRDP 的可见文字仍走 Surface/Texture
+缓存，因此生产 Adapter 继续暂缓。官方动态 `showfont` 则证明 `TTF_DrawRendererText` 能取得完整 UTF-8
+原文，瞬时译文 Text 可复制公开布局属性完成首代、同进程第二代和停用恢复的可见像素切换；中央缓存
+纹理文字保持原文，覆盖边界符合源码。该 smoke 只证明技术 seam 可实施，不计入真实软件支持。
+
+后续动态 C 绘制栈复核与 Allegro/Open Surge 实机 Go/No-Go 也已完成。Open Surge 正式 Windows 包没有
+独立 DLL 或 Allegro PE import，属于静态/monolith；显式动态源码构建虽成功导入并实际加载 Allegro core、
+font 与 TTF 模块，公开文字导出也存在，但预构建 `allegro_physfs` 与目标自身使用了不共享状态的 PhysFS
+实例，初始化即在资源读取路径崩溃。继续需要项目外定制重建整套依赖，已不再是可重复真实目标，因此
+Allegro 以 No-Go 收口，没有进入文字 Hook 或生产 Adapter。raylib 字符串入口仍受真实目标 ASCII glyph
+atlas 阻断，直接替换中文只会回退为问号。
+
+raylib fallback Font/atlas 原型与生产接入现已完成。纯状态机的 23 个转移先证明 GPU context、渲染线程、
+代次交换、帧尾回收与关闭顺序；生产 Adapter 随后只挂动态 raylib 5.5 兼容 `DrawTextEx`、`EndDrawing`
+和 `CloseWindow`，用公开 skyline atlas、48px fallback 栅格、mipmap 与双线性过滤绘制逐字形验证通过的
+译文。无模块、缺导出、无可用字体、缺字、非法 atlas、非 UTF-8、过长文本、重入或线程不一致均安全
+放行，静态链接、复制绘制实现和业务纹理缓存明确不在覆盖范围。
+
+正式九 Adapter Bundle 已在 Musializer 项目自有动态 hot-reload 构建中通过：首代和第二代各取得 256 条
+`Matched + Replaced`，像素分别显示两代完整中文；停用恢复英文，重新激活后在 atlas 仍活跃时直接关闭
+也能干净退出。真实字体、截图、日志与构建物仍只保存在本机私有目录。
+
+raylib 之后的候选复核也已完成。FLTK 有公开 UTF-8 `fl_draw`，但 Windows shared build 默认关闭、
+C++ DLL 要求编译器匹配，且当前没有外部动态真实目标；SFML 在绘制时只剩缓存 vertices，Open Hexagon
+显式静态链接；Dear ImGui 的 Tracy 候选也静态集成。本轮没有候选进入 Hook 或新增生产 Adapter。
+UI Automation 继续只作为查看/采集能力。
+
+Adapter 技术说明入口也已补齐。正式清单新增可选 `documentationUrl` 展示元数据，当前 10 个技术条目
+全部指向官方 HTTPS 资料；Runtime 会拒绝相对路径、非 HTTPS、带凭据或缺少主机名的显式 URL，同时
+兼容缺少字段的旧 Bundle。帮助页为每行提供“查看文档”，由受限 Tauri Opener 交给系统默认浏览器，
+不展示裸 URL、DLL 目标或内部 Adapter ID。
+
 ## Next
 
-- DirectWrite 桌面端到端验收与级联菜单边界均已闭环；下一轮从尚未覆盖的真实软件文字栈选择一个
-  小型、可重复授权目标，先用现有 Adapter 矩阵测量缺口，再决定是否需要新增 Adapter。
+- 等待新的、明确授权且可重复的 Windows 真实目标；按
+  [raylib 之后的候选复核](references/post-raylib-next-adapter-primary-source-review.md)先查 PE import、运行模块
+  与公开文字导出，固定可见词条命中后才恢复 Adapter 原型。
 - DirectWrite TextLayout 的底层生产接入已完成；WPF 等不经过公开 TextLayout 绘制入口的目标仍不在
   覆盖范围，不因加载 DirectWrite 模块而扩大支持声明。
 - 下一轮继续用“真实软件缺口 → 一手入口证据 → 有界原型 → 可见写回”的顺序选择文字技术，不以
@@ -185,6 +226,26 @@ DirectWrite 制品与清单摘要一致；既有 Probe Run 保留创建时的 Ad
 - 已验证真实级联菜单的二级词条同时命中 GDI ExtTextOut 与 USER32 DrawText；其中 ExtTextOut 二级词条
   取得 2 次 `Matched + Replaced`。级联菜单不新增 Adapter；开发构建替换已加载 Runtime DLL 时需重启
   目标进程，避免旧译文残留被误认为当前探针仍在连接。
+- 完成 [SDL3_ttf 真实目标候选筛选](references/sdl3-ttf-real-target-candidates.md)：FreeRDP 等外部候选的
+  可见文字仍落入 Surface/Texture 缓存，未满足生产门槛；官方 `showfont` 只作为确定性技术宿主。
+- 完成 [SDL3_ttf `showfont` 技术 smoke](slices/sdl3-ttf-showfont-technology-smoke.md)：动态模块实际加载，
+  完整 UTF-8 source 命中；第一代、第二代与停用恢复均取得可见像素证据，缓存纹理区域按预期不变。
+  技术 seam 为 Go，但生产 Adapter 在外部真实目标出现前仍为 No-Go。
+- 完成 [SDL3_ttf 之后的动态 C 文字入口复核](references/post-sdl3-next-dynamic-c-seam-review.md)：raylib
+  真实候选只烘焙 95 个 ASCII glyph；Allegro/Open Surge 进入唯一下一实机门槛。
+- 完成 [Allegro / Open Surge 真实目标 smoke](slices/allegro-opensurge-real-target-smoke.md)：正式包确认
+  静态/monolith；显式动态构建通过 PE import、运行模块和公开导出检查，但目标在 PhysFS 状态隔离处
+  初始化崩溃，未到文字绘制即按 No-Go 停止，没有新增生产 Adapter。
+- 完成 [raylib fallback Font/atlas 原型](slices/raylib-fallback-font-atlas-prototype.md) 与
+  [raylib `DrawTextEx` 生产 Adapter](slices/raylib-draw-text-adapter.md)：正式 Bundle 两代各取得 256 条
+  `Matched + Replaced`，两代中文、停用恢复和活跃 atlas 关闭均有真实目标证据；完整 workspace、全
+  workspace Clippy 与架构检查通过。
+- 完成 [raylib 之后的下一 Adapter 第一方资料复核](references/post-raylib-next-adapter-primary-source-review.md)：
+  FLTK 因缺外部动态真实目标暂缓，SFML 与 Dear ImGui 因当前真实候选静态集成或绘制阶段已无原文而
+  No-Go；没有为数量新增空置 crate、目录选项或 Bundle 项。
+- 完成 [Adapter 技术文档链接](slices/adapter-technical-documentation-links.md)：清单、Runtime 与桌面快照
+  贯通可选 `documentationUrl`，正式目录 10/10 使用官方 HTTPS；帮助页通过系统默认浏览器打开，桌面
+  Capability 只放行当前官方域名。完整 workspace、Clippy、架构、关键 Playwright 与双尺寸视觉回归通过。
 
 ## References
 
@@ -197,5 +258,14 @@ DirectWrite 制品与清单摘要一致；既有 Probe Run 保留创建时的 Ad
 - [GTK/Pango 实时写回候选评审](references/gtk-pango-adapter-primary-source-review.md)
 - [GTK/Pango 后续入口评审](references/post-gtk-next-adapter-primary-source-review.md)
 - [Tk 之后的实时文字入口复核](references/post-tk-runtime-seam-review.md)
+- [SDL3_ttf 真实目标候选筛选](references/sdl3-ttf-real-target-candidates.md)
+- [SDL3_ttf `showfont` 技术 smoke](slices/sdl3-ttf-showfont-technology-smoke.md)
+- [SDL3_ttf 之后的动态 C 文字入口复核](references/post-sdl3-next-dynamic-c-seam-review.md)
+- [Allegro / Open Surge 真实目标 smoke](slices/allegro-opensurge-real-target-smoke.md)
+- [raylib fallback Font/atlas 原型](slices/raylib-fallback-font-atlas-prototype.md)
+- [raylib `DrawTextEx` 生产 Adapter](slices/raylib-draw-text-adapter.md)
+- [raylib 之后的下一 Adapter 第一方资料复核](references/post-raylib-next-adapter-primary-source-review.md)
+- [raylib 之后的下一写回 Adapter 选择](slices/post-raylib-next-writeback-adapter.md)
+- [Adapter 技术文档链接](slices/adapter-technical-documentation-links.md)
 - [WPF 真实目标缺口验收](slices/wpf-real-target-gap.md)
 - [下一真实目标候选筛选](references/next-real-target-candidates.md)

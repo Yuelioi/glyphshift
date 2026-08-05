@@ -1,6 +1,6 @@
 # 桌面应用行为设置
 
-Status: Ready for review
+Status: Finished
 
 ## Goal
 
@@ -9,15 +9,13 @@ Status: Ready for review
 
 ## Current
 
-设置页已经按“外观 / 应用行为 / 权限”提供开机启动、关闭行为、当前权限和“始终以管理员身份启动”
-开关。开启先持久化再立即请求 UAC，后续普通启动自动再次请求；关闭只影响下一次启动，不伪装当前
-进程已经降权。UAC 重启现在使用同步 Shell 交接并显式传递本地数据根与 Runtime 根；新版独立
-Release App 已成功以管理员权限接管并保持窗口运行。
+桌面应用行为设置已经交付并完成自动回归与独立 Release 实机冒烟。持久 UAC 开关、后续普通权限
+恢复、当前用户开机启动、任务栏最小化和彻底退出均按合同工作；本机设置与启动项已恢复默认关闭，
+测试实例已退出。
 
 ## Next
 
-下次启动独立 Release App 后确认权限状态，再验证关闭管理员开关后的下次普通启动、当前用户开机
-启动和两种原生关闭行为；自动测试不修改这些本机状态。
+None
 
 ## Progress
 
@@ -27,7 +25,7 @@ Release App 已成功以管理员权限接管并保持窗口运行。
 - 开机启动写入当前用户 Run 项；设置文件落盘失败时会尽力回滚启动项，避免界面与系统状态分叉。
 - Windows Controller 隔离查询权限与 `runas` 启动能力，桌面壳不直接扩散 Win32 `unsafe`。
 - IPC 合同证明开启时先保存偏好再请求提升，关闭时只保存且不触发第二次重启。
-- 前端构建、桌面壳 43 项测试、Windows Controller 18 项测试和桌面 Playwright 44 项测试通过；另有
+- 前端构建、桌面壳 43 项测试、Windows Controller 18 项测试和桌面 Playwright 59 项测试通过；另有
   1 项需要真实授权目标的既有测试按设计忽略。
 - 深色/浅色、1440×900/960×640 设置页已由仓库 Playwright runner 截图检查；本机证据只保存在
   `target/local-test/`。
@@ -35,6 +33,13 @@ Release App 已成功以管理员权限接管并保持窗口运行。
   `ShellExecuteExW` 同步创建、保留子进程句柄并确认提升后的 GUI 进程没有在启动阶段退出。
 - 提升进程不能依赖继承本地测试环境变量；数据根和 Runtime 根现在通过正确引用的内部参数显式
   传递，避免误读另一套工作区。新版 Release 已确认提升后窗口存在且响应正常。
+- 独立 Release 冒烟必须使用 `scripts/build-desktop-release.ps1` 产出的候选；直接 Cargo 编译的 EXE
+  保留开发服务器入口。窗口可访问性反馈环能够稳定区分连接拒绝页与内嵌产品界面。
+- Tauri `onCloseRequested` 在未阻止关闭时通过 `destroy()` 销毁窗口，因此 capability 必须同时授权
+  `allow-close` 与 `allow-destroy`。新增 Playwright 配置合同先红后绿，修复版正式 Release 已由
+  UI Automation 连续触发关闭并确认窗口和进程退出。
+- 用户接受剩余原生行为冒烟；最终只读检查确认管理员启动与开机启动均关闭、当前用户启动项不存在，
+  关闭行为恢复为彻底退出，修复版实例通过真实标题栏按钮完整结束。
 
 ## References
 
