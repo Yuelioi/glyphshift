@@ -74,7 +74,8 @@
 
 - [ ] 研究 SEH/VEH、Watchdog、熔断和运行成本，选择能保持 fail-open 的最小方案。
 - [ ] 以真实截断案例验证字体度量和 `LayoutAdjust`，不建立万能 Renderer。
-- [ ] 仅在原位写回不可行且有真实需求时评估独立 Overlay / External Window Apply Model。
+- [x] 在授权 WPF 目标证明 Native 原位写回不可行后完成 Apply Model 评估：后续复用 Stage 4 的结构化
+  取词与 External Translation Presentation，不建设通用 Overlay Renderer 或当前 Managed Agent。
 
 ## Stage 6：有界 Transform Profile
 

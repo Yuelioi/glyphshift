@@ -10,8 +10,9 @@
 
 - [x] 用确定性合成目标证明 DirectWrite Unicode 观察、Dictionary 替换、失败开放、停用恢复、重复
   激活和复杂布局安全放行。
-- [ ] 在授权真实目标中证明路径命中和可见译文；零命中时否决该目标，不用更多抽象掩盖结果。
-  - DirectWrite TextLayout 已完成真实测试，运行成功但零命中，已否决当前目标并停止生产接入。
+- [x] 在授权真实目标中证明路径命中和可见译文；零命中时否决该目标，不用更多抽象掩盖结果。
+  - 早期 WPF 目标零命中后未进入生产；后续 Scintilla DirectWrite 编辑区取得完整 source、两代可见
+    译文和停止恢复，满足生产接入门槛。
 
 ## Stage 3：生产接入
 
@@ -25,10 +26,12 @@
   [Probe 到 GDI+ 实时更新](slices/probe-gdiplus-live-update.md)的用户可见验收。
 - [x] 根据实际会话 ACK 区分“可直接替换 / 仅采集 / 无信号”，且仅采集明确说明目标界面不会被修改；
   该状态只属于当前连接，不写入持久任务。
+- [x] 同一目标进程内并行候选 Adapter 独立激活；不适用技术只报告自身失败，不撤销健康写回技术，
+  Controller 回传真实激活集合供 Session 生成 Active / Failed 状态。
 - [x] 将没有目标译文的观察条目明确显示为“词典未命中”。
 - [x] 预览发布失败时明确区分“Dictionary 已保存”与“Runtime 未收到更新”，不误报成停止失败。
-- [ ] 为 Adapter 最终应用结果设计窄回执合同；现有 Runtime Trace 只能证明替换决策，不能据此展示
-  “目标界面写回成功 / 失败”，且不新增第二套持久诊断模型。
+- [x] 复核 Adapter 最终应用回执并作 No-Go：Qt/GTK 绘制入口没有返回值，GDI API 成功也不证明像素
+  可见；运行诊断只显示“替换决策已生成”，不新增第二套持久诊断模型。
 
 ## Stage 4：重复扩展
 
@@ -51,5 +54,13 @@
   唯一公开文本，但六条 Native 写回入口持续重绘仍全部零命中。
 - [x] 将该 WPF 目标明确降级为“仅结构化观察”，不因 DirectWrite/Direct2D 模块存在或成功注入计入
   通用实时写回覆盖。
-- [ ] 选择下一 Apply Model：Managed WPF Agent 的原位写回有界原型，或 UIA 驱动的外部翻译呈现；
-  未选择前不实现私有符号 Hook、属性全局改写或万能 Overlay Renderer。
+- [x] WPF 后续选择 UIA 驱动的外部翻译呈现并路由到交互式取词 Roadmap；当前不实现 Managed Agent、
+  私有符号 Hook、属性全局改写或万能 Overlay Renderer。
+- [x] 按[下一真实目标候选](references/next-real-target-candidates.md)验收 Notepad++ Scintilla DirectWrite
+  编辑区：只统计完整编辑区文字，完成首版替换、第二代热更新和释放恢复，零命中则 No-Go。
+- [x] 将 DirectWrite TextLayout 加入正式 Runtime Bundle 与 Catalog，并修复目录链接导致的软件路径
+  身份不一致，确保通过包管理器稳定入口启动的实例仍可发现。
+- [x] 在重新构建的桌面 App 中把 DirectWrite 加入既有 Probe Adapter Plan，确认 UIA 仍可采集原文的
+  同时，编辑区由 DirectWrite 产生肉眼可见译文；只有两项证据同时成立才结束端到端验收。
+- [x] 复核真实级联菜单：一级与二级菜单均由既有 GDI/USER32 Adapter 捕获，并确认二级词条可生成
+  `Matched + Replaced`；不为级联菜单另建 Adapter。

@@ -10,13 +10,14 @@ Status: Open
 
 ## Current
 
-现有 GDI、USER32 DrawText 与 GDI+ Adapter 已能覆盖命中这些调用的经典 Windows 界面，并在一个授权
-桌面工具的部分界面得到写回证据。Console 与 UI Automation 目前只有采集价值，不能作为实时翻译
-成功。Direct2D `DrawText` 已通过合成写回，但在当前授权目标中零命中，因此尚未进入生产 Bundle。
+现有 GDI、USER32 DrawText、GDI+、Qt、GTK 3/Pango 与 DirectWrite TextLayout Adapter 已进入正式
+Runtime Bundle。Console 与 UI Automation 目前只有采集价值，不能作为实时翻译成功。Direct2D
+`DrawText` 已通过合成写回，但在授权目标中零命中，因此仍未进入生产 Bundle。
 
-DirectWrite TextLayout 的两种常见绘制入口也完成过窄原型：合成目标可以观察、替换，并让同一布局在
-停用后恢复、重新启用后再次替换；复杂多段格式会安全放行。但 AE 与 WPF 授权测试均为零命中，所以
-实验实现已从工作区撤回，只保留否决结论，不进入生产 Bundle，也不计入软件支持范围。
+DirectWrite TextLayout 已从窄原型升级为生产 Adapter：同时覆盖普通 Render Target 与 Scintilla 缓冲
+绘制使用的 Compatible Bitmap Render Target，在 `CreateTextLayout` 取得完整 source，并在
+`DrawTextLayout` 时按当前 Dictionary 创建瞬时译文布局。单一格式布局可替换，局部格式、内联对象或
+无法证明格式一致的布局安全放行；停止后目标继续使用原布局，不需要修改目标文本。
 
 当前已补齐两段实时更新合同：Probe 内编辑译文会保存到绑定 Dictionary 并发布下一代预览；GDI+
 确定性 Windows 宿主在不重启目标的情况下能从首版译文切换到第二代，诊断确认两代均为
@@ -37,6 +38,11 @@ Probe 与 Dictionary 的创建流程也已收敛：每次打开都使用干净�
 分别尝试激活；任一侧成功即可保留会话，失败侧的能力进入 Failed，只有全部 Placement 都失败才拒绝
 连接。这样仅支持 UIA 观察的目标不会再被同组选中的不兼容 Native Hook 阻断。
 
+同一 Target Process 内的多条候选 Hook 也已改为部分成功语义。Qt、GTK 等不适用于当前进程的技术只
+标记自身失败，不再撤销已经成功的 GDI、GDI+ 或 DirectWrite；只有全部原生技术都失败时才拒绝连接。
+注入 Runtime 通过独立激活回执上报真实成功集合，Session 不会把未激活技术冒充为 Active。这样用户
+取消 UIA/Console 观察器后，健康的实时写回技术仍可单独建立连接。
+
 `runtime.component_incompatible` 的界面文案不再猜测“刚升级过”或要求重启目标软件，而是明确说明
 所选探针技术不适用于当前软件，并引导用户调整技术。HandBrake 类 WPF 目标当前仍只能归为“仅采集
 原文”，不能因 UIA 连接成功显示成实时翻译支持。
@@ -47,8 +53,9 @@ Probe 连接状态现已使用实际会话 ACK，而不是用户勾选的 Adapte
 
 条目状态也不再把 Dictionary 未命中含糊显示为“待翻译”，而是明确显示“词典未命中”。用户在 Probe
 内保存译文后，如果下一代预览没有成功发送到目标 Runtime，界面会说明“词典已保存，但目标界面可能
-仍显示旧译文”，不再误报成停止失败。现有 Runtime Trace 可以证明替换决策已产生，但不能证明 Adapter
-最终改动了目标控件或像素；在增加窄的最终应用回执前，不展示虚假的“写回成功 / 写回失败”条目状态。
+仍显示旧译文”，不再误报成停止失败。最终应用回执复核也已完成：GDI 可返回 API 状态，但 Qt/GTK
+绘制入口没有返回值，而且 API 接受调用仍不等于像素可见，因此不存在可信的跨 Adapter 最终成功状态。
+运行诊断现将 `Matched + Replaced` 明确显示为“替换决策已生成”，不再显示“已替换”。
 
 Qt Widgets `QPainter::drawText` 绘制链现已完成。Qt 5/6 MSVC x64 ABI 分支均通过本地 QImage 合成
 宿主的像素替换、同进程第二代 Dictionary 更新与停用恢复；首个授权目标因静态链接 Qt 在注入前被
@@ -76,28 +83,33 @@ Workflow/Probe 互斥继续保留。
 首个“真实软件缺口驱动”目标也已完成验收。授权 WPF 工具加载 .NET/WPF、DirectWrite 与 Direct2D；
 正式 UIA Worker 可健康观察 72 条唯一公开文本，但 GDI、DrawText、GDI+、Direct2D DrawText 和本地
 DirectWrite TextLayout 六条可写回路径在持续重绘中全部零命中。WPF 因此不进入当前 Native Bundle；
-下一步必须在 Managed WPF Agent 与 UIA 驱动的外部应用模型之间先做产品选择。
+后续已选择 UIA 取词与外部译文呈现路线并转入 Roadmap，当前不建设 Managed WPF Agent。
+
+下一真实目标的 Go/No-Go 已完成。Scintilla 自身确认使用 DirectWrite 模式；编辑区完整测试文本在正式
+Runtime Bundle 中完成首代 Dictionary 替换、同进程第二代热更新和停止恢复。真实验证同时暴露并修复
+了 Scoop `current` 目录链接：软件登记路径与进程报告路径现在都会解析为同一真实可执行文件身份，
+不会再把已运行实例误判为未启动。
+
+桌面端到端复核随后发现，先前仍在运行的开发 App 使用的是生产接入前的旧 Bundle，因此用户实际只能
+看到 UI Automation 观察，不能据此证明 DirectWrite 写回。开发 Bundle 已重新构建为 8 个 Adapter，
+DirectWrite 制品与清单摘要一致；既有 Probe Run 保留创建时的 Adapter Plan，在显式加入 DirectWrite
+并使用新构建重连后，用户已确认编辑区实时翻译正常工作。
+
+同一真实目标的级联菜单也完成了边界复核：一级和二级菜单均能由 GDI `ExtTextOutW` 与 USER32
+`DrawTextW` 观察，二级菜单词条在干净、同版本的目标实例中取得明确的 `Matched + Replaced`。因此
+级联菜单不是新的 Adapter 缺口。开发期替换 Runtime DLL 后，如果目标进程仍加载旧 DLL，旧译文可能
+暂时可见但新观察不会继续回传；这种跨二进制版本升级仍要求重启目标软件，不能误判为二级菜单不支持。
 
 ## Next
 
-- 暂停继续枚举 Native Hook。连接级能力、条目级“词典未命中”和预览发布失败均已明确；剩余缺口是
-  Adapter 最终应用结果的窄回执合同。现有 Runtime Trace 只能证明替换决策，不能冒充目标控件或像素
-  已被修改。UIA/坐标与 OCR 的共用底层已路由到
-  [交互式取词 Seam](../runtime-capability-roadmap/slices/interactive-text-acquisition-seam.md)，当前不抢先实现
-  热键、浮层或翻译器。
-- [WPF 真实目标缺口验收](slices/wpf-real-target-gap.md)已完成：结构化观察有收益，但六条 Native
-  写回路径全部零命中；不按已加载模块或成功注入虚报支持。
-- 下一步先决定 WPF 的 Apply Model：若坚持原位翻译，只能进入独立 Managed WPF Agent 的有界原型；
-  若优先覆盖率，则评估 UIA 驱动的翻译面板/最小 Overlay，并明确不是原位写回。
-- [Tk 文字绘制链对照诊断](slices/tk-text-draw-path-diagnostic.md)已完成并作 No-Go：正式 GDI 与公开
-  Tk 路径均取得 3/3 个完整词条，两代中文译文都与 Tk 原生像素一致，停用后恢复原文；实验实现已撤回。
-- [Tk 之后的实时文字入口复核](references/post-tk-runtime-seam-review.md)已完成：SDL2_ttf 只有 Surface
-  创建时替换，无法保证缓存文字热更新和停用恢复；SDL3_ttf 具备真正绘制时 Text API，但缺少代表性授权
-  Windows 目标。两者都不直接加入当前 Bundle，SDL3 与 Web/托管运行时入口转入 Roadmap。
-- Web/CDP 已从通用 Adapter 候选降为后续宿主协作集成：普通已运行的 Electron/WebView2 软件通常没有
-  GlyphShift 可安全连接的 endpoint，自有调试宿主成功不能外推第三方覆盖。
-- 当前不再以 Adapter 数量为目标枚举包装层；下一步先对一个用户真实需要翻译、且尚未被现有路径覆盖的
-  授权软件做缺口验收。只有命中稳定的绘制时文字入口并证明可见增量，才新增生产 Adapter。
+- DirectWrite 桌面端到端验收与级联菜单边界均已闭环；下一轮从尚未覆盖的真实软件文字栈选择一个
+  小型、可重复授权目标，先用现有 Adapter 矩阵测量缺口，再决定是否需要新增 Adapter。
+- DirectWrite TextLayout 的底层生产接入已完成；WPF 等不经过公开 TextLayout 绘制入口的目标仍不在
+  覆盖范围，不因加载 DirectWrite 模块而扩大支持声明。
+- 下一轮继续用“真实软件缺口 → 一手入口证据 → 有界原型 → 可见写回”的顺序选择文字技术，不以
+  Adapter 数量或框架名称驱动实现。
+- [交互式取词 Seam](../runtime-capability-roadmap/slices/interactive-text-acquisition-seam.md)继续留在 Roadmap，
+  当前不抢先实现热键、浮层、OCR 或翻译器。
 
 ## Progress
 
@@ -113,6 +125,10 @@ DirectWrite TextLayout 六条可写回路径在持续重绘中全部零命中。
   详情；针对性 Playwright 3/3、组件与视觉合同 5/5、Capture 与 Desktop Shell 单元测试 54/54 通过。
 - 已修复混合 Placement 的全有或全无启动：Native 激活失败时健康的 UIA Worker 仍会保持会话，失败
   能力不会冒充 Active；Isolated Worker Host 11/11、Desktop Runtime 13/13 常规测试通过。
+- 已修复同一 Target Process 内多条 Native Hook 的全有或全无启动：不可用候选不再撤销健康 Adapter，
+  Controller 会回传真实激活集合并由 Session 分别标记 Active / Failed。GDI 成功与 Qt 无模块失败的
+  原生回归 1/1、Controller/Host 针对性回归 3/3、完整 Rust workspace 与架构检查通过；探针相关
+  Playwright 5/5 通过。
 - 已移除组件不兼容错误中“升级后重启目标软件”的无依据推断；针对性 Playwright 回归 1/1 与前端
   生产构建通过。
 - 已修复“请求能力冒充已激活能力”：Session 只公开宿主确认 Active 的 Feature，Desktop Runtime 按
@@ -121,7 +137,10 @@ DirectWrite TextLayout 六条可写回路径在持续重绘中全部零命中。
   10/10 与前端生产构建通过。
 - 已把无 Dictionary 译文的条目明确标记为“词典未命中”；预览发布失败现在说明译文已经保存、但目标
   Runtime 未收到更新，不再伪装成停止失败。Desktop Shell 41/41、Probe Playwright 10/10 与格式检查
-  通过；最终 Adapter 应用结果仍等待独立的窄回执合同。
+  通过。
+- 已否决跨 Adapter 的“最终写回成功”回执：部分绘制入口没有返回值，有返回值也不能证明像素可见；
+  运行诊断改为“替换决策已生成”并明确说明证据边界。WPF 外部翻译回退继续由交互式取词 Roadmap
+  承接，当前不建设 Managed Agent。前端生产构建、针对性 Playwright 1/1 与 Impeccable 机械检测通过。
 - 已验证 GDI+ Dictionary 在同一目标进程内发布第二代并立即替换，停止后恢复原文。
 - 已比较 Qt、WinUI/MRT、WPF 与 Web 桌面壳入口；Qt 绘制链进入下一有界原型，其余候选保留在
   调研结论中，不并行扩张实现面。
@@ -149,7 +168,23 @@ DirectWrite TextLayout 六条可写回路径在持续重绘中全部零命中。
 - Web transport 与 DOM ownership 原型虽已通过，但产品适用性复核确认其依赖目标宿主主动开放接口；
   已停止自有目标 DOM 验收，不把 Host-assisted 能力计入通用实时翻译覆盖。
 - 完成授权 WPF 真实目标验收：UIA 观察 72 条公开文本且健康；六条 Native 写回入口全部完成有效激活
-  但零命中。WPF 当前归为“仅结构化观察”，Managed Agent 或外部 Apply Model 需另行选择。
+  但零命中。WPF 当前归为“仅结构化观察”，后续由交互式取词与外部译文呈现承接。
+- 完成下一真实目标一手资料筛选：Notepad++ 的 Scintilla 编辑区具有明确
+  `IDWriteTextLayout → DrawTextLayout` 路径，进入唯一下一实机 Go/No-Go；VS Code 与 Godot 仅保留为
+  Web/引擎文字栈边界，不并行立项。
+- 完成 Scintilla DirectWrite 编辑区 Go：正式 Adapter 覆盖直接与 Compatible Bitmap 两类
+  `DrawTextLayout`，首版和热更新代次均取得 `Matched + Replaced`，停止后恢复原文；复杂格式继续
+  fail-open。正式 Bundle 真实复测首版命中 16 次、第二代命中 18 次。
+- 修复 Windows 进程发现对目录链接两侧路径身份不一致的问题；通过 Scoop `current` 路径启动的真实
+  目标已完成发现与 25 次稳定替换命中，控制器路径合同 6/6 通过。
+- DirectWrite 纯逻辑 4/4、Native 绘制合同 1/1、Clippy 零警告、架构检查和完整 Rust workspace 测试
+  均通过；正式 Bundle 构建成功。运行诊断文案的桌面生产构建与针对性 Playwright 1/1 也通过。
+- 已纠正“独立 Runtime 通过即等于当前 App 可用”的错误结论：旧开发 App 的 Bundle 只有 7 个 Adapter，
+  当前 Probe 也没有 DirectWrite。重新构建后根 Bundle 为 8 个 Adapter，DirectWrite 制品摘要验证通过，
+  新桌面进程已启动；用户随后确认加入 DirectWrite 的 Probe 可正常实时工作。
+- 已验证真实级联菜单的二级词条同时命中 GDI ExtTextOut 与 USER32 DrawText；其中 ExtTextOut 二级词条
+  取得 2 次 `Matched + Replaced`。级联菜单不新增 Adapter；开发构建替换已加载 Runtime DLL 时需重启
+  目标进程，避免旧译文残留被误认为当前探针仍在连接。
 
 ## References
 
@@ -163,3 +198,4 @@ DirectWrite TextLayout 六条可写回路径在持续重绘中全部零命中。
 - [GTK/Pango 后续入口评审](references/post-gtk-next-adapter-primary-source-review.md)
 - [Tk 之后的实时文字入口复核](references/post-tk-runtime-seam-review.md)
 - [WPF 真实目标缺口验收](slices/wpf-real-target-gap.md)
+- [下一真实目标候选筛选](references/next-real-target-candidates.md)

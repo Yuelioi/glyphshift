@@ -9,11 +9,12 @@
   因标准控件只经过私有 snapshot 入口而暂不建设。动态 Tk 8.6 与 GDI 的隐藏双路对照也已证明结果
   等价并作 No-Go。SDL2_ttf 因缓存 Surface 无法满足实时恢复合同；SDL3_ttf 虽有绘制时 Text API，
   但等待真实授权目标后再进入 Roadmap 原型，不提前制造空置 Adapter。
-- **Focus:** [通用实时翻译覆盖](work/real-time-translation-coverage/index.md) — Web/CDP 已确认不能连接绝大多数
-  未主动开放宿主接口的现有 Web 桌面软件，降级为后续 Host-assisted Integration，不计通用实时翻译
-  覆盖。首个授权 WPF 真实目标已证明 UIA 可观察 72 条公开文本，但六条 Native 写回入口全部零命中；
-  当前需要在 Managed WPF Agent 与 UIA 驱动的外部翻译呈现之间选择下一 Apply Model，不按模块名称
-  制造空置 Adapter。
+- **Focus:** [通用实时翻译覆盖](work/real-time-translation-coverage/index.md) — Scintilla DirectWrite 编辑区
+  底层已完成真实 Go，并覆盖 Compatible Bitmap 缓冲绘制；开发 App 也已用含 DirectWrite 的新 Bundle
+  重启。同一目标进程中的候选 Hook 现已支持部分成功，不适用技术不会再撤销健康写回技术，且
+  Controller 只回传真实激活集合。当前只差在既有 Probe 中显式加入 DirectWrite 并完成肉眼端到端
+  验收，不能再用 UIA 观察冒充写回。WPF 仍只有 UIA 结构化观察收益，后续由外部译文呈现 Roadmap
+  承接。
 - [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — Observation Stream、共享 Hook、区域
   Binding 和 Web 宿主协作等架构升级继续保留，但不再抢占当前通用写回主线。
 

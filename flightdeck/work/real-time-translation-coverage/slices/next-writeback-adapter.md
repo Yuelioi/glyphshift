@@ -35,8 +35,9 @@ TextLayout 自带的 `Draw`。合成合同全部通过，复杂格式安全放�
 | `DrawTextW/DrawTextExW` | Bundle | 已验证，含停用恢复 | 尚无独立证据 | 候选实时翻译 |
 | `GdipDrawString` | Bundle | 已验证，含停用恢复 | 已观察并用于部分界面写回 | 已验证实时翻译 |
 | Qt `QPainter::drawText` | Bundle | Qt 5/6 均已验证，含热更新与停用恢复 | 动态 Qt 6 Widgets 可见写回；静态 Qt 安全拒绝 | 已验证实时翻译 |
+| GTK 3 `gtk_render_layout` / Pango | Bundle | 已验证，含热更新、样式放行与停用恢复 | 正式注入链取得两代 Dictionary 命中 | 已验证实时翻译 |
 | Direct2D `DrawText` | 实验 | 已验证，含停用恢复 | 测试执行成功但零命中 | 被当前目标否决 |
-| DirectWrite TextLayout | 实验 | 两种绘制入口均已验证，含停用恢复 | 测试执行成功但零命中 | 被当前目标否决 |
+| DirectWrite TextLayout | Bundle | 直接与 Compatible Bitmap 绘制均已验证；复杂格式放行 | Scintilla 编辑区两代热更新与停用恢复可见；WPF 零命中 | 已验证实时翻译（不含 WPF） |
 | `WriteConsoleW` | Bundle | 不支持写回 | 已验证采集 | 仅采集原文 |
 | UI Automation | Bundle | 不支持写回 | 已验证采集与隐私边界 | 仅采集原文 |
 

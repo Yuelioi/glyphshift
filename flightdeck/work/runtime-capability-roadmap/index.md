@@ -67,7 +67,8 @@ Workflow 的翻译候选仍只接纳 `TextReplace`。正式合成目标合同已
 Interface，UIA 与授权 Target Frame + OCR 分别作为 Structured / Visual Acquisition Adapter。该链路
 不扩充持续 Probe 的 observation payload，也不把坐标写入 Dictionary 或 Region Binding；Translation
 Resolver 与 External Translation Presentation 位于取词之后，是否使用热键、悬停、浮层、在线翻译器
-或具体 OCR 引擎继续延后。
+或具体 OCR 引擎继续延后。已证明 Native 写回零命中的 WPF 目标选择这条外部呈现路线作为后续回退，
+不再为当前目标建设 Managed WPF Agent，也不把外部呈现冒充原位 `TextReplace`。
 
 同类工具的引擎翻译能力汇总已完成。公开清单可用作市场覆盖地图，但公开资料不足以证明逐项技术接入点；
 Glyphshift 因此新增后续 Engine-aware Integration Stage，以 build mode、观察来源、应用方式、版本、
@@ -106,6 +107,8 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 - 已完成 AI 评审路由，建立采纳门槛和明确的非目标；Roadmap 按真实证据逐 Stage 推进。
 - 已完成交互式取词底层路由：持续 Observation 保持最小；Point、Text Range、Region 统一为短期选区，
   Structured/UIA 与 Visual/OCR 共用同一深 Interface，翻译与外部呈现继续分离。
+- 已完成 WPF Apply Model 选择：六条 Native 写回路径零命中后，后续采用结构化取词与外部译文呈现，
+  不建设当前 Managed Agent 或全局 Dependency Property 改写。
 - 已完成同类 Hook/翻译工具的一手资料汇总，冻结 Observation Stream、Transform Profile
   及可选输入/输出能力的路由边界。
 - Process Family Stage 完成：Extension → Runtime Spec → Controller 配置贯通显式后代 allowlist；

@@ -25,6 +25,8 @@
 - 第一版只处理文字本身；字体、布局和区域选择仅在真实替换案例暴露阻塞时进入同一切片。
 - 合成测试证明参数、失败开放和停用恢复；真实测试证明该软件确实经过这条路径。两者缺一不可。
 - observe-only 结果可以进入 Probe 与 Dictionary 作业，但不能被包装成实时翻译能力。
+- 同一目标进程的候选 Adapter 必须独立激活；部分不兼容时保留健康技术，且只把 Runtime 明确回执的
+  Adapter 能力标记为 Active。
 - WPF 的 retained-mode 真实目标已经证明：加载 DirectWrite/Direct2D 模块不等于命中公开绘制入口；
   UIA 可观察而六条 Native 路径零命中时，能力等级仍是“仅采集原文”。
 - 全局设置 WPF Dependency Property 会改变应用对象与 Binding 状态，不属于安全绘制时写回。需要
