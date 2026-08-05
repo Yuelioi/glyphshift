@@ -25,8 +25,30 @@ DirectWrite TextLayout 的两种常见绘制入口也完成过窄原型：合成
 
 Probe 与 Dictionary 的创建流程也已收敛：每次打开都使用干净表单，任务名称与新词典名称不再根据
 软件自动生成，取消或关闭不会遗留旧草稿；创建阶段只询问名称和语言等必要信息，发布版本、作者、
-许可证、主页与标签继续由词典设置维护。目标软件未启动时任务仍保存为“待连接”，不会把连接失败
+许可证、主页与标签继续由词典设置维护。目标软件未启动时任务仍保存为“未连接”，不会把连接失败
 误报成创建失败；之后显式重连仍显示具体原因。
+
+探针管理列表也已收敛为二态连接语义：运行与暂停都显示“已连接”，其他持久状态显示“未连接”；
+应用重启会把旧的运行、暂停或中断记录恢复为未连接，不再制造一排历史故障。任务行只保留名称，
+程序位置与 Adapter 技术明细进入可悬浮、可聚焦的详情入口。创建后的首次连接即使失败，只要任务
+已经持久化，创建 Modal 仍会关闭并进入详情，同时保留具体连接错误。
+
+混合 Placement 的启动也已改为部分成功语义：Target Process 原位 Hook 与 Isolated Worker 观察器会
+分别尝试激活；任一侧成功即可保留会话，失败侧的能力进入 Failed，只有全部 Placement 都失败才拒绝
+连接。这样仅支持 UIA 观察的目标不会再被同组选中的不兼容 Native Hook 阻断。
+
+`runtime.component_incompatible` 的界面文案不再猜测“刚升级过”或要求重启目标软件，而是明确说明
+所选探针技术不适用于当前软件，并引导用户调整技术。HandBrake 类 WPF 目标当前仍只能归为“仅采集
+原文”，不能因 UIA 连接成功显示成实时翻译支持。
+
+Probe 连接状态现已使用实际会话 ACK，而不是用户勾选的 Adapter 能力推断。桌面 Runtime 只汇总宿主
+真正确认 Active 的 Feature；当前连接据此显示“可直接替换 / 仅采集 / 无信号”。“仅采集”会明确说明
+目标软件界面不会被修改；能力状态只属于本次连接，释放连接或重启后不会写进可恢复任务配置。
+
+条目状态也不再把 Dictionary 未命中含糊显示为“待翻译”，而是明确显示“词典未命中”。用户在 Probe
+内保存译文后，如果下一代预览没有成功发送到目标 Runtime，界面会说明“词典已保存，但目标界面可能
+仍显示旧译文”，不再误报成停止失败。现有 Runtime Trace 可以证明替换决策已产生，但不能证明 Adapter
+最终改动了目标控件或像素；在增加窄的最终应用回执前，不展示虚假的“写回成功 / 写回失败”条目状态。
 
 Qt Widgets `QPainter::drawText` 绘制链现已完成。Qt 5/6 MSVC x64 ABI 分支均通过本地 QImage 合成
 宿主的像素替换、同进程第二代 Dictionary 更新与停用恢复；首个授权目标因静态链接 Qt 在注入前被
@@ -51,13 +73,31 @@ WinUI 3 / MRT Core 三层诊断也已完成。显式 `ResourceLoader.GetString` 
 增加可翻译软件数量，现已退回后续 Roadmap。尚未提交的 Observation Stream 实现已撤回，现有简单
 Workflow/Probe 互斥继续保留。
 
+首个“真实软件缺口驱动”目标也已完成验收。授权 WPF 工具加载 .NET/WPF、DirectWrite 与 Direct2D；
+正式 UIA Worker 可健康观察 72 条唯一公开文本，但 GDI、DrawText、GDI+、Direct2D DrawText 和本地
+DirectWrite TextLayout 六条可写回路径在持续重绘中全部零命中。WPF 因此不进入当前 Native Bundle；
+下一步必须在 Managed WPF Agent 与 UIA 驱动的外部应用模型之间先做产品选择。
+
 ## Next
 
-- [WinUI/MRT 文字路径诊断](slices/winui-mrt-path-diagnostic.md)已完成并对生产实时 Adapter 作 No-Go；
-  不建设 CLR Profiler、PRI 修改或按软件写特例。
-- [GTK 3 Pango 绘制时写回](slices/gtk3-pango-draw-writeback.md)已完成并进入正式 Bundle；GTK 4 维持
-  No-Go。下一步重新按“可取得原文、同链安全写回、跨软件复用、停用恢复”排序剩余候选，不默认扩张到
-  CLR Profiler 或 Web 调试连接。
+- 暂停继续枚举 Native Hook。连接级能力、条目级“词典未命中”和预览发布失败均已明确；剩余缺口是
+  Adapter 最终应用结果的窄回执合同。现有 Runtime Trace 只能证明替换决策，不能冒充目标控件或像素
+  已被修改。UIA/坐标与 OCR 的共用底层已路由到
+  [交互式取词 Seam](../runtime-capability-roadmap/slices/interactive-text-acquisition-seam.md)，当前不抢先实现
+  热键、浮层或翻译器。
+- [WPF 真实目标缺口验收](slices/wpf-real-target-gap.md)已完成：结构化观察有收益，但六条 Native
+  写回路径全部零命中；不按已加载模块或成功注入虚报支持。
+- 下一步先决定 WPF 的 Apply Model：若坚持原位翻译，只能进入独立 Managed WPF Agent 的有界原型；
+  若优先覆盖率，则评估 UIA 驱动的翻译面板/最小 Overlay，并明确不是原位写回。
+- [Tk 文字绘制链对照诊断](slices/tk-text-draw-path-diagnostic.md)已完成并作 No-Go：正式 GDI 与公开
+  Tk 路径均取得 3/3 个完整词条，两代中文译文都与 Tk 原生像素一致，停用后恢复原文；实验实现已撤回。
+- [Tk 之后的实时文字入口复核](references/post-tk-runtime-seam-review.md)已完成：SDL2_ttf 只有 Surface
+  创建时替换，无法保证缓存文字热更新和停用恢复；SDL3_ttf 具备真正绘制时 Text API，但缺少代表性授权
+  Windows 目标。两者都不直接加入当前 Bundle，SDL3 与 Web/托管运行时入口转入 Roadmap。
+- Web/CDP 已从通用 Adapter 候选降为后续宿主协作集成：普通已运行的 Electron/WebView2 软件通常没有
+  GlyphShift 可安全连接的 endpoint，自有调试宿主成功不能外推第三方覆盖。
+- 当前不再以 Adapter 数量为目标枚举包装层；下一步先对一个用户真实需要翻译、且尚未被现有路径覆盖的
+  授权软件做缺口验收。只有命中稳定的绘制时文字入口并证明可见增量，才新增生产 Adapter。
 
 ## Progress
 
@@ -69,6 +109,19 @@ Workflow/Probe 互斥继续保留。
 - 已验证 Probe 译文编辑会产生下一代预览发布；桌面 Shell 单元测试 38/38 通过。
 - 已完成[探针与词典创建流程收敛](slices/creation-flow-distillation.md)：取消后不再保留任务、Adapter
   或词典草稿，创建界面不再暴露内部词典 ID 与低频发布元数据；桌面 Playwright 53/53 通过。
+- 已修复探针创建后首次连接失败导致 Modal 残留的问题，并把管理列表压缩为二态连接状态与悬浮技术
+  详情；针对性 Playwright 3/3、组件与视觉合同 5/5、Capture 与 Desktop Shell 单元测试 54/54 通过。
+- 已修复混合 Placement 的全有或全无启动：Native 激活失败时健康的 UIA Worker 仍会保持会话，失败
+  能力不会冒充 Active；Isolated Worker Host 11/11、Desktop Runtime 13/13 常规测试通过。
+- 已移除组件不兼容错误中“升级后重启目标软件”的无依据推断；针对性 Playwright 回归 1/1 与前端
+  生产构建通过。
+- 已修复“请求能力冒充已激活能力”：Session 只公开宿主确认 Active 的 Feature，Desktop Runtime 按
+  实际 ACK 汇总，Probe 将其临时投影为“可直接替换 / 仅采集 / 无信号”；仅采集说明明确告知不会修改
+  目标界面。Session 针对回归 1/1、Desktop Runtime 13/13、Desktop Shell 40/40、Probe Playwright
+  10/10 与前端生产构建通过。
+- 已把无 Dictionary 译文的条目明确标记为“词典未命中”；预览发布失败现在说明译文已经保存、但目标
+  Runtime 未收到更新，不再伪装成停止失败。Desktop Shell 41/41、Probe Playwright 10/10 与格式检查
+  通过；最终 Adapter 应用结果仍等待独立的窄回执合同。
 - 已验证 GDI+ Dictionary 在同一目标进程内发布第二代并立即替换，停止后恢复原文。
 - 已比较 Qt、WinUI/MRT、WPF 与 Web 桌面壳入口；Qt 绘制链进入下一有界原型，其余候选保留在
   调研结论中，不并行扩张实现面。
@@ -87,6 +140,16 @@ Workflow/Probe 互斥继续保留。
 - GTK 3 / Pango 纯逻辑 6/6 与无模块拒绝激活 1/1 通过；真实 Pango 属性范围、普通/全范围样式替换、
   局部样式放行和停用恢复均由像素合同确认。正式 Bundle 的后台注入复测中，第一代与第二代 Dictionary
   各命中替换 31 次，停止后恢复原文。
+- GTK/Pango 后续候选已重新排序：`SetWindowTextW`、`LoadStringW`、Java agent 与常见静态 C++ 绘制库
+  均不满足当前安全热更新合同；动态 Tk 8.6 只进入相对 GDI 的增量诊断，不因框架名称直接立项。
+- Tk 隐藏双路宿主确认 GDI 与公开 Tk 路径都取得 3/3 个完整 source；两代中文译文均与原生 Tk 像素
+  一致并可停用恢复。Tk 没有形成独立覆盖价值，实验实现已撤回且未进入 Bundle。
+- SDL2_ttf 的稳定 UTF-8 C API 已复核，但其 Surface/Texture 缓存语义不能满足当前实时恢复合同；
+  SDL3_ttf 的 `TTF_Text` 绘制链进入 Engine-aware Roadmap，等待真实目标触发，不先建设空置 Adapter。
+- Web transport 与 DOM ownership 原型虽已通过，但产品适用性复核确认其依赖目标宿主主动开放接口；
+  已停止自有目标 DOM 验收，不把 Host-assisted 能力计入通用实时翻译覆盖。
+- 完成授权 WPF 真实目标验收：UIA 观察 72 条公开文本且健康；六条 Native 写回入口全部完成有效激活
+  但零命中。WPF 当前归为“仅结构化观察”，Managed Agent 或外部 Apply Model 需另行选择。
 
 ## References
 
@@ -97,3 +160,6 @@ Workflow/Probe 互斥继续保留。
 - [下一 Adapter 第一方资料评审](references/next-adapter-primary-source-review.md)
 - [WinUI 3 / MRT Core 原生入口诊断](references/winui-mrt-primary-source-diagnostic.md)
 - [GTK/Pango 实时写回候选评审](references/gtk-pango-adapter-primary-source-review.md)
+- [GTK/Pango 后续入口评审](references/post-gtk-next-adapter-primary-source-review.md)
+- [Tk 之后的实时文字入口复核](references/post-tk-runtime-seam-review.md)
+- [WPF 真实目标缺口验收](slices/wpf-real-target-gap.md)

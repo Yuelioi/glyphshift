@@ -5,13 +5,15 @@ Status: Open
 ## Goal
 
 在不扩大 Dictionary 职责、不泄漏平台细节到核心匹配 Interface 的前提下，按真实软件证据逐步扩展
-多进程接管、观察流复用、Windows 文字技术覆盖、原生隔离和布局适配能力。
+多进程接管、观察流复用、Windows 文字技术覆盖、交互式取词、原生隔离和布局适配能力。
 
 ## Current
 
-优先级已纠正：本 Work 现在只保存后续运行时能力 Roadmap，不再是当前执行主线。Observation Stream、
-跨启动 Binding 与 Probe/诊断/Workflow 共享 Hook 都不能直接增加实时翻译覆盖，已延后到真实软件案例
-证明必要时再恢复。当前 Focus 转到[通用实时翻译覆盖](../real-time-translation-coverage/index.md)。
+优先级已纠正：Observation Stream、跨启动 Binding 与 Probe/诊断/Workflow 共享 Hook 都不能直接增加
+实时翻译覆盖，继续延后到真实软件案例证明必要时再恢复。Web 桌面原型证明 DOM ownership 和父进程
+继承管道可以成立，但也证明这条路径依赖目标宿主在 WebView 创建前主动开放接口；绝大多数已运行的
+Electron/WebView2 软件没有该接口，GlyphShift 不能通用 attach。因此 Web 已降级为后续
+Host-assisted Integration，不再作为当前通用 Adapter 或首个 Engine-aware 交付目标。
 
 Process Family Stage 已交付。Software Extension 现在可声明显式后代可执行文件 allowlist，并经
 Desktop Runtime Spec、Controller Host 配置进入 Windows Controller；工作流和 Dictionary 不承担
@@ -61,6 +63,12 @@ Healthy。UIA 的生产安全门已完成；Descriptor 与 Worker artifact 也�
 catalog。Desktop 只为包含隔离 Adapter 的 recipe 签发临时 grant，UIA 只在 Probe capture 中启动；
 Workflow 的翻译候选仍只接纳 `TextReplace`。正式合成目标合同已证明公开标准控件可采集且密码不入库。
 
+交互式取词的底层设计现已独立路由：Point、Text Range 与 Region 共用一个一次性 request/result
+Interface，UIA 与授权 Target Frame + OCR 分别作为 Structured / Visual Acquisition Adapter。该链路
+不扩充持续 Probe 的 observation payload，也不把坐标写入 Dictionary 或 Region Binding；Translation
+Resolver 与 External Translation Presentation 位于取词之后，是否使用热键、悬停、浮层、在线翻译器
+或具体 OCR 引擎继续延后。
+
 同类工具的引擎翻译能力汇总已完成。公开清单可用作市场覆盖地图，但公开资料不足以证明逐项技术接入点；
 Glyphshift 因此新增后续 Engine-aware Integration Stage，以 build mode、观察来源、应用方式、版本、
 证据和失败语义定义支持。项目文件/资源改写将来另走 Content Adapter Work，不混入 Runtime Adapter
@@ -84,12 +92,20 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 
 ## Next
 
-- 等待[通用实时翻译覆盖](../real-time-translation-coverage/index.md)产生具体阻塞；只有真实软件必须区分
-  多个文字流、共享同一 Hook 或跨启动恢复选择时，才恢复对应 Slice。
+- [交互式取词 Seam](slices/interactive-text-acquisition-seam.md)底层设计已完成并进入 Stage 4；实现继续
+  延后，恢复时必须先做 UIA Point / Text Range 与 Geometry Fixture，再接 OCR 和外部呈现。
+- [Web Desktop 首个真实目标验收](slices/web-desktop-first-target-acceptance.md)已暂停：隔离宿主实验足以
+  证明“主动开放接口时可用”，继续修改自有目标 DOM 不能证明对第三方现有软件的通用覆盖。
+- Web 后续只有在目标软件提供官方扩展、启动集成或宿主 SDK 时才恢复，并以 Host-assisted Integration
+  单独标注；不把 CDP 端口或自有调试构建包装成通用 Adapter。
+- 当前 Focus 返回[通用实时翻译覆盖](../real-time-translation-coverage/index.md)；SDL3_ttf 以及其他候选均
+  等待授权真实软件先证明动态入口命中和可见增量。
 
 ## Progress
 
 - 已完成 AI 评审路由，建立采纳门槛和明确的非目标；Roadmap 按真实证据逐 Stage 推进。
+- 已完成交互式取词底层路由：持续 Observation 保持最小；Point、Text Range、Region 统一为短期选区，
+  Structured/UIA 与 Visual/OCR 共用同一深 Interface，翻译与外部呈现继续分离。
 - 已完成同类 Hook/翻译工具的一手资料汇总，冻结 Observation Stream、Transform Profile
   及可选输入/输出能力的路由边界。
 - Process Family Stage 完成：Extension → Runtime Spec → Controller 配置贯通显式后代 allowlist；
@@ -155,6 +171,25 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
   Desktop capture 合同通过，初始空 publication generation `0` 不再误拒绝握手。
 - 完成引擎翻译能力汇总：确认同类公开清单适合作为覆盖参考而非实现证明；新增后续 Engine-aware
   Support Matrix 路线，并将文件/资源汉化明确路由到独立 Content Adapter Work。
+- 完成 SDL_ttf major 边界复核：SDL2 只能替换后续创建的 Surface，SDL3 才有公开绘制时 Text 对象；
+  前者不计实时覆盖，后者等待代表性授权目标后再立项。
+- 完成 [Web 桌面软件授权会话评审](references/web-desktop-authorized-session-review.md)：明确私有会话、
+  固定本地脚本、DOM 最小范围、敏感数据拒绝、generation 更新和条件恢复合同；尚未进入生产实现。
+- 完成 [Web Desktop Session 最小状态机](slices/web-desktop-session-prototype.md)：隐藏主/子 frame 的
+  observation、两代译文、应用重渲染和条件恢复 verdict 6/6 通过；一次性代码已删除。
+- 完成 [Web Desktop Session 进程外 transport](slices/web-desktop-session-transport-prototype.md)：临时
+  endpoint 与退出 verdict 通过，但无凭据第二客户端证明 loopback 端口不私有；生产端口方案 No-Go。
+- 完成 [Web Desktop Session 继承管道](slices/web-desktop-session-pipe-diagnostic.md)：隐藏 Chromium 的
+  十项 transport/lifecycle 检查全过，无 `DevToolsActivePort`、无进程级 TCP Listen；一次性代码已删除。
+- 完成 [Web Desktop 首个真实目标候选](references/web-desktop-first-target-candidates.md)筛选：Obsidian
+  官方 CLI 是唯一已确认的宿主主动授权 seam；draw.io 覆盖价值高但 transport/profile 尚未闭合。
+- 自有 Yotta 进入候选后重新排序：其 Wails + WebView2 宿主、按 Storage Root 派生的单实例身份和
+  非 production 调试配置允许隔离验收；当前已运行实例没有 endpoint，因此不直接 attach。
+- 完成 Yotta UAC/Web endpoint 因果诊断：production/admin 与 development/asInvoker manifest 合同、
+  debug options 合同均通过；隔离开发 Host 的 CDP/page target 控制两轮全绿。提升 GlyphShift 不能替代
+  WebView 创建前的宿主 endpoint。
+- 完成 Web 路线产品适用性复核：宿主主动开放接口时 transport 与 DOM 写回可实现，但普通已运行软件
+  不具备可通用连接的 endpoint；因此停止首个目标 DOM 验收，将该能力降为后续宿主协作集成。
 
 ## References
 
@@ -176,4 +211,6 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 - [UIA Isolated Worker transport 与合成 Provider](slices/uia-isolated-worker-transport.md)
 - [Windows UIA MTA Client](slices/windows-uia-mta-client.md)
 - [UIA Runtime Bundle 集成](slices/uia-runtime-bundle-integration.md)
+- [交互式取词 Seam](slices/interactive-text-acquisition-seam.md)
 - [引擎翻译能力调研汇总](references/engine-translation-capability-summary.md)
+- [Web 桌面软件授权会话评审](references/web-desktop-authorized-session-review.md)

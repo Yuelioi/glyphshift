@@ -59,28 +59,52 @@
   Change Trigger Policy 组成的兜底。
 - [ ] 按真实缺口分别决定 Direct2D、Direct3D、OpenGL 或 Vulkan 是否立项。
 
-## Stage 4：原生稳定性与布局
+## Stage 4：交互式翻译回退
+
+- [x] [定义交互式取词 Seam](slices/interactive-text-acquisition-seam.md)：Point、Text Range 与 Region
+  共用一次性 request/result Interface；坐标不进入持续 Observation、Dictionary 或 Region Binding。
+- [ ] 先以 UIA Fixture 交付 Point / Text Range 的结构化取词和多显示器 Geometry 合同，不同时建设
+  热键、浮层、翻译器或 OCR。
+- [ ] 再让授权 Target Frame + OCR 作为第二个 Acquisition Adapter 复用同一 Interface；截图默认只在
+  内存中存在，跨进程选区、密码和受保护窗口失败关闭。
+- [ ] 最后分别组合 Dictionary / Translation Provider 与 External Translation Presentation；外部呈现
+  不修改目标软件，也不冒充 `TextReplace`。
+
+## Stage 5：原生稳定性与布局
 
 - [ ] 研究 SEH/VEH、Watchdog、熔断和运行成本，选择能保持 fail-open 的最小方案。
 - [ ] 以真实截断案例验证字体度量和 `LayoutAdjust`，不建立万能 Renderer。
 - [ ] 仅在原位写回不可行且有真实需求时评估独立 Overlay / External Window Apply Model。
 
-## Stage 5：有界 Transform Profile
+## Stage 6：有界 Transform Profile
 
 - [ ] 定义捕获正规化、保护/排除和结果修正的有序、版本化、可预览规则合同。
 - [ ] 为每个 Operator 固定输入类型、执行预算、冲突诊断和 fail-open 语义，不开放任意脚本。
 
-## Stage 6：可选匹配与创作辅助
+## Stage 7：可选匹配与创作辅助
 
 - [ ] 只有精确匹配出现可复现缺口时才设计 Dictionary Match Policy 和冲突诊断。
 - [ ] 将模糊/AI 能力限制为 Probe 离线建议，并保留人工确认与确定性 Runtime Publication。
 
-## Stage 7：引擎感知扩展（后续）
+## Stage 8：引擎感知扩展（后续）
 
 - [ ] 依据[引擎翻译能力调研汇总](references/engine-translation-capability-summary.md)定义正式
   Support Matrix：Engine/runtime、build mode、观察来源、应用方式、版本、证据与失败语义分别记录。
 - [ ] 用授权真实目标验证首个 Engine-aware Extension；优先调查与桌面工具相关的
   V8/Chromium/WebView 或托管运行时结构化 Seam，不按游戏类型或宣传覆盖数量选择目标。
+- [x] 完成 [Web 桌面软件授权会话评审](references/web-desktop-authorized-session-review.md)：固定为
+  显式授权 Extension，不通过 Native DLL 绕过调试/宿主授权；生产实现等待安全会话与 DOM 恢复门槛。
+- [x] [验证 Web Desktop Session 最小状态机](slices/web-desktop-session-prototype.md)：隔离 world 只处理
+  可见普通文本，并证明 generation、应用重渲染与条件恢复不会互相覆盖。
+- [x] [验证 Web Desktop Session 进程外 transport](slices/web-desktop-session-transport-prototype.md)：
+  临时 endpoint、page attach 与目标退出必须确定，并将随机 loopback 端口与真正私有通道分开。
+- [x] [验证 Web Desktop Session 继承管道](slices/web-desktop-session-pipe-diagnostic.md)：仅以 GlyphShift
+  作为父进程启动的 Chromium 合成目标验证无监听 endpoint 的私有 transport，不外推宿主支持。
+- [x] 复核 [Web Desktop 首个真实目标验收](slices/web-desktop-first-target-acceptance.md)的产品适用性：
+  自有隔离宿主只能证明 Host-assisted Integration，不能证明第三方现有软件的通用连接与实时写回；暂停
+  DOM 验收，不建设 Catalog/UI。
+- [ ] 只有授权 Windows 目标真实使用动态 SDL3_ttf `TTF_Text` 绘制链时，才验证临时译文对象、属性
+  复制、热更新与停用恢复；SDL2_ttf Surface 创建时替换不计入实时覆盖。
 - [ ] Unity Mono 与 IL2CPP 等差异明显的构建后端分别立证，不发布无版本边界的引擎级支持声明。
 - [ ] 评估隔离的通用进程内文字观察器：只声明 `TextObserve`，并先固定候选流选择、跨启动 Binding、
   权限与崩溃恢复合同；不把原文提取成功等同于实时写回。

@@ -19,9 +19,16 @@
 - [x] Probe 编辑绑定 Dictionary 后保存并发布下一代预览；GDI+ 确定性目标无需重启即可使用新代次。
 - [x] [收敛探针与词典创建流程](slices/creation-flow-distillation.md)：创建时只询问必要信息，取消与
   关闭完整丢弃未提交草稿，发布类元数据留在词典设置中维护。
+- [x] 收敛探针管理列表：创建任务已保存时即关闭 Modal；路径与 Adapter 明细按需展示；重启后的
+  旧连接统一恢复为“未连接”，列表只显示“未连接 / 已连接”。
 - [ ] 在干净重启的授权真实目标上完成
   [Probe 到 GDI+ 实时更新](slices/probe-gdiplus-live-update.md)的用户可见验收。
-- [ ] 对无信号、仅采集、字典未命中和写回失败分别返回清晰状态。
+- [x] 根据实际会话 ACK 区分“可直接替换 / 仅采集 / 无信号”，且仅采集明确说明目标界面不会被修改；
+  该状态只属于当前连接，不写入持久任务。
+- [x] 将没有目标译文的观察条目明确显示为“词典未命中”。
+- [x] 预览发布失败时明确区分“Dictionary 已保存”与“Runtime 未收到更新”，不误报成停止失败。
+- [ ] 为 Adapter 最终应用结果设计窄回执合同；现有 Runtime Trace 只能证明替换决策，不能据此展示
+  “目标界面写回成功 / 失败”，且不新增第二套持久诊断模型。
 
 ## Stage 4：重复扩展
 
@@ -30,6 +37,19 @@
   每次绘制都能取得原文、Dictionary 命中可替换本次绘制、热更新生效且停用恢复。
 - [x] 仅在显式配置的合成宿主合同通过后，选择一个授权 Qt Widgets 目标完成可见 smoke；未命中时
   记录覆盖边界，不退化为仅注入成功。
-- [ ] 完成 [WinUI/MRT 文字路径诊断](slices/winui-mrt-path-diagnostic.md)：只有声明式 `x:Uid` 也命中
+- [x] 完成 [WinUI/MRT 文字路径诊断](slices/winui-mrt-path-diagnostic.md)：只有声明式 `x:Uid` 也命中
   可安全替换的入口，才进入 Adapter 实现。
-- [ ] 把共享 Hook、区域 Binding、字体布局和 OCR 等阻塞项送回各自 Roadmap，不抢占覆盖主线。
+- [x] 把共享 Hook、区域 Binding、字体布局和 OCR 等阻塞项送回各自 Roadmap，不抢占覆盖主线。
+- [x] 完成 [Tk 文字绘制链对照诊断](slices/tk-text-draw-path-diagnostic.md)：只有公开 Tk 层相对现有
+  GDI 在完整词条或中文 fallback 上产生稳定增量，才新增生产 Adapter；结果等价则 No-Go。
+- [x] 完成 [Tk 之后的实时文字入口复核](references/post-tk-runtime-seam-review.md)：SDL2_ttf 因缓存
+  语义不进入实时 Bundle；SDL3_ttf 与需要目标主动授权的 Web/托管入口转入 Roadmap。
+
+## Stage 5：真实软件缺口驱动
+
+- [x] 完成 [WPF 真实目标缺口验收](slices/wpf-real-target-gap.md)：实际模块确认 WPF；UIA 取得 72 条
+  唯一公开文本，但六条 Native 写回入口持续重绘仍全部零命中。
+- [x] 将该 WPF 目标明确降级为“仅结构化观察”，不因 DirectWrite/Direct2D 模块存在或成功注入计入
+  通用实时写回覆盖。
+- [ ] 选择下一 Apply Model：Managed WPF Agent 的原位写回有界原型，或 UIA 驱动的外部翻译呈现；
+  未选择前不实现私有符号 Hook、属性全局改写或万能 Overlay Renderer。

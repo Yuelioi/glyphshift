@@ -88,6 +88,21 @@ Target Execution
 - Direct2D、Direct3D、OpenGL 和 Vulkan 仅在目标软件证据显示真实缺口后分别立项，不创建万能图形
   Renderer。
 
+### 交互式取词与外部呈现
+
+- 悬停、划词和框选 OCR 都从一次显式 `Interactive Selection` 进入同一个取词 Interface；热键、鼠标
+  手势和呈现样式属于调用者，不为每种交互复制一套采集管道。
+- 持续 Probe 的 `CaptureObservationBatch/1` 保持最小文字事实，不增加坐标、控件或截图字段；交互取词
+  通过独立 request/result Seam 返回有界原文块与短期屏幕锚点。
+- Point、Text Range 和 Region 都绑定当前授权 Target Instance。UIA 作为 Structured Acquirer，授权
+  Target Frame + OCR 作为 Visual Acquirer；两者可以按策略回退，但不能扩大到任意桌面截图。
+- 屏幕锚点使用虚拟桌面物理像素并只在当前交互会话内有效；窗口移动、滚动、DPI 或目标实例变化后
+  重新获取，绝不持久化为 Region Binding、Dictionary Location 或 Probe 证据。
+- 取词、Translation Resolver 与 External Translation Presentation 是三个独立 Module。外部呈现不会
+  修改目标控件，也不能提升为 `TextReplace` 实际状态。
+- UIA 密码内容继续失败关闭；Visual 取词只由用户显式触发，中间图像默认只驻留内存，未来发送到网络
+  翻译器或 AI 必须另行取得明确授权。
+
 ### Engine-aware Integration
 
 - 同类工具公开的引擎清单只作为市场覆盖参考，不作为 Glyphshift 的实现或支持证明；完整判断见
@@ -100,6 +115,17 @@ Target Execution
   Runtime Adapter 的生命周期，也不把资源位置与改写证据塞入 Dictionary Entry。
 - 首个 Engine-aware 验证必须由授权真实目标和确定性 Fixture 驱动；对当前桌面工具方向，优先调研
   V8/Chromium/WebView 等结构化接入，再按实际需求评估游戏专用引擎。
+- Web DOM 节点只有在当前值仍等于 GlyphShift 最后一次 applied translation 时才由会话继续拥有；应用
+  写入不同值后，该值成为新 source。停用也只恢复仍由会话拥有的节点，不能覆盖应用后续状态。
+- Web Session 的随机 loopback CDP 端口不构成授权：同机第二客户端无需凭据即可取得 browser 权限。
+  生产 transport 必须由父进程独占的继承 pipe 或目标宿主主动提供，端口模式只能用于本地诊断。
+- Chromium 的父子继承 pipe 已通过无调试 endpoint、零进程级 TCP 监听、隔离 Runtime 和退出断线合同；
+  它只适用于 GlyphShift 启动并拥有生命周期的目标，不构成 Electron、CEF 或任意现有进程 attach 能力。
+- Web/CDP 不属于通用实时翻译 Adapter：只有目标的官方扩展、受控启动或宿主 SDK 明确开放会话时，才可
+  作为 Host-assisted Integration 建设。自有调试构建能连接只证明宿主协作可行，不能外推第三方软件覆盖。
+- Web endpoint 与 Windows 完整性是正交边界：目标未在 WebView 创建前开放宿主接口时，提升 GlyphShift
+  也不能连接 DOM；目标完整性更高时，Native/UIA 仍必须独立返回权限拒绝，不能用 Web transport 成功
+  掩盖原生权限不匹配。
 - 公开实现抽样只证明通用进程内文字观察和文本流选择，没有证明通用译文写回；类似能力只能作为
   隔离的 observe-only Adapter Pack 候选，不能提升为 `TextReplace`。
 
