@@ -1,6 +1,6 @@
 # 交互式取词 Seam
 
-Status: Planned; interface design complete
+Status: Finished
 
 ## Outcome
 
@@ -104,6 +104,6 @@ Source Blocks + Ephemeral Anchors
 
 ## Next
 
-实现仍延后。恢复本切片时先交付 UIA Point / Text Range 的纯取词合同和 Geometry Fixture，不先做全局
-热键、浮层 UI、在线翻译或 OCR；只有结构化 Interface 通过后，再用同一 Interface 接入授权窗口截图与
-OCR Adapter。
+底层 Interface、UIA / Visual Adapter Fixture、一次性 Worker、真实 Windows UIA Provider 和后续
+Dictionary / Provider / External Presentation 组合合同均已交付。全局热键、浮层 UI、真实在线服务与
+生产 OCR 仍是独立的产品/技术选择，不属于本 Seam。

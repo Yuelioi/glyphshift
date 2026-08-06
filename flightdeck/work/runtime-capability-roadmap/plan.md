@@ -63,12 +63,19 @@
 
 - [x] [定义交互式取词 Seam](slices/interactive-text-acquisition-seam.md)：Point、Text Range 与 Region
   共用一次性 request/result Interface；坐标不进入持续 Observation、Dictionary 或 Region Binding。
-- [ ] 先以 UIA Fixture 交付 Point / Text Range 的结构化取词和多显示器 Geometry 合同，不同时建设
-  热键、浮层、翻译器或 OCR。
-- [ ] 再让授权 Target Frame + OCR 作为第二个 Acquisition Adapter 复用同一 Interface；截图默认只在
-  内存中存在，跨进程选区、密码和受保护窗口失败关闭。
-- [ ] 最后分别组合 Dictionary / Translation Provider 与 External Translation Presentation；外部呈现
-  不修改目标软件，也不冒充 `TextReplace`。
+- [x] [先以 UIA Fixture 交付 Point / Text Range 的结构化取词和多显示器 Geometry
+  合同](slices/interactive-uia-acquisition-contract.md)，不同时建设热键、浮层、翻译器或 OCR。
+- [x] [再让授权 Target Frame + OCR 作为第二个 Acquisition Adapter 复用同一
+  Interface](slices/interactive-visual-acquisition-fixture.md)；截图默认只在内存中存在，跨进程选区、
+  密码和受保护窗口失败关闭。
+- [x] [为 Structured/UIA 与 Visual/Frame+OCR 固定受监督的一次性 Worker
+  transport](slices/interactive-acquisition-worker-transport.md)，先覆盖有界 wire、grant、超时、取消和
+  子进程退出，不绑定热键或 UI。
+- [x] [接入 Windows UIA Point / Text Range Provider](slices/windows-uia-interactive-provider.md)，复用
+  Controller process grant 和一次性 worker wire，以标准控件进程固定真实合同。
+- [x] [最后分别组合 Dictionary / Translation Provider 与 External Translation
+  Presentation](slices/interactive-acquisition-composition.md)；外部呈现不修改目标软件，也不冒充
+  `TextReplace`。
 
 ## Stage 5：原生稳定性与布局
 

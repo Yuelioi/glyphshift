@@ -13,11 +13,12 @@ pub fn run_uia_standard_control_server(
     use std::sync::mpsc::{self, TryRecvError};
     use std::sync::Arc;
     use std::time::{Duration, Instant};
+    use windows_sys::Win32::System::LibraryLoader::LoadLibraryW;
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        CreateWindowExW, DestroyWindow, DispatchMessageW, PeekMessageW, SetWindowTextW, ShowWindow,
-        TranslateMessage, ES_AUTOHSCROLL, ES_AUTOVSCROLL, ES_MULTILINE, ES_PASSWORD, MSG,
-        PM_REMOVE, SW_SHOWNOACTIVATE, WS_BORDER, WS_CHILD, WS_EX_TOOLWINDOW, WS_OVERLAPPEDWINDOW,
-        WS_VISIBLE,
+        CreateWindowExW, DestroyWindow, DispatchMessageW, GetWindowRect, PeekMessageW,
+        SetWindowTextW, ShowWindow, TranslateMessage, ES_AUTOHSCROLL, ES_AUTOVSCROLL, ES_MULTILINE,
+        ES_PASSWORD, MSG, PM_REMOVE, SW_SHOWNOACTIVATE, WS_BORDER, WS_CHILD, WS_EX_TOOLWINDOW,
+        WS_OVERLAPPEDWINDOW, WS_VISIBLE,
     };
 
     fn wide(value: &str) -> Vec<u16> {
@@ -55,10 +56,15 @@ pub fn run_uia_standard_control_server(
         label: windows_sys::Win32::Foundation::HWND,
         value: windows_sys::Win32::Foundation::HWND,
         document: windows_sys::Win32::Foundation::HWND,
+        range: windows_sys::Win32::Foundation::HWND,
         password: windows_sys::Win32::Foundation::HWND,
     }
 
     unsafe fn create_controls(recreated: bool) -> Option<Controls> {
+        let rich_edit_module = wide("Msftedit.dll");
+        if LoadLibraryW(rich_edit_module.as_ptr()).is_null() {
+            return None;
+        }
         let class_name = wide("Static");
         let title = wide(if recreated {
             "GlyphShift recreated UIA fixture"
@@ -73,7 +79,7 @@ pub fn run_uia_standard_control_server(
             40,
             40,
             520,
-            260,
+            360,
             null_mut(),
             null_mut(),
             null_mut(),
@@ -115,6 +121,17 @@ pub fn run_uia_standard_control_server(
             (16, 92, 450, 64),
             window,
         );
+        let range = create(
+            "RICHEDIT50W",
+            if recreated {
+                "Recreated first line\r\nRecreated second line"
+            } else {
+                "First line\r\nSecond line"
+            },
+            WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE as u32 | ES_AUTOVSCROLL as u32,
+            (16, 168, 450, 72),
+            window,
+        );
         let password = create(
             "Edit",
             if recreated {
@@ -123,10 +140,10 @@ pub fn run_uia_standard_control_server(
                 "Fixture secret"
             },
             WS_CHILD | WS_VISIBLE | WS_BORDER | ES_PASSWORD as u32,
-            (16, 168, 450, 28),
+            (16, 252, 450, 28),
             window,
         );
-        if [label, value, document, password]
+        if [label, value, document, range, password]
             .into_iter()
             .any(|handle| handle.is_null())
         {
@@ -139,6 +156,7 @@ pub fn run_uia_standard_control_server(
             label,
             value,
             document,
+            range,
             password,
         })
     }
@@ -189,6 +207,10 @@ pub fn run_uia_standard_control_server(
                     SetWindowTextW(controls.label, wide("Updated label").as_ptr());
                     SetWindowTextW(controls.value, wide("Updated value").as_ptr());
                     SetWindowTextW(controls.document, wide("Updated document").as_ptr());
+                    SetWindowTextW(
+                        controls.range,
+                        wide("Updated first line\r\nUpdated second line").as_ptr(),
+                    );
                     SetWindowTextW(controls.password, wide("Updated secret").as_ptr());
                 }
                 writeln!(stdout, "uia-updated")?;
@@ -211,6 +233,32 @@ pub fn run_uia_standard_control_server(
                     std::thread::sleep(Duration::from_millis(10));
                 }
                 writeln!(stdout, "uia-provider-unblocked")?;
+                stdout.flush()?;
+            }
+            Ok(command) if command.trim() == "geometry" => {
+                let mut label = windows_sys::Win32::Foundation::RECT::default();
+                let mut range = windows_sys::Win32::Foundation::RECT::default();
+                let mut password = windows_sys::Win32::Foundation::RECT::default();
+                let available = unsafe {
+                    GetWindowRect(controls.label, &mut label) != 0
+                        && GetWindowRect(controls.range, &mut range) != 0
+                        && GetWindowRect(controls.password, &mut password) != 0
+                };
+                if !available {
+                    return Err(std::io::Error::other("uia fixture geometry unavailable"));
+                }
+                writeln!(
+                    stdout,
+                    "uia-geometry {} {} {} {} {} {} {} {}",
+                    (label.left + label.right) / 2,
+                    (label.top + label.bottom) / 2,
+                    range.left + 24,
+                    range.top + 12,
+                    range.left + 72,
+                    range.top + 36,
+                    (password.left + password.right) / 2,
+                    (password.top + password.bottom) / 2,
+                )?;
                 stdout.flush()?;
             }
             Ok(command) if command.trim() == "exit" => {

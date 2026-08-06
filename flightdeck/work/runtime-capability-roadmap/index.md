@@ -9,6 +9,11 @@ Status: Open
 
 ## Current
 
+Stage 4 的仓库内后端合同已完成。一次性 Acquisition 深 Interface、Structured / Visual Fixture、独立
+受监督 Worker transport、真实 Windows UIA Point / Text Range Provider，以及 Dictionary 优先、
+Translation Provider 回退、External Presentation 清理组合均已交付；Point、Text Range、Region、坐标、
+裁剪、隐私、wire、超时、取消和部分成功都有确定性合同。热键、生产 OCR 引擎与 UI 仍需独立产品选择。
+
 优先级已纠正：Observation Stream、跨启动 Binding 与 Probe/诊断/Workflow 共享 Hook 都不能直接增加
 实时翻译覆盖，继续延后到真实软件案例证明必要时再恢复。Web 桌面原型证明 DOM ownership 和父进程
 继承管道可以成立，但也证明这条路径依赖目标宿主在 WebView 创建前主动开放接口；绝大多数已运行的
@@ -93,8 +98,8 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 
 ## Next
 
-- [交互式取词 Seam](slices/interactive-text-acquisition-seam.md)底层设计已完成并进入 Stage 4；实现继续
-  延后，恢复时必须先做 UIA Point / Text Range 与 Geometry Fixture，再接 OCR 和外部呈现。
+- Stage 4 后端已闭环；若进入 Desktop/UI，先明确用户触发方式、会话取消和外部呈现形态，再开独立
+  产品切片，不在 Runtime 合同中猜测交互。
 - [Web Desktop 首个真实目标验收](slices/web-desktop-first-target-acceptance.md)已暂停：隔离宿主实验足以
   证明“主动开放接口时可用”，继续修改自有目标 DOM 不能证明对第三方现有软件的通用覆盖。
 - Web 后续只有在目标软件提供官方扩展、启动集成或宿主 SDK 时才恢复，并以 Host-assisted Integration
@@ -107,6 +112,21 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 - 已完成 AI 评审路由，建立采纳门槛和明确的非目标；Roadmap 按真实证据逐 Stage 推进。
 - 已完成交互式取词底层路由：持续 Observation 保持最小；Point、Text Range、Region 统一为短期选区，
   Structured/UIA 与 Visual/OCR 共用同一深 Interface，翻译与外部呈现继续分离。
+- 完成 [UIA 交互式取词合同与 Geometry Fixture](slices/interactive-uia-acquisition-contract.md)：新增零依赖
+  `runtime/acquisition` Module，Structured-first 回退、稳定失败、部分成功、文本/块/anchor 上限以及
+  UIA Point / Text Range / Control / Privacy Fixture 均通过；55 包 workspace 与全部门禁全绿。
+- 完成 [Target Frame + OCR Visual Fixture](slices/interactive-visual-acquisition-fixture.md)：第二个
+  Acquisition Adapter 只向 OCR 暴露授权 frame 与 Region 的交集，crop-local anchor、负坐标/DPI、
+  protected/cross-target 和 bounded confidence 合同通过；56 包 workspace 与全部门禁全绿。
+- 完成 [一次性 Acquisition Worker transport](slices/interactive-acquisition-worker-transport.md)：独立
+  `/1` wire 与 SDK/Host 分层已交付，grant 绑定、1 MiB/字段上限、unknown-field、成功/拒绝、超时、
+  取消、崩溃和畸形响应合同通过；59 包 workspace 与全部门禁全绿。
+- 完成 [Windows UIA 交互式 Provider](slices/windows-uia-interactive-provider.md)：一次性 MTA Worker
+  复用 Controller process grant，真实标准控件覆盖 Point Word、Name-only Control、跨行 Text Range、
+  密码拒绝、目标退出与 Provider 超时；59 包 workspace 与全部门禁全绿。
+- 完成 [交互式采集组合合同](slices/interactive-acquisition-composition.md)：新增产品策略 Module，Dictionary
+  精确命中优先、Provider 逐块回退、部分成功与 External Presenter 回收合同 6/6 通过；任何 port 均拿不到
+  target/grant，也没有 `TextReplace` 入口。60 包 workspace 与全部门禁全绿。
 - 已完成 WPF Apply Model 选择：六条 Native 写回路径零命中后，后续采用结构化取词与外部译文呈现，
   不建设当前 Managed Agent 或全局 Dependency Property 改写。
 - 已完成同类 Hook/翻译工具的一手资料汇总，冻结 Observation Stream、Transform Profile

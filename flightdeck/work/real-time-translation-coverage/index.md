@@ -149,8 +149,8 @@ Adapter 技术说明入口也已补齐。正式清单新增可选 `documentation
   覆盖范围，不因加载 DirectWrite 模块而扩大支持声明。
 - 下一轮继续用“真实软件缺口 → 一手入口证据 → 有界原型 → 可见写回”的顺序选择文字技术，不以
   Adapter 数量或框架名称驱动实现。
-- [交互式取词 Seam](../runtime-capability-roadmap/slices/interactive-text-acquisition-seam.md)继续留在 Roadmap，
-  当前不抢先实现热键、浮层、OCR 或翻译器。
+- [交互式取词 Seam](../runtime-capability-roadmap/slices/interactive-text-acquisition-seam.md)的仓库内后端合同
+  已完成；热键、浮层、生产 OCR 与真实翻译服务仍留在 Roadmap，等待独立产品选择与授权目标证据。
 
 ## Progress
 
