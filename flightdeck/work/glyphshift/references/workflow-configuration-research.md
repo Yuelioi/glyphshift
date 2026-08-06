@@ -59,24 +59,24 @@ LunaTranslator 仍主要按游戏保存一套专用设置，不能直接满足 G
 
 - GDI Native Adapter 声明并执行 `FontSubstitute`，通过临时创建并选入新 `LOGFONTW`
   字体实现。见
-  [GDI Adapter](../../../../crates/glyphshift-adapter-gdi-native/src/lib.rs#L25)及
-  [Font-only 合同](../../../../crates/glyphshift-adapter-native-host/tests/native_gdi_activation_contract.rs#L87)。
+  [GDI Adapter](../../../../crates/adapters/implementations/gdi-native/src/lib.rs#L25)及
+  [Font-only 合同](../../../../crates/adapters/platform/native-host/tests/native_gdi_activation_contract.rs#L87)。
 - GDI+ Native Adapter 同样声明 `FontSubstitute`，保留原字号、样式与单位后创建替代字体。
-  见 [GDI+ Adapter](../../../../crates/glyphshift-adapter-gdiplus-native/src/lib.rs#L18)及
-  [Font-only 合同](../../../../crates/glyphshift-adapter-native-host/tests/native_gdiplus_activation_contract.rs#L89)。
+  见 [GDI+ Adapter](../../../../crates/adapters/implementations/gdiplus-native/src/lib.rs#L18)及
+  [Font-only 合同](../../../../crates/adapters/platform/native-host/tests/native_gdiplus_activation_contract.rs#L89)。
 - Desktop Backend 的 `FontArtifact` 只有一个 `family`，读取后应用到软件全部 Location；
   当前没有 GUI 写入接口。见
-  [Desktop Backend](../../../../crates/glyphshift-desktop-backend/src/lib.rs#L393)。
+  [Desktop Backend](../../../../crates/product/desktop-backend/src/lib.rs#L393)。
 - 前端和 Backend 都以 Software ID 直接索引翻译集合，仍是隐式一软件一 Catalog。
   见 [桌面模型](../../../../apps/glyphshift-desktop/src/model.ts#L74)和
-  [Backend Snapshot](../../../../crates/glyphshift-desktop-backend/src/lib.rs#L198)。
+  [Backend Snapshot](../../../../crates/product/desktop-backend/src/lib.rs#L198)。
 - Runtime Publication 已天然包含一份完整 Translation Snapshot 与 Font Policy；新的
   Workflow Composition 可以在 Desktop Runtime 之前生成 Publication，不需要让 Native
   Adapter 理解工作流。见
-  [Runtime Contract](../../../../crates/glyphshift-runtime-contract/src/lib.rs#L71)。
+  [Runtime Contract](../../../../crates/runtime/contract/src/lib.rs#L71)。
 - Desktop Runtime Pool 已按 Software 保存 requested Feature，并能在目标重启后 reconcile；
   它缺少的是工作流产生的完整 Target Intent，而不是另一套注入协议。见
-  [Desktop Runtime Pool](../../../../crates/glyphshift-desktop-runtime/src/lib.rs#L331)。
+  [Desktop Runtime Pool](../../../../crates/runtime/desktop/src/lib.rs#L331)。
 
 ## 三种候选方案
 

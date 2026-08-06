@@ -29,7 +29,24 @@
 - 新测试在被重构 module 的 interface 上验证可观察行为；新 interface 测试覆盖后，删除只验证旧浅层
   实现细节的重复测试。
 - `core` 只能是目录和依赖方向概念，不能成为容纳所有共享代码的巨型 crate。
+- 物理家族与依赖层级是两套分类：目录按能力导航，架构门禁按 L0 基础模型/SDK、L1 策略、L2 部署
+  合同、Adapter 侧车、L3 Host/Kernel、L4 产品编排、L5 Shell 约束方向。
+- 47 个 `crates/` package 使用 `adapters/`、`core/`、`dictionary/`、`runtime/` 与 `product/` 家族入口；
+  叶目录使用短能力名，例如 `crates/runtime/protocol`。Target 子家族必须用复数 `runtime/targets/`，避免
+  命中 Cargo/仓库的 `**/target` 构建输出忽略规则。
+- Cargo package/lib/target 身份保留 `glyphshift-` 上下文；目录名与 package 名解耦。当前全部 54 个
+  workspace package 继承 `publish = false`，未来公开 SDK 必须显式建立 registry/versioning 合同。
+- 物理归档不改变 package 名、ABI、部署 seam 或依赖层；是否合并 crate 仍须逐项删除测试，不由目录家族
+  机械外推。
 - Adapter 逻辑、Native/Worker Placement 和宿主编排可以物理分组，但保留其真实进程与 ABI seam。
+- Desktop Tauri 壳采用纵向功能 module 加小型平台 module；根保留 `run()` 与 Builder 组合，不采用把全部
+  DTO、应用操作和命令各自堆成横向大文件的结构。
+- Desktop Tauri 壳的共享应用状态和 Runtime seam 留在根组合层；功能 module 通过同一个
+  `DesktopApplication` 实现用例，跨功能协作仅使用 `pub(super)`，不拆成互相转发的状态 facade。
+- Desktop Backend 根是公开 re-export 与加载组合层；Dictionary、Workflow、Software/Extension 各自
+  拥有 DTO、artifact、用例和验证，Snapshot 单向读取 feature view，Storage 不拥有业务 schema。
+- Desktop Runtime 的 Bundle、Pool 与 Target Runtime 是三个独立变化原因：Bundle 认证 bytes，Target
+  管理一个已验证连接的 Session 生命周期，Pool 管理多软件所有权；Native/Worker Host 继续是外部 seam。
 - 每个重构切片必须无产品行为变化，并通过受影响 crate 测试、架构检查、全 workspace Clippy；涉及桌面
   界面或命令合同的切片还要通过仓库 Playwright。
 
@@ -37,5 +54,6 @@
 
 - 首批超长实现体按稳定职责形成内部 module，顶层 `lib.rs` 或 App 壳只保留清晰 interface 与组合入口。
 - 测试文件按被测 interface 分组，单个端到端规格不再承担全部桌面功能。
-- crate 家族、命名和依赖方向能从目录与架构测试共同读出，新贡献者无需浏览 54 个扁平目录猜测角色。
+- crate 家族、命名和依赖方向能从 package 名、`crates/README.md` 与架构测试共同读出，新贡献者无需逐个
+  打开 54 个 package 猜测角色。
 - 结构调整后外部 ABI、序列化字段、持久文件、Tauri 命令名、错误码和 Runtime Bundle 结果保持兼容。

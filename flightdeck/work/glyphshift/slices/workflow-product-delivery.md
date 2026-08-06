@@ -11,7 +11,7 @@ Status: Superseded
 可启停、可组合多软件与多词典的 Workflow 产品。Dictionary 是独立替换资产，既可替换文字，
 也可提供默认字体和逐词条字体覆盖；Workflow 激活后自动维持期望，不再提供“开始翻译”按钮。
 
-决定依据见[工作流、软件与多词典模型](desktop-configuration-model.md)和
+决定依据见[字典、字体与 Adapter 可组合模型最终复核](../references/composable-dictionary-font-and-adapter-model-review.md)和
 [工作流配置模型调研](../references/workflow-configuration-research.md)。
 
 ## Current
@@ -178,7 +178,7 @@ TextDecision / FontDecision。
 
 ### 2. Pure Workflow Composition Module (Complete)
 
-在根 `Cargo.toml` 注册 `crates/glyphshift-workflow`，测试公开 `resolve`：
+在根 `Cargo.toml` 注册当前位于 `crates/core/workflow` 的 package，测试公开 `resolve`：
 
 - WF-001：一个软件 + 一个词典，编译出 Text-only。
 - WF-002：同一词条的指定字体编译出 Text+Font。

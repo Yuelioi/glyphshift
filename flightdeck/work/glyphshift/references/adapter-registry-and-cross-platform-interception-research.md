@@ -98,14 +98,14 @@ Agent 的分层很值得借鉴：稳定执行引擎与快速变化的逐目标�
 
 ### 5.1 已经具备的基础
 
-[`glyphshift-adapter-sdk`](../../../../crates/glyphshift-adapter-sdk/src/lib.rs) 的 `AdapterDescriptor` 已包含：
+[`glyphshift-adapter-sdk`](../../../../crates/adapters/platform/sdk/src/lib.rs) 的 `AdapterDescriptor` 已包含：
 
 - `adapter_id`、semantic version、ABI；
 - `ApplyModel`、`Placement`；
 - Feature 集合；
 - architecture 集合。
 
-[`glyphshift-adapter-registry`](../../../../crates/glyphshift-adapter-registry/src/lib.rs) 已经是实质 Registry，而不是概念占位：
+[`glyphshift-adapter-registry`](../../../../crates/adapters/platform/registry/src/lib.rs) 已经是实质 Registry，而不是概念占位：
 
 - `reload()` 构建 ID + version 的包索引并拒绝重复/冲突内容；
 - `resolve()` 验证 artifact hash、trusted signer、adapter authorization、host model、ABI major、架构和请求 Feature；
@@ -128,14 +128,14 @@ Agent 的分层很值得借鉴：稳定执行引擎与快速变化的逐目标�
 
 ### 5.3 Hook 目标与激活参数均写死
 
-[`glyphshift-adapter-gdi-native`](../../../../crates/glyphshift-adapter-gdi-native/src/lib.rs)固定：
+[`glyphshift-adapter-gdi-native`](../../../../crates/adapters/implementations/gdi-native/src/lib.rs)固定：
 
 - `GetModuleHandleW("gdi32.dll")` + `GetProcAddress("ExtTextOutW")`；
 - 通过 `retour::GenericDetour` 安装一次；
 - UTF-16 上限、glyph-index 反查、trim、重入保护和字体创建/恢复均在实现内；
 - 文字替换时清除 `ETO_GLYPH_INDEX` 并丢弃原 `lpDx`，让 GDI 重新排版。
 
-[`glyphshift-adapter-gdiplus-native`](../../../../crates/glyphshift-adapter-gdiplus-native/src/lib.rs)固定：
+[`glyphshift-adapter-gdiplus-native`](../../../../crates/adapters/implementations/gdiplus-native/src/lib.rs)固定：
 
 - `LoadLibraryW("gdiplus.dll")` + `GetProcAddress("GdipDrawString")`；
 - 同时解析一组 GDI+ Font/FontFamily helper；
@@ -144,11 +144,11 @@ Agent 的分层很值得借鉴：稳定执行引擎与快速变化的逐目标�
 
 两者 `activate(host, requested, granted)` 只接收 Runtime Host 回调和 Feature bitsets。`deactivate()` 只把 Active Feature 清零；已安装 Detour 不更换目标，也没有 DLL、函数名、调用栈、线程、模块、窗口、过滤器或任意 JSON 参数。由于 `HOOK` / helper 使用 `OnceLock`，当前生命周期从设计上就是“固定实现，安装一次，Feature 开关控制透传”。
 
-[`glyphshift-adapter-native-abi`](../../../../crates/glyphshift-adapter-native-abi/src/lib.rs)也只有 x86/x86_64 architecture bits，没有 OS、arm64、最低 OS 版本、参数 schema 或 presentation 字段。
+[`glyphshift-adapter-native-abi`](../../../../crates/adapters/platform/native-abi/src/lib.rs)也只有 x86/x86_64 architecture bits，没有 OS、arm64、最低 OS 版本、参数 schema 或 presentation 字段。
 
 ### 5.4 OS 声明的真实缺口
 
-[`TargetFacts`](../../../../crates/glyphshift-domain/src/lib.rs)已经存储 `operating_system` 与 `architecture`，但只公开 `architecture()`；Registry `resolve()` 也只检查 architecture。因此当前描述符可能在错误 OS 上通过逻辑匹配，只会在更后面的文件/加载阶段失败。
+[`TargetFacts`](../../../../crates/core/domain/src/lib.rs)已经存储 `operating_system` 与 `architecture`，但只公开 `architecture()`；Registry `resolve()` 也只检查 architecture。因此当前描述符可能在错误 OS 上通过逻辑匹配，只会在更后面的文件/加载阶段失败。
 
 跨平台前至少需要：
 
