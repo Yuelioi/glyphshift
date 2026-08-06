@@ -14,9 +14,20 @@ Stage 4 的底层与组合合同已完成。一次性 Acquisition 深 Interface�
 Translation Provider 回退、External Presentation 清理组合均已交付；Point、Text Range、Region、坐标、
 裁剪、隐私、wire、超时、取消和部分成功都有确定性合同。UIA 一次性 Worker 现也已进入受验证的
 Runtime Bundle，Desktop 只能按 Adapter ID 创建 Host，不能取得或绕过验证后的制品路径。Desktop
-Acquisition Session 也已完成：每次 Point 请求在 Runtime 内重新签发短期 grant，稳定映射全部终态并
-回收一次性 Worker。当前把该 Interface 接入 Runtime Pool 与窄 Tauri command；热键、生产 OCR 引擎与
-UI 仍需独立产品选择。
+Acquisition Session 与 Desktop Command 也已完成：每次 Point 请求建立独立短期 Runtime，重新签发
+短期 grant，稳定映射全部终态并回收一次性 Worker；Workflow/Capture 的 Controller Session 不会被
+复用、停止或替换。UIA Point 产品入口现也已完成：`Ctrl+Shift+F9` 只触发一次前台 Point 请求，
+Dictionary 精确命中与 Glyphshift 内有界结果表面不创建 Probe、不修改目标。生产 OCR 技术评审现已完成，
+当前进入 WGC 单帧有界 ROI 与离线 OCR 的生产验证。
+
+授权真实目标暴露的兼容性与测试流程缺口现已关闭：Desktop 按 Placement / architecture 选择可用技术，
+多进程目标保留逐 target 的部分成功，驻留 Runtime 重配明确要求完整重启目标；Probe 创建、恢复、更新和
+设置共用同一兼容计划。Probe 页也已交付一键快速测试，Desktop 通过持久 ownership ledger 一次管理临时
+Software、Dictionary、兼容 Adapter Plan 和 Probe，并在失败、保留、清理、引用保护与崩溃恢复中维持
+同一生命周期。Desktop Acquisition Command 与 UIA Point 产品入口现均已完成。OCR 仍只允许在 UIA
+无结构化结果且用户明确选择时进入。任一授权软件的可见文字都可用于截图、ROI、识别与生命周期的工程
+样板；两个“UIA 无文本、像素文字可见”的成对授权样本只阻塞产品默认提升，不阻塞最小生产验证。
+离线引擎仍须通过识别率、制品体积与完整依赖许可门禁后才能进入正式发布 Bundle。
 
 优先级已纠正：Observation Stream、跨启动 Binding 与 Probe/诊断/Workflow 共享 Hook 都不能直接增加
 实时翻译覆盖，继续延后到真实软件案例证明必要时再恢复。Web 桌面原型证明 DOM ownership 和父进程
@@ -102,23 +113,31 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 
 ## Next
 
-- [Desktop Acquisition Command](slices/interactive-desktop-acquisition-command.md)：由 Runtime Pool 明确
-  一次性 Acquisition 与 Workflow/Capture 的共存，再向 Tauri 暴露不含平台身份的窄 Point command。
-- [Web Desktop 首个真实目标验收](slices/web-desktop-first-target-acceptance.md)已暂停：隔离宿主实验足以
-  证明“主动开放接口时可用”，继续修改自有目标 DOM 不能证明对第三方现有软件的通用覆盖。
-- Web 后续只有在目标软件提供官方扩展、启动集成或宿主 SDK 时才恢复，并以 Host-assisted Integration
-  单独标注；不把 CDP 端口或自有调试构建包装成通用 Adapter。
-- 当前 Focus 返回[通用实时翻译覆盖](../real-time-translation-coverage/index.md)；SDL3_ttf 以及其他候选均
-  等待授权真实软件先证明动态入口命中和可见增量。
+- [生产 OCR 显式回退](slices/interactive-ocr-production-fallback.md)：先以授权可见文字验证 WGC 单帧有界
+  ROI 与离线 OCR 候选；UIA 真实缺口证据与发布许可、体积、性能继续作为产品提升门槛。
 
 ## Progress
 
+- 完成 Runtime 兼容性路由：Placement-aware x86 前置检查、创建/设置/恢复共用的兼容计划、多进程
+  target 部分成功、驻留 Adapter 集合变化的稳定重启语义与授权 CEF 混合计划复测均已交付。
+- 完成 [Desktop Acquisition Command](slices/interactive-desktop-acquisition-command.md)：Pool 为每次请求
+  建立不进入持久 Session map 的短期 Runtime；Shell 以 `spawn_blocking`、独立取消注册表和稳定本地化
+  code 返回平台中立结果。Runtime 10/10、Shell 7/7 定向合同及相关门禁通过。
+- 完成 [快速探针测试流程](slices/quick-probe-test-flow.md)：默认路径只选择或捕获运行程序，Shell 以
+  ownership ledger 管理创建、复用、保留、补偿、引用保护和崩溃恢复；Shell 合同 8/8、Probe 页面
+  Playwright 11/11 与机械界面检测通过。
+- 根据 PowerToys、x86 软件与 CEF 多进程目标的新实机证据重排近期交付：先修兼容性路由，再交付一键
+  快速 Probe、UIA 取词翻译产品入口和显式 OCR 回退；不再让用户为一次技术测试跨三处创建资产。
 - 已完成 AI 评审路由，建立采纳门槛和明确的非目标；Roadmap 按真实证据逐 Stage 推进。
 - 已完成交互式取词底层路由：持续 Observation 保持最小；Point、Text Range、Region 统一为短期选区，
   Structured/UIA 与 Visual/OCR 共用同一深 Interface，翻译与外部呈现继续分离。
 - 完成 [UIA 交互式取词合同与 Geometry Fixture](slices/interactive-uia-acquisition-contract.md)：新增零依赖
   `runtime/acquisition` Module，Structured-first 回退、稳定失败、部分成功、文本/块/anchor 上限以及
   UIA Point / Text Range / Control / Privacy Fixture 均通过；55 包 workspace 与全部门禁全绿。
+- 完成 [Windows 生产 OCR 选项评审](references/windows-production-ocr-options.md)：确认 WGC 可作为已授权
+  HWND 的单帧 Frame Provider 候选；普通 unpackaged Desktop 不适合把 `Windows.Media.Ocr` 作为当前
+  基线，新 Windows AI Text Recognizer 还受 package identity 与 NPU 门槛约束。Tesseract 作为首个
+  工程验证候选；两个成对真实目标证据只决定产品提升，不阻塞授权样板验证。
 - 完成 [Target Frame + OCR Visual Fixture](slices/interactive-visual-acquisition-fixture.md)：第二个
   Acquisition Adapter 只向 OCR 暴露授权 frame 与 Region 的交集，crop-local anchor、负坐标/DPI、
   protected/cross-target 和 bounded confidence 合同通过；56 包 workspace 与全部门禁全绿。
@@ -250,5 +269,7 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 - [Acquisition Worker 正式 Bundle 接入](slices/interactive-acquisition-runtime-bundle.md)
 - [Desktop Acquisition Session](slices/interactive-desktop-acquisition-session.md)
 - [Desktop Acquisition Command](slices/interactive-desktop-acquisition-command.md)
+- [Windows 生产 OCR 显式回退选项](references/windows-production-ocr-options.md)
+- [生产 OCR 显式回退](slices/interactive-ocr-production-fallback.md)
 - [引擎翻译能力调研汇总](references/engine-translation-capability-summary.md)
 - [Web 桌面软件授权会话评审](references/web-desktop-authorized-session-review.md)

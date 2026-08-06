@@ -1,9 +1,10 @@
 /// Runs a deterministic standard-control UIA target over a line-oriented stdin contract.
 ///
 /// Commands: `update` changes the public label/edit/document values; `recreate` replaces the
-/// top-level window and controls; `block-provider` stalls the window thread until the stdin
-/// reader receives `unblock-provider`; `exit` closes the window. A password edit is also
-/// changed so the observer contract can prove that sensitive text never reaches capture output.
+/// top-level window and controls; `foreground` makes the deterministic Point fixture topmost;
+/// `block-provider` stalls the window thread until the stdin reader receives `unblock-provider`;
+/// `exit` closes the window. A password edit is also changed so the observer contract can prove
+/// that sensitive text never reaches capture output.
 pub fn run_uia_standard_control_server(
     keepalive: Option<std::time::Duration>,
 ) -> std::io::Result<()> {
@@ -16,8 +17,9 @@ pub fn run_uia_standard_control_server(
     use windows_sys::Win32::System::LibraryLoader::LoadLibraryW;
     use windows_sys::Win32::UI::WindowsAndMessaging::{
         CreateWindowExW, DestroyWindow, DispatchMessageW, GetWindowRect, PeekMessageW,
-        SetWindowTextW, ShowWindow, TranslateMessage, ES_AUTOHSCROLL, ES_AUTOVSCROLL, ES_MULTILINE,
-        ES_PASSWORD, MSG, PM_REMOVE, SW_SHOWNOACTIVATE, WS_BORDER, WS_CHILD, WS_EX_TOOLWINDOW,
+        SetWindowPos, SetWindowTextW, ShowWindow, TranslateMessage, ES_AUTOHSCROLL, ES_AUTOVSCROLL,
+        ES_MULTILINE, ES_PASSWORD, HWND_TOPMOST, MSG, PM_REMOVE, SWP_NOMOVE, SWP_NOSIZE,
+        SWP_SHOWWINDOW, SW_SHOWNOACTIVATE, WS_BORDER, WS_CHILD, WS_EX_TOOLWINDOW,
         WS_OVERLAPPEDWINDOW, WS_VISIBLE,
     };
 
@@ -233,6 +235,24 @@ pub fn run_uia_standard_control_server(
                     std::thread::sleep(Duration::from_millis(10));
                 }
                 writeln!(stdout, "uia-provider-unblocked")?;
+                stdout.flush()?;
+            }
+            Ok(command) if command.trim() == "foreground" => {
+                let positioned = unsafe {
+                    SetWindowPos(
+                        controls.window,
+                        HWND_TOPMOST,
+                        0,
+                        0,
+                        0,
+                        0,
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW,
+                    )
+                } != 0;
+                if !positioned {
+                    return Err(std::io::Error::other("uia fixture foreground unavailable"));
+                }
+                writeln!(stdout, "uia-foreground")?;
                 stdout.flush()?;
             }
             Ok(command) if command.trim() == "geometry" => {

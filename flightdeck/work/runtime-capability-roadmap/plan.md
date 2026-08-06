@@ -55,12 +55,17 @@
 - [x] [将 `windows.uia.observe` 接入正式 Runtime Bundle / Desktop catalog](slices/uia-runtime-bundle-integration.md)：
   只进入 Probe 的 observe-only 候选，Workflow 仍只接纳 `TextReplace`；Worker artifact 缺件、正式
   Desktop capture、密码排除和初始 generation `0` 均有合同。
-- [ ] 只在结构化 Adapter 无法覆盖且用户明确选择时评估 Window Capture、OCR observe-only 与
-  Change Trigger Policy 组成的兜底。
+- [x] [评估 Window Capture 与本地 OCR 显式回退](references/windows-production-ocr-options.md)：WGC
+  `CreateForWindow` 可作为授权 Frame Provider 候选；Tesseract 进入授权样板验证，两个 UIA 无文本而
+  像素文字可见的成对真实目标证据作为产品提升门槛，不阻塞工程实现。
 - [ ] 按真实缺口分别决定 Direct2D、Direct3D、OpenGL 或 Vulkan 是否立项。
 
 ## Stage 4：交互式翻译回退
 
+- [x] [交付 Runtime 兼容性路由](slices/runtime-compatibility-routing.md)：按 Placement、架构、target 与
+  Adapter 判断可用性，允许 Probe 部分成功，并固定驻留 Runtime 重配的恢复语义。
+- [x] [交付快速探针测试流程](slices/quick-probe-test-flow.md)：一次选择程序即可创建 Probe 专用软件、
+  草稿词典与兼容计划；保留、独占清理和失败补偿由 Desktop Module 负责。
 - [x] [定义交互式取词 Seam](slices/interactive-text-acquisition-seam.md)：Point、Text Range 与 Region
   共用一次性 request/result Interface；坐标不进入持续 Observation、Dictionary 或 Region Binding。
 - [x] [先以 UIA Fixture 交付 Point / Text Range 的结构化取词和多显示器 Geometry
@@ -81,8 +86,13 @@
   target/grant 和 UI。
 - [x] [建立 Desktop Acquisition Session](slices/interactive-desktop-acquisition-session.md)：只在 Runtime
   内组合当前授权 target、短期 grant 与受验证 Host，先固定一次 Point 请求的生命周期和错误映射。
-- [ ] [接入 Desktop Acquisition Command](slices/interactive-desktop-acquisition-command.md)：由 Pool 管理
+- [x] [接入 Desktop Acquisition Command](slices/interactive-desktop-acquisition-command.md)：由 Pool 管理
   与现有 Workflow/Capture 的共存，再向 Tauri 暴露不含平台身份的窄 Point command。
+- [x] [交付 UIA 取词翻译产品入口](slices/interactive-acquisition-product-flow.md)：一次 Point 请求组合
+  Dictionary / Translation Provider 与外部呈现，不创建完整 Probe，不冒充原位写回。
+- [ ] [以 UIA 无结果为门槛接入生产 OCR 回退](slices/interactive-ocr-production-fallback.md)：正在以授权
+  可见文字验证 Capture 与 OCR；产品路径仍只在 UIA 无结果且用户明确选择时截取授权区域，并复用
+  同一翻译和结果表面。
 
 ## Stage 5：原生稳定性与布局
 
