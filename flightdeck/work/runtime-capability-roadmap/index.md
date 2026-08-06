@@ -9,10 +9,14 @@ Status: Open
 
 ## Current
 
-Stage 4 的仓库内后端合同已完成。一次性 Acquisition 深 Interface、Structured / Visual Fixture、独立
+Stage 4 的底层与组合合同已完成。一次性 Acquisition 深 Interface、Structured / Visual Fixture、独立
 受监督 Worker transport、真实 Windows UIA Point / Text Range Provider，以及 Dictionary 优先、
 Translation Provider 回退、External Presentation 清理组合均已交付；Point、Text Range、Region、坐标、
-裁剪、隐私、wire、超时、取消和部分成功都有确定性合同。热键、生产 OCR 引擎与 UI 仍需独立产品选择。
+裁剪、隐私、wire、超时、取消和部分成功都有确定性合同。UIA 一次性 Worker 现也已进入受验证的
+Runtime Bundle，Desktop 只能按 Adapter ID 创建 Host，不能取得或绕过验证后的制品路径。Desktop
+Acquisition Session 也已完成：每次 Point 请求在 Runtime 内重新签发短期 grant，稳定映射全部终态并
+回收一次性 Worker。当前把该 Interface 接入 Runtime Pool 与窄 Tauri command；热键、生产 OCR 引擎与
+UI 仍需独立产品选择。
 
 优先级已纠正：Observation Stream、跨启动 Binding 与 Probe/诊断/Workflow 共享 Hook 都不能直接增加
 实时翻译覆盖，继续延后到真实软件案例证明必要时再恢复。Web 桌面原型证明 DOM ownership 和父进程
@@ -98,8 +102,8 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 
 ## Next
 
-- Stage 4 后端已闭环；若进入 Desktop/UI，先明确用户触发方式、会话取消和外部呈现形态，再开独立
-  产品切片，不在 Runtime 合同中猜测交互。
+- [Desktop Acquisition Command](slices/interactive-desktop-acquisition-command.md)：由 Runtime Pool 明确
+  一次性 Acquisition 与 Workflow/Capture 的共存，再向 Tauri 暴露不含平台身份的窄 Point command。
 - [Web Desktop 首个真实目标验收](slices/web-desktop-first-target-acceptance.md)已暂停：隔离宿主实验足以
   证明“主动开放接口时可用”，继续修改自有目标 DOM 不能证明对第三方现有软件的通用覆盖。
 - Web 后续只有在目标软件提供官方扩展、启动集成或宿主 SDK 时才恢复，并以 Host-assisted Integration
@@ -127,6 +131,14 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 - 完成 [交互式采集组合合同](slices/interactive-acquisition-composition.md)：新增产品策略 Module，Dictionary
   精确命中优先、Provider 逐块回退、部分成功与 External Presenter 回收合同 6/6 通过；任何 port 均拿不到
   target/grant，也没有 `TextReplace` 入口。60 包 workspace 与全部门禁全绿。
+- 完成 [Acquisition Worker 正式 Bundle 接入](slices/interactive-acquisition-runtime-bundle.md)：未发布
+  `/2` schema 要求显式声明 `acquisition_workers`，不为缺字段清单保留静默兼容；未来兼容只通过明确
+  schema 版本与迁移策略引入。Desktop 仍只获得 Adapter ID 与 Host factory，现恢复 Desktop
+  Acquisition Session。
+- 完成 [Desktop Acquisition Session](slices/interactive-desktop-acquisition-session.md)：Runtime 以窄
+  `acquire_point` Interface 隐藏 target/grant/制品，每次请求重新授权并稳定映射取消、超时、权限、目标
+  退出和 Worker 故障；正式 Debug Bundle 已真实取得合成 UIA Point 文本，60 包 workspace 与全部门禁
+  全绿。
 - 已完成 WPF Apply Model 选择：六条 Native 写回路径零命中后，后续采用结构化取词与外部译文呈现，
   不建设当前 Managed Agent 或全局 Dependency Property 改写。
 - 已完成同类 Hook/翻译工具的一手资料汇总，冻结 Observation Stream、Transform Profile
@@ -235,5 +247,8 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 - [Windows UIA MTA Client](slices/windows-uia-mta-client.md)
 - [UIA Runtime Bundle 集成](slices/uia-runtime-bundle-integration.md)
 - [交互式取词 Seam](slices/interactive-text-acquisition-seam.md)
+- [Acquisition Worker 正式 Bundle 接入](slices/interactive-acquisition-runtime-bundle.md)
+- [Desktop Acquisition Session](slices/interactive-desktop-acquisition-session.md)
+- [Desktop Acquisition Command](slices/interactive-desktop-acquisition-command.md)
 - [引擎翻译能力调研汇总](references/engine-translation-capability-summary.md)
 - [Web 桌面软件授权会话评审](references/web-desktop-authorized-session-review.md)

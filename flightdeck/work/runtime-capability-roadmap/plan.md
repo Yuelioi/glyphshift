@@ -76,6 +76,13 @@
 - [x] [最后分别组合 Dictionary / Translation Provider 与 External Translation
   Presentation](slices/interactive-acquisition-composition.md)；外部呈现不修改目标软件，也不冒充
   `TextReplace`。
+- [x] [将一次性 Acquisition Worker 接入正式 Runtime Bundle
+  `/2`](slices/interactive-acquisition-runtime-bundle.md)，先固定制品校验与 Host factory，再接 Desktop
+  target/grant 和 UI。
+- [x] [建立 Desktop Acquisition Session](slices/interactive-desktop-acquisition-session.md)：只在 Runtime
+  内组合当前授权 target、短期 grant 与受验证 Host，先固定一次 Point 请求的生命周期和错误映射。
+- [ ] [接入 Desktop Acquisition Command](slices/interactive-desktop-acquisition-command.md)：由 Pool 管理
+  与现有 Workflow/Capture 的共存，再向 Tauri 暴露不含平台身份的窄 Point command。
 
 ## Stage 5：原生稳定性与布局
 
