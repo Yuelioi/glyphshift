@@ -82,7 +82,7 @@
   Presentation](slices/interactive-acquisition-composition.md)；外部呈现不修改目标软件，也不冒充
   `TextReplace`。
 - [x] [将一次性 Acquisition Worker 接入正式 Runtime Bundle
-  `/2`](slices/interactive-acquisition-runtime-bundle.md)，先固定制品校验与 Host factory，再接 Desktop
+  `/3`](slices/interactive-acquisition-runtime-bundle.md)，固定 executable/support files 校验与 Host factory，再接 Desktop
   target/grant 和 UI。
 - [x] [建立 Desktop Acquisition Session](slices/interactive-desktop-acquisition-session.md)：只在 Runtime
   内组合当前授权 target、短期 grant 与受验证 Host，先固定一次 Point 请求的生命周期和错误映射。
@@ -90,9 +90,10 @@
   与现有 Workflow/Capture 的共存，再向 Tauri 暴露不含平台身份的窄 Point command。
 - [x] [交付 UIA 取词翻译产品入口](slices/interactive-acquisition-product-flow.md)：一次 Point 请求组合
   Dictionary / Translation Provider 与外部呈现，不创建完整 Probe，不冒充原位写回。
-- [ ] [以 UIA 无结果为门槛接入生产 OCR 回退](slices/interactive-ocr-production-fallback.md)：正在以授权
-  可见文字验证 Capture 与 OCR；产品路径仍只在 UIA 无结果且用户明确选择时截取授权区域，并复用
-  同一翻译和结果表面。
+- [ ] [以 UIA 无结果为门槛接入生产 OCR 回退](slices/interactive-ocr-production-fallback.md)：WGC、候选
+  Tesseract Worker、Region 调度、一次性 eligibility、显式产品入口、精简制品、完整许可证/notice 与
+  性能预算、两个独立授权 UIA 缺口样本、负坐标、受保护窗口和退出边界均已通过；剩余发布门槛只有
+  物理多显示器/混合缩放验证。
 
 ## Stage 5：原生稳定性与布局
 

@@ -6,8 +6,10 @@
   可验证的官方技术文档入口；raylib 之后暂无满足门槛的真实动态目标，等待新缺口触发。
 - **Focus:** [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — Runtime 兼容性路由与
   一键快速探针、Desktop Acquisition Command 与 UIA 取词翻译产品入口已完成。生产 OCR 的技术评审
-  已完成，当前以授权软件的可见文字作为工程样板，验证 WGC 单帧有界 ROI 与离线 OCR；两个“UIA
-  无文本、像素文字可见”的成对样本改为产品提升门槛，不再阻塞技术实现。
+  、候选 Worker、Region 调度及 UIA 无文本后的显式 OCR 产品入口已完成。精简 Tesseract 支持集、
+  完整许可/notice、体积、延迟与峰值内存门禁也已通过；负坐标、受保护窗口及退出边界已由真实 WGC
+  Fixture 固定，两个独立授权目标的同点 UIA/OCR 缺口证据也已完成。当前只剩物理多显示器/混合缩放
+  验证，决定是否进入标准 Release Bundle。
   Observation Stream、共享 Hook、区域 Binding 和 Web 宿主协作继续不抢占当前路径。
 
 ## Project links

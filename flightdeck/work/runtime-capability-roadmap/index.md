@@ -18,7 +18,8 @@ Acquisition Session 与 Desktop Command 也已完成：每次 Point 请求建立
 短期 grant，稳定映射全部终态并回收一次性 Worker；Workflow/Capture 的 Controller Session 不会被
 复用、停止或替换。UIA Point 产品入口现也已完成：`Ctrl+Shift+F9` 只触发一次前台 Point 请求，
 Dictionary 精确命中与 Glyphshift 内有界结果表面不创建 Probe、不修改目标。生产 OCR 技术评审现已完成，
-当前进入 WGC 单帧有界 ROI 与离线 OCR 的生产验证。
+受监管一次性 Worker 也已复用 process grant，以 WGC 捕获授权窗口的有界 Region，并在内存中调用
+Tesseract；Desktop Region 调度、一次性 OCR eligibility 和 UIA 无文本后的显式产品回退现已完成。
 
 授权真实目标暴露的兼容性与测试流程缺口现已关闭：Desktop 按 Placement / architecture 选择可用技术，
 多进程目标保留逐 target 的部分成功，驻留 Runtime 重配明确要求完整重启目标；Probe 创建、恢复、更新和
@@ -26,8 +27,11 @@ Dictionary 精确命中与 Glyphshift 内有界结果表面不创建 Probe、不
 Software、Dictionary、兼容 Adapter Plan 和 Probe，并在失败、保留、清理、引用保护与崩溃恢复中维持
 同一生命周期。Desktop Acquisition Command 与 UIA Point 产品入口现均已完成。OCR 仍只允许在 UIA
 无结构化结果且用户明确选择时进入。任一授权软件的可见文字都可用于截图、ROI、识别与生命周期的工程
-样板；两个“UIA 无文本、像素文字可见”的成对授权样本只阻塞产品默认提升，不阻塞最小生产验证。
-离线引擎仍须通过识别率、制品体积与完整依赖许可门禁后才能进入正式发布 Bundle。
+样板；两个“UIA 无文本、像素文字可见”的成对授权样本现已由独立目标完成。
+默认 vcpkg 闭包约 22.4 MB，只保留为可运行上界。固定源码与模型提交的精简构建现仅包含 Tesseract、
+Leptonica、libpng、zlib 四个 DLL 和中英模型，支持制品约 12.2 MB；许可证、notice、来源摘要、Bundle
+逐文件校验、真实延迟与峰值内存门禁均已通过。它仍只进入显式本地候选 Bundle；标准发布只继续等待
+物理多显示器与混合缩放边界验证。
 
 优先级已纠正：Observation Stream、跨启动 Binding 与 Probe/诊断/Workflow 共享 Hook 都不能直接增加
 实时翻译覆盖，继续延后到真实软件案例证明必要时再恢复。Web 桌面原型证明 DOM ownership 和父进程
@@ -113,8 +117,10 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 
 ## Next
 
-- [生产 OCR 显式回退](slices/interactive-ocr-production-fallback.md)：先以授权可见文字验证 WGC 单帧有界
-  ROI 与离线 OCR 候选；UIA 真实缺口证据与发布许可、体积、性能继续作为产品提升门槛。
+- [生产 OCR 显式回退](slices/interactive-ocr-production-fallback.md)：WGC、Tesseract、共享 grant、一次性
+  OCR Worker、多文件 Bundle `/3`、Region 调度、显式产品入口、精简制品和许可/性能门禁均已完成；
+  两个独立 UIA 真实缺口及负坐标、受保护内容和退出清理边界也已通过；下一步只验证物理多显示器/
+  混合缩放边界。
 
 ## Progress
 
@@ -151,9 +157,9 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
   精确命中优先、Provider 逐块回退、部分成功与 External Presenter 回收合同 6/6 通过；任何 port 均拿不到
   target/grant，也没有 `TextReplace` 入口。60 包 workspace 与全部门禁全绿。
 - 完成 [Acquisition Worker 正式 Bundle 接入](slices/interactive-acquisition-runtime-bundle.md)：未发布
-  `/2` schema 要求显式声明 `acquisition_workers`，不为缺字段清单保留静默兼容；未来兼容只通过明确
-  schema 版本与迁移策略引入。Desktop 仍只获得 Adapter ID 与 Host factory，现恢复 Desktop
-  Acquisition Session。
+  schema 当前已演进到 `/3`，要求显式声明 `acquisition_workers` 及每个 Worker 的 `support_files`，
+  不为 `/2` 保留兼容分支；未来兼容只通过明确版本与迁移策略引入。Desktop 仍只获得 Adapter ID 与
+  Host factory。
 - 完成 [Desktop Acquisition Session](slices/interactive-desktop-acquisition-session.md)：Runtime 以窄
   `acquire_point` Interface 隐藏 target/grant/制品，每次请求重新授权并稳定映射取消、超时、权限、目标
   退出和 Worker 故障；正式 Debug Bundle 已真实取得合成 UIA Point 文本，60 包 workspace 与全部门禁

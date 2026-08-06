@@ -4,7 +4,7 @@ Status: Finished
 
 ## Outcome
 
-Runtime Bundle `/2` 可声明并验证一次性 Acquisition Worker；Desktop Runtime 只按 Adapter ID 取得受
+Runtime Bundle 当前 `/3` 可声明并验证一次性 Acquisition Worker 及其 support files；Desktop Runtime 只按 Adapter ID 取得受
 信 Host，不向 Shell 暴露制品路径。正式构建包含 `windows.uia.acquire` executable，缺件、篡改、重复
 ID 或越界路径均在启动 Worker 前拒绝。
 
@@ -24,7 +24,7 @@ ID 或越界路径均在启动 Worker 前拒绝。
 
 ## Verification
 
-- [x] `/2` manifest 必须显式声明 `acquisition_workers`，缺字段稳定拒绝。
+- [x] `/3` manifest 必须显式声明 `acquisition_workers` 与每项的 `support_files`，缺字段稳定拒绝。
 - [x] 受验证 Artifact 可按 Adapter ID 创建 Host，未知 ID 与重复声明稳定拒绝。
 - [x] 缺件、摘要不匹配和越界路径在进程启动前失败。
 - [x] Debug Runtime Bundle 包含且只包含 manifest 声明的 UIA Acquisition Worker。
