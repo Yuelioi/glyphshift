@@ -2,7 +2,7 @@
 
 ## Open Work
 
-- [通用实时翻译覆盖](work/real-time-translation-coverage/index.md) — 正式 Adapter 已补齐
+- **Focus:** [通用实时翻译覆盖](work/real-time-translation-coverage/index.md) — 正式 Adapter 已补齐
   可验证的官方技术文档入口；Unity / UE 可实施性已完成分层复核，不从引擎名承诺覆盖。生产实现前
   必须先通过每个分层两个外部 Shipping 真实目标加一个负例的 gate，当前未新增引擎 Adapter。
 - [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — Runtime 兼容性路由与
@@ -16,8 +16,9 @@
 - [探针创建来源统一](work/probe-creation-sources/index.md) — 已完成：Probe 创建统一 Software/Dictionary
   来源，临时资产可保留或清理，Probe/Dictionary 联动与元数据表单已补齐，Desktop API 已推进到
   `/26`。Rust 定向门禁与前端生产构建通过；Playwright CLI 单文件启动超时作为测试基础设施风险留存。
-- **Focus:** `adapters` 二级目录架构复核 — 重新对照外部架构建议与当前 Adapter Registry、crate 所有权
-  和依赖边界，决定是否按稳定能力边界建立二级目录；不以竞品名称或本机路径进入跟踪文档。
+- [全仓代码结构梳理与优化](work/repository-structure-optimization/index.md) — Adapter 实现二级目录纠正已
+  完成：23 个 crate 归入 `native/framework/accessibility/fallback`；分组只负责导航，没有新增运行时
+  seam，也没有创建空的未来类别。
   Observation Stream、共享 Hook、区域 Binding 和 Web 宿主协作继续不抢占当前路径。
 
 ## Project links

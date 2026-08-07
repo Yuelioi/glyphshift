@@ -50,19 +50,15 @@ Desktop 或具体 Adapter 实现。
 
 ### `crates/adapters/implementations/`（已落实）
 
-按文字技术划分的 21 个具体 capability package 与部署 companion：
+23 个具体 capability package 与部署 companion 使用第二级导航分组：
 
-- Console：`glyphshift-adapter-console`、`glyphshift-adapter-console-native`
-- Direct2D：`glyphshift-adapter-direct2d`、`glyphshift-adapter-direct2d-native`
-- DirectWrite：`glyphshift-adapter-directwrite`、`glyphshift-adapter-directwrite-native`
-- Win32 DrawText：`glyphshift-adapter-draw-text-native`
-- GDI：`glyphshift-adapter-gdi`、`glyphshift-adapter-gdi-native`、
-  `glyphshift-adapter-gdi-native-support`、`glyphshift-adapter-gdi-text-out-native`
-- GDI+：`glyphshift-adapter-gdiplus`、`glyphshift-adapter-gdiplus-native`
-- GTK3/Pango：`glyphshift-adapter-gtk3-pango`、`glyphshift-adapter-gtk3-pango-native`
-- Qt Painter：`glyphshift-adapter-qt-painter`、`glyphshift-adapter-qt-painter-native`
-- raylib：`glyphshift-adapter-raylib`、`glyphshift-adapter-raylib-native`
-- UI Automation：`glyphshift-adapter-uia`、`glyphshift-adapter-uia-worker`
+- `native/`：Console、Direct2D、DirectWrite、Win32 DrawText/GDI 与 GDI+，共 13 个 crate。
+- `framework/`：GTK3/Pango、Qt Painter 与 raylib，共 6 个 crate。
+- `accessibility/`：UI Automation descriptor 与 Worker，共 2 个 crate。
+- `fallback/`：OCR descriptor 与 Worker，共 2 个 crate。
+
+每个叶目录仍使用技术短名，例如 `native/gdi`、`native/gdi-native`、
+`accessibility/uia-worker`。二级分组仅用于物理导航，不是依赖层或新的运行时 seam。
 
 一个技术可拥有 descriptor、Native DLL 或 Worker companion，但不按软件品牌创建 Adapter。
 
@@ -70,9 +66,9 @@ Desktop 或具体 Adapter 实现。
 
 跨进程合同、Controller、Worker、Session 与 Target Runtime 编排：
 
-- 公共编排：`protocol/`、`contract/`、`kernel/`、`session/`、`desktop/`
+- 公共编排：`acquisition/`、`protocol/`、`contract/`、`kernel/`、`session/`、`desktop/`
 - Controller：`controller/{sdk,host,windows}`
-- Worker：`worker/{sdk,host}`
+- Worker：`worker/{acquisition-sdk,acquisition-host,process-grant,sdk,host}`
 - Target：`targets/{contract,process-host,runtime}`；复数目录避免命中 Cargo/仓库的 `target/` 构建输出忽略规则
 
 ### 产品与测试（保持原位）
@@ -81,7 +77,7 @@ Desktop 或具体 Adapter 实现。
 - `apps/glyphshift-desktop` 与 `apps/glyphshift-service` 保持应用组合根，不移入 `crates/`。
 - 五个 `test-support/` package 保持独立；生产 package 禁止依赖它们。
 
-分类覆盖 47 个 `crates/` package、2 个 App package 与 5 个 test-support package，共 54 个 workspace
+分类当前覆盖 54 个 `crates/` package、2 个 App package 与 6 个 test-support package，共 62 个 workspace
 package；所有 `crates/` package 均有真实物理家族入口。
 
 ## 依赖层级
@@ -93,7 +89,7 @@ package；所有 `crates/` package 均有真实物理家族入口。
 | L0 基础模型/SDK | Domain、Translation、Capture、Dictionary Package、Adapter SDK、Controller SDK、Worker SDK | 外部库及更基础的同层模型 |
 | L1 策略/目录 | Adapter Registry、Decision、Workflow、Extension、Dictionary Distribution、Runtime Contract | L0 与经审计的 L1 |
 | L2 部署/线协议合同 | Native ABI、Protocol、Target Runtime Contract | L0-L1 与合同同层 |
-| Adapter 实现侧车 | 21 个具体 Adapter/Native/Worker package | L0-L2 中对应 SDK/ABI/合同及本技术 companion |
+| Adapter 实现侧车 | 23 个具体 Adapter/Native/Worker package | L0-L2 中对应 SDK/ABI/合同及本技术 companion |
 | L3 Host/Kernel | Native Host、Controller Host/Windows、Worker Host、Runtime Kernel、Session、Target Process Host、Target Runtime | L0-L2、Adapter Platform；运行时发现具体 Adapter，不静态依赖产品 |
 | L4 产品编排 | Desktop Backend、Desktop Runtime、Service | L0-L3；不得依赖 Shell 或测试支持 |
 | L5 产品 Shell | Desktop Shell | L0-L4；只负责用户/平台入口和组合 |

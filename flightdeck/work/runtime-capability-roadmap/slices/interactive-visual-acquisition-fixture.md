@@ -31,7 +31,7 @@ Status: Finished
 
 ## Review
 
-- 新增 `adapters/implementations/ocr`，实现既有 `AcquisitionAdapter`；没有向调用者增加第二套 request /
+- 新增 `adapters/implementations/fallback/ocr`，实现既有 `AcquisitionAdapter`；没有向调用者增加第二套 request /
   result Interface。
 - `TargetFrame` 不实现 `Clone` 或 `Debug`；OCR 引擎只借用交集内的 RGBA8、宽和高，不接触 target token、
   桌面坐标或交集外像素。

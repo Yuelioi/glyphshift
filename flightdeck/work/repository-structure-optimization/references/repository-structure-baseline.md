@@ -76,7 +76,7 @@ Desktop Runtime、Translation 与 Isolated Worker Host。
 | 977 | `test-support/windows-host/src/windows/render.rs` | 四种绘制技术共享 COM/DIB/PixelEvidence，继续作为一个 Rendering owner |
 | 944 | `crates/dictionary/distribution/src/model.rs` | 独立分发 domain model；未与 file store/catalog 生命周期混合 |
 | 938 | `crates/product/desktop-backend/src/workflow.rs` | Workflow DTO、验证、用例与制品映射的纵向 feature module |
-| 919 | `crates/adapters/implementations/uia-worker/src/lib.rs` | UIA Worker process、timeout/privacy 与事件 owner，部署 seam 独立 |
+| 919 | `crates/adapters/implementations/accessibility/uia-worker/src/lib.rs` | UIA Worker process、timeout/privacy 与事件 owner，部署 seam 独立 |
 | 907 | `crates/core/capture/src/workspace.rs` | 深 Store implementation，测试已按 join/query/settings 外移 |
 | 878 | `crates/core/translation/src/workspace.rs` | 可编辑 Workspace/冲突/事件单一变化原因 |
 | 871 | `apps/glyphshift-desktop/src/components/CaptureView.vue` | Probe selection 的单一视图 owner；DOM 滚动生命周期已提取 |

@@ -59,10 +59,10 @@ LunaTranslator 仍主要按游戏保存一套专用设置，不能直接满足 G
 
 - GDI Native Adapter 声明并执行 `FontSubstitute`，通过临时创建并选入新 `LOGFONTW`
   字体实现。见
-  [GDI Adapter](../../../../crates/adapters/implementations/gdi-native/src/lib.rs#L25)及
+  [GDI Adapter](../../../../crates/adapters/implementations/native/gdi-native/src/lib.rs#L25)及
   [Font-only 合同](../../../../crates/adapters/platform/native-host/tests/native_gdi_activation_contract.rs#L87)。
 - GDI+ Native Adapter 同样声明 `FontSubstitute`，保留原字号、样式与单位后创建替代字体。
-  见 [GDI+ Adapter](../../../../crates/adapters/implementations/gdiplus-native/src/lib.rs#L18)及
+  见 [GDI+ Adapter](../../../../crates/adapters/implementations/native/gdiplus-native/src/lib.rs#L18)及
   [Font-only 合同](../../../../crates/adapters/platform/native-host/tests/native_gdiplus_activation_contract.rs#L89)。
 - Desktop Backend 的 `FontArtifact` 只有一个 `family`，读取后应用到软件全部 Location；
   当前没有 GUI 写入接口。见

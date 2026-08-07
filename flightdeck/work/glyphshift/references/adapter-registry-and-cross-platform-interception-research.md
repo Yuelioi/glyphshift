@@ -128,14 +128,14 @@ Agent 的分层很值得借鉴：稳定执行引擎与快速变化的逐目标�
 
 ### 5.3 Hook 目标与激活参数均写死
 
-[`glyphshift-adapter-gdi-native`](../../../../crates/adapters/implementations/gdi-native/src/lib.rs)固定：
+[`glyphshift-adapter-gdi-native`](../../../../crates/adapters/implementations/native/gdi-native/src/lib.rs)固定：
 
 - `GetModuleHandleW("gdi32.dll")` + `GetProcAddress("ExtTextOutW")`；
 - 通过 `retour::GenericDetour` 安装一次；
 - UTF-16 上限、glyph-index 反查、trim、重入保护和字体创建/恢复均在实现内；
 - 文字替换时清除 `ETO_GLYPH_INDEX` 并丢弃原 `lpDx`，让 GDI 重新排版。
 
-[`glyphshift-adapter-gdiplus-native`](../../../../crates/adapters/implementations/gdiplus-native/src/lib.rs)固定：
+[`glyphshift-adapter-gdiplus-native`](../../../../crates/adapters/implementations/native/gdiplus-native/src/lib.rs)固定：
 
 - `LoadLibraryW("gdiplus.dll")` + `GetProcAddress("GdipDrawString")`；
 - 同时解析一组 GDI+ Font/FontFamily helper；

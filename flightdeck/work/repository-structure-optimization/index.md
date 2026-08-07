@@ -6,9 +6,19 @@ Status: Finished
 
 在不改变产品行为、Adapter ABI、Runtime Bundle 合同和安全失败语义的前提下，让代码库更容易定位、
 修改与验证：拆解职责堆叠的超长文件，把测试放到合适的 seam，通过明确的 crate 家族与依赖方向降低
-54 个 workspace crate 的导航成本，并避免产生新的浅模块或万能 `core`。
+workspace crate 的导航成本，并避免产生新的浅模块或万能 `core`。
 
 ## Current
+
+Adapter 实现二级目录纠正已完成。当前 23 个 implementation crate 位于
+`implementations/{native,framework,accessibility,fallback}/<technology-crate>`；同一技术的 descriptor
+与 Native/Worker companion 保持相邻。当前没有正式 DX/OpenGL/Vulkan Adapter，因此没有提前创建空
+`rendering/`。二级目录只表达物理导航，Registry Technology/Capability、package/lib/target 名、ABI、
+制品与依赖集合保持不变。
+
+实时 Cargo metadata 为 62 个 workspace package、27 个 Adapter package，其中 4 个 platform、23 个
+implementation。架构检查已同步覆盖此前漏记的 OCR Worker、进程授权模块及真实依赖，并把明确的
+合成路径夹具与机器特定路径区分开；完整 package partition、依赖层级与隐私扫描通过。
 
 全仓代码结构优化已完成。29 个非 Adapter package 的官方资料、实时依赖图和删除测试没有发现应合并的
 package；Cargo package/lib/target 身份保留 `glyphshift-` 上下文，47 个 `crates/` package 全部迁入短家族
@@ -114,6 +124,11 @@ None.
 
 ## Progress
 
+- 已完成 [Adapter 实现二级目录归档](slices/adapter-implementation-second-level-groups.md)：13 个 native、
+  6 个 framework、2 个 accessibility、2 个 fallback crate 已归档；旧平铺路径为 0。
+- Cargo metadata、全部相对 path 存在性、架构、格式与 diff 门禁通过；GDI、Qt、UIA、OCR 四个分组代表
+  Adapter 合同共 29/29 通过，没有运行全仓测试。
+
 - 用户要求继续审视非 Adapter crate 的合并、物理家族与 `glyphshift-` package 前缀；Work 已重开并新增
   Stage 8，先做官方资料与删除测试审计。
 - 已完成[非 Adapter crate 边界与命名复核](slices/non-adapter-crate-boundaries-and-naming.md)：29 个 package
@@ -187,6 +202,7 @@ None.
 - [全仓验证与最终 Review](slices/full-repository-validation.md)
 - [Adapter 家族物理归档](slices/physical-adapter-family.md)
 - [Adapter 迁移后全仓验证](slices/post-adapter-full-validation.md)
+- [Adapter 实现二级目录归档](slices/adapter-implementation-second-level-groups.md)
 - [Rust/Cargo 命名与 workspace 最佳实践](references/rust-crate-naming-and-workspace-best-practices.md)
 - [非 Adapter crate 边界与命名审计](references/non-adapter-crate-boundary-audit.md)
 - [crate 家族短目录迁移](slices/crate-family-short-paths.md)

@@ -72,3 +72,11 @@
 
 - [x] 完成[家族短目录迁移后全仓验证](slices/post-family-full-validation.md)：完整 Rust workspace、Clippy、
   Desktop build、Playwright、metadata/lockfile、目录、文档链接与隐私门禁全部通过。
+
+## Stage 10：Adapter 实现二级目录纠正
+
+- [x] 完成 [Adapter 实现二级目录归档](slices/adapter-implementation-second-level-groups.md)：将 23 个实现
+  crate 按 `native`、`framework`、`accessibility`、`fallback` 归档，同技术 companion 保持相邻。
+- [x] 更新 workspace members、manifest 相对依赖、测试脚本、架构导航与文档链接；不新增空的未来分类。
+- [x] 运行 Cargo metadata、架构检查、格式/diff 和 Adapter 家族定向测试，完成路径残留与隐私自审后
+  将本 Work 恢复为 Finished。

@@ -34,10 +34,11 @@ Work 将深化该边界为统一的 Probe creation command，而不是让 Vue �
 ## Architecture note review
 
 外部架构建议中“Adapter 发现文字、Context 理解文字、Translator 转换文字”的职责分离与现有边界一致，
-继续保留。OCR 作为 fallback 的优先级也采纳。暂不按 native/framework/accessibility/rendering 搬迁目录：
-这些是 Technology 分类，不是所有权与生命周期边界，当前 Registry 已可表达。也不把窗口、程序、坐标、
-上下文和置信度全部塞入全局 `TextEvent`；持续 `TextObservation` 保持最小，富证据继续走有界 envelope
-或交互式 acquisition result。
+继续保留。OCR 作为 fallback 的优先级也采纳。实现 crate 最初只有 21 个时没有立即按技术类别增加目录；
+增长到 23 个后重新评估，现采用 `native/framework/accessibility/fallback` 作为纯导航分组，不把它们误作
+新的所有权、生命周期或运行时 seam，也不提前创建空 `rendering`。窗口、程序、坐标、上下文和置信度
+仍不全部塞入全局 `TextEvent`；持续 `TextObservation` 保持最小，富证据走有界 envelope 或交互式
+acquisition result。
 
 ## Next
 
@@ -54,8 +55,8 @@ Work 将深化该边界为统一的 Probe creation command，而不是让 Vue �
 - Desktop API `/24` 已以 `desktop_create_probe_from_sources` 固定四种来源组合；旧 quick-test 创建
   payload 没有兼容读取或双写。
 - Probe 页已合并为单一入口，临时词典由系统命名，用户无需先去软件库或词典库创建测试资产。
-- 外部架构建议已按本项目边界评审：采纳 Adapter/Context/Translator 职责分离与 OCR fallback；拒绝
-  按技术类别重组所有权目录以及膨胀全局 TextObservation。
+- 外部架构建议已按本项目边界复评：采纳 Adapter/Context/Translator 职责分离、OCR fallback 与实现
+  crate 的二级导航分组；分组不新增运行时 seam，仍拒绝膨胀全局 TextObservation。
 - 最终定向门禁通过：Desktop Shell 来源/ownership 合同 9/9、Probe Playwright 12/12、前端生产构建
   与 Rust fmt check 均通过；未运行全仓测试。
 - 用户实机审阅发现空资料库 Tab 被禁用、普通字段被错误折叠且缺少运行中软件列表。纠正切片已将
