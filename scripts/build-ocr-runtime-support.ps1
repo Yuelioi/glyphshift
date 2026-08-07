@@ -318,4 +318,4 @@ Move-Item -LiteralPath $stagingRoot -Destination $OutputRoot
 $outputFiles = @(Get-ChildItem -LiteralPath $OutputRoot -File)
 $outputBytes = ($outputFiles | Measure-Object Length -Sum).Sum
 Write-Output "OCR runtime support ready: $($outputFiles.Count) files, $outputBytes bytes."
-Write-Output 'Pass this output to build-runtime-bundle.ps1 with -OcrSupportRoot.'
+Write-Output 'The default Runtime Bundle build will use this verified OCR support directory.'

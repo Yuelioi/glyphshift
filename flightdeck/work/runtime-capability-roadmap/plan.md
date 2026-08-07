@@ -90,10 +90,15 @@
   与现有 Workflow/Capture 的共存，再向 Tauri 暴露不含平台身份的窄 Point command。
 - [x] [交付 UIA 取词翻译产品入口](slices/interactive-acquisition-product-flow.md)：一次 Point 请求组合
   Dictionary / Translation Provider 与外部呈现，不创建完整 Probe，不冒充原位写回。
-- [ ] [以 UIA 无结果为门槛接入生产 OCR 回退](slices/interactive-ocr-production-fallback.md)：WGC、候选
+- [x] [以 UIA 无结果为门槛接入生产 OCR 回退](slices/interactive-ocr-production-fallback.md)：WGC、生产
   Tesseract Worker、Region 调度、一次性 eligibility、显式产品入口、精简制品、完整许可证/notice 与
-  性能预算、两个独立授权 UIA 缺口样本、负坐标、受保护窗口和退出边界均已通过；剩余发布门槛只有
-  物理多显示器/混合缩放验证。
+  性能预算、两个独立授权 UIA 缺口样本、负坐标、受保护窗口和退出边界均已通过；用户已批准默认
+  Runtime/Release 构建包含精简 OCR 支持集，物理多显示器/混合缩放保留为发布前残余验证。
+- [x] [交付默认 OCR 与悬浮取词呈现](slices/interactive-translation-floating-presentation.md)：默认构建固定
+  OCR 文件集，独立 Tauri 气泡按最近结果块与当前显示器定位，并提供浏览、复制、关闭及主窗口回退。
+- [x] [交付可录制、可探测的全局快捷键设置](slices/interactive-translation-shortcut-settings.md)：设置页
+  为软件快速捕获和取词翻译从真实按键组合录制候选，Desktop 先探测全局占用/内部冲突再原子替换注册
+  与持久设置，冲突时保留旧快捷键。
 
 ## Stage 5：原生稳定性与布局
 

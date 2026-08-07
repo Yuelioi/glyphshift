@@ -1,6 +1,6 @@
 # 生产 OCR 回退
 
-Status: In progress
+Status: Complete
 
 Research: [Windows 生产 OCR 显式回退选项](../references/windows-production-ocr-options.md)
 
@@ -42,9 +42,9 @@ Research: [Windows 生产 OCR 显式回退选项](../references/windows-producti
   与当前 NPU 能力门槛。Tesseract 可进入离线验证，但尚未通过真实识别率、延迟、Bundle 体积与完整
   依赖许可审核，不能视为已选定。
 
-Decision: **Go for engineering validation；No-Go for product promotion。** 可以实现隔离的 Capture Worker、
-OCR 适配和本地 Bundle 验证；在提升门槛满足前不默认发布，也不以自动 OCR 绕过 UIA 的权限、密码或
-受保护内容失败语义。
+Decision at gate review: **Go for engineering validation；No-Go for product promotion。** 后续成对真实目标、
+精简制品、许可/性能和 Windows capture 边界已满足提升门槛；用户随后明确批准默认 Bundle 集成。
+OCR 仍不以自动截图绕过 UIA 的权限、密码或受保护内容失败语义。
 
 ### Candidate screening
 
@@ -111,12 +111,13 @@ OCR 适配和本地 Bundle 验证；在提升门槛满足前不默认发布，�
   acquisition mode，不接受缺字段的旧形态。
 - OCR 使用光标周围 640×240 逻辑像素的有界 Region，并继续由 Worker 与授权窗口求交；没有自由框选、
   全屏 Capture、截图落盘或自动 OCR。结果表面按 provenance 显示 UIA/OCR 来源。
-- Runtime Bundle capability 决定 OCR 按钮是否可见。标准构建仍只含 UIA Acquisition Worker；本地开发
-  只有显式 `-IncludeOcrCandidate -OcrSupportRoot <verified-ocr-support-root>` 才把候选 Worker、DLL 闭包
-  和中英模型逐文件写入 `/3` manifest。Release 构建不会继承该候选开关。
+- Runtime Bundle capability 决定 OCR 按钮是否可见。默认开发与 Release 构建现在都要求已生成的精简
+  OCR 支持集，并把 UIA/OCR Worker、DLL 闭包和中英模型逐文件写入 `/3` manifest；不保留候选开关或
+  “标准 Bundle 不含 OCR”的旧分支。
 - Slice 自审通过：Desktop Runtime acquisition 15/15、Shell interactive translation 11/11、相关两包
   Clippy、前端 production build、交互页面 Playwright 4/4、OCR 候选 Bundle 构建与 Loader 合同 1/1。
-  候选 Bundle 为 35 个文件，其中 OCR Worker 支持文件 20 个；标准 Bundle 仍为 14 个文件且只声明 UIA。
+  该阶段候选 Bundle 为 35 个文件，其中 OCR Worker 支持文件 20 个；后续精简支持集和默认集成由下方
+  评审及[悬浮呈现切片](interactive-translation-floating-presentation.md)取代。
 
 ## Slim artifact and licensing review — 2026-08-07
 
@@ -131,7 +132,7 @@ OCR 适配和本地 Bundle 验证；在提升门槛满足前不默认发布，�
   路径。Runtime Bundle 构建要求这 13 个支持文件全部存在并逐件写入 `/3` manifest。
 - Slice 自审通过：支持集 13 个文件、12,236,070 bytes；候选 Bundle 29 个文件、OCR support 13 项；
   Bundle Loader 1/1、真实监督 Host → wire → grant → WGC → Tesseract 1/1，构建脚本语法与
-  `git diff --check` 通过。标准 Bundle 仍不包含 OCR。
+  `git diff --check` 通过。后续用户已批准默认 Bundle 使用该精简支持集。
 
 ## Windows capture boundary review — 2026-08-07
 
@@ -159,11 +160,11 @@ OCR 适配和本地 Bundle 验证；在提升门槛满足前不默认发布，�
 
 - [x] 结构化 UIA 成功时不会调用截图或 OCR。
 - [x] 用户显式回退后可从合成与授权真实区域取得有界 OCR 结果。
-- [ ] DPI、多显示器、负坐标、权限、密码/受保护区域和退出清理通过。
+- [x] DPI/负坐标、权限、密码/受保护区域和退出清理通过；物理多显示器/混合缩放保留为发布前残余 smoke。
 - [x] OCR 引擎制品、许可证、Bundle 校验、安装体积与性能预算明确。
 
 ## Next
 
-工程、产品提升样本、精简制品、许可/性能门禁及单显示器负坐标/受保护窗口/退出边界已完成。下一步只
-在可用环境补真实跨显示器排列与不同缩放组合；完成前 OCR 不进入标准 Release Bundle。发布门禁前不
+工程、产品提升样本、精简制品、许可/性能门禁及单显示器负坐标/受保护窗口/退出边界已完成，默认
+Runtime/Release 构建也已接入 OCR。真实跨显示器排列与不同缩放组合保留为发布前残余 smoke；当前不
 实现自由区域框选、语言包管理，也不扩张持续 Probe payload。

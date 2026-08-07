@@ -16,7 +16,7 @@ Translation Provider 回退、External Presentation 清理组合均已交付；P
 Runtime Bundle，Desktop 只能按 Adapter ID 创建 Host，不能取得或绕过验证后的制品路径。Desktop
 Acquisition Session 与 Desktop Command 也已完成：每次 Point 请求建立独立短期 Runtime，重新签发
 短期 grant，稳定映射全部终态并回收一次性 Worker；Workflow/Capture 的 Controller Session 不会被
-复用、停止或替换。UIA Point 产品入口现也已完成：`Ctrl+Shift+F9` 只触发一次前台 Point 请求，
+复用、停止或替换。UIA Point 产品入口现也已完成：设备设置中的组合键（默认 `Ctrl+Shift+F9`）只触发一次前台 Point 请求，
 Dictionary 精确命中与 Glyphshift 内有界结果表面不创建 Probe、不修改目标。生产 OCR 技术评审现已完成，
 受监管一次性 Worker 也已复用 process grant，以 WGC 捕获授权窗口的有界 Region，并在内存中调用
 Tesseract；Desktop Region 调度、一次性 OCR eligibility 和 UIA 无文本后的显式产品回退现已完成。
@@ -30,8 +30,12 @@ Software、Dictionary、兼容 Adapter Plan 和 Probe，并在失败、保留、
 样板；两个“UIA 无文本、像素文字可见”的成对授权样本现已由独立目标完成。
 默认 vcpkg 闭包约 22.4 MB，只保留为可运行上界。固定源码与模型提交的精简构建现仅包含 Tesseract、
 Leptonica、libpng、zlib 四个 DLL 和中英模型，支持制品约 12.2 MB；许可证、notice、来源摘要、Bundle
-逐文件校验、真实延迟与峰值内存门禁均已通过。它仍只进入显式本地候选 Bundle；标准发布只继续等待
-物理多显示器与混合缩放边界验证。
+逐文件校验、真实延迟与峰值内存门禁均已通过。用户已批准默认开发与 Release Bundle 集成；物理
+多显示器与混合缩放保留为发布前残余 smoke，不再阻止默认集成。成功取词现在通过独立 Tauri 气泡在
+光标附近显示最近文字块，可浏览、复制或关闭，主窗口仍保留完整结果。软件快速捕获与取词翻译快捷键
+现作为设备级设置统一驱动启动注册、等待提示与结果事件；设置页通过真实按键录制、系统占用/内部冲突
+探测和原子重绑修改组合键，冲突或保存失败时保留旧注册。本轮按用户要求未运行自动化验证，后续提交
+或发布前必须补定向门禁。
 
 优先级已纠正：Observation Stream、跨启动 Binding 与 Probe/诊断/Workflow 共享 Hook 都不能直接增加
 实时翻译覆盖，继续延后到真实软件案例证明必要时再恢复。Web 桌面原型证明 DOM ownership 和父进程
@@ -117,10 +121,9 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 
 ## Next
 
-- [生产 OCR 显式回退](slices/interactive-ocr-production-fallback.md)：WGC、Tesseract、共享 grant、一次性
-  OCR Worker、多文件 Bundle `/3`、Region 调度、显式产品入口、精简制品和许可/性能门禁均已完成；
-  两个独立 UIA 真实缺口及负坐标、受保护内容和退出清理边界也已通过；下一步只验证物理多显示器/
-  混合缩放边界。
+- 进入 Stage 5 原生稳定性与布局研究；提交或发布前补
+  [可录制取词快捷键设置](slices/interactive-translation-shortcut-settings.md) 的定向门禁，以及物理
+  多显示器/混合缩放 smoke。
 
 ## Progress
 
