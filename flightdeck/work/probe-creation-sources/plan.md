@@ -19,3 +19,28 @@
 - [x] Desktop Shell 定向合同覆盖四种来源组合和所有权边界。
 - [x] Probe Playwright 覆盖空资料库、已有资料、当前程序、临时词典、中英文与紧凑视口。
 - [x] 删除重复入口和失效文案，更新 PRODUCT、DESIGN 与旧 Quick Probe Slice 的后续说明。
+
+## Corrective slice：创建器可用性
+
+- [x] 资料库为空时保持 Software/Dictionary 来源 Tab 可进入，并呈现明确空态和替代路径。
+- [x] 任务名称与临时词典目标语言常显，不再归入折叠的高级选项。
+- [x] Active Process 来源支持运行中可见软件列表、刷新和快捷键捕获三项交互。
+- [x] Desktop API `/25` 提供去重排序的运行中可见软件候选，不向 GUI 暴露 PID。
+
+## Corrective slice：资产创建与清理
+
+- [x] 临时 Probe 清理在 ownership ledger 存在但 Probe Run 已缺失时，释放悬空运行态并继续回收资产。
+- [x] Software 页头只保留一个“新建软件”，Modal 内统一运行中列表、按键捕获与手动路径。
+- [x] Dictionary 新建和设置复用元数据表单；主要字段常显，低频发布字段折叠到“更多”。
+- [x] 标签和作者使用 Nuxt UI 项目输入；发布版本使用三个数字字段生成。
+- [x] 受影响的 Rust 边界与前端生产构建通过；不升级为全仓测试。
+- [ ] Playwright CLI 单文件启动超时，待测试启动链路恢复后重跑 Software/Dictionary 页面用例。
+
+## Corrective slice：Probe 与 Dictionary 联动
+
+- [x] Probe 详情常显绑定 Dictionary、语言、词条数、关系说明和打开入口。
+- [x] Probe 设置允许在释放连接后切换唯一 Dictionary binding；切换不复制或删除词典内容。
+- [x] 联合表支持单条或多选非空译文写入绑定 Dictionary，并支持移除译文但保留 Observation。
+- [x] Desktop API `/26` 增加原子批量词条 upsert，Probe Run update 合同纳入 `dictionaryId`。
+- [x] Core、Desktop Backend 与 Desktop Shell 定向门禁通过。
+- [ ] Playwright CLI 单文件启动超时，待测试启动链路恢复后重跑 Probe 页面用例。

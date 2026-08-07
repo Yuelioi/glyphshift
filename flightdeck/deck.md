@@ -3,7 +3,8 @@
 ## Open Work
 
 - [通用实时翻译覆盖](work/real-time-translation-coverage/index.md) — 正式 Adapter 已补齐
-  可验证的官方技术文档入口；raylib 之后暂无满足门槛的真实动态目标，等待新缺口触发。
+  可验证的官方技术文档入口；Unity / UE 可实施性已完成分层复核，不从引擎名承诺覆盖。生产实现前
+  必须先通过每个分层两个外部 Shipping 真实目标加一个负例的 gate，当前未新增引擎 Adapter。
 - [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — Runtime 兼容性路由与
   一键快速探针、Desktop Acquisition Command 与 UIA 取词翻译产品入口已完成。生产 OCR 的技术评审
   、候选 Worker、Region 调度及 UIA 无文本后的显式 OCR 产品入口已完成。精简 Tesseract 支持集、
@@ -12,11 +13,11 @@
   光标附近悬浮翻译气泡现已交付；软件快速捕获与取词翻译快捷键设置也已实现真实按键录制、占用/内部
   冲突探测和原子重绑。本轮按用户要求未运行自动化验证；当前剩余提交/发布前定向门禁与物理多显示器/
   混合缩放 smoke。OCR 与取词翻译不再抢占近期产品工作，只作为最后阶段的可选兜底继续保留。
-- [探针创建来源统一](work/probe-creation-sources/index.md) — 已完成。Software/Dictionary 资料库现为
-  可选创建来源；当前程序和系统命名临时词典通过 ownership ledger 原子解析，Probe 页只保留一个
-  新建入口，Desktop API `/24` 不保留旧 quick-test payload。
-- **Focus:** [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — 恢复为后续议程；OCR 与
-  取词翻译继续作为最后阶段的可选兜底，不抢占新的真实 Adapter 覆盖缺口。
+- [探针创建来源统一](work/probe-creation-sources/index.md) — 已完成：Probe 创建统一 Software/Dictionary
+  来源，临时资产可保留或清理，Probe/Dictionary 联动与元数据表单已补齐，Desktop API 已推进到
+  `/26`。Rust 定向门禁与前端生产构建通过；Playwright CLI 单文件启动超时作为测试基础设施风险留存。
+- **Focus:** `adapters` 二级目录架构复核 — 重新对照外部架构建议与当前 Adapter Registry、crate 所有权
+  和依赖边界，决定是否按稳定能力边界建立二级目录；不以竞品名称或本机路径进入跟踪文档。
   Observation Stream、共享 Hook、区域 Binding 和 Web 宿主协作继续不抢占当前路径。
 
 ## Project links

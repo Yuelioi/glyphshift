@@ -41,8 +41,10 @@ Work 将深化该边界为统一的 Probe creation command，而不是让 Vue �
 
 ## Next
 
-- 本 Work 已完成。后续回到运行时能力 Roadmap；OCR 与交互式取词保持最后阶段 fallback，不从本
-  Work 延伸新的 Provider、截图或划词范围。
+- 本 Work 的产品与实现目标已完成，后续产品工作回到实时翻译覆盖；`adapters` 二级目录建议作为独立
+  架构复核处理，不与 Probe 资产工作流继续耦合。
+- Playwright CLI 在单文件运行时 64 秒无输出并被超时终止；后续修复测试启动链路时重跑受影响页面，
+  不因此扩大为全仓测试。
 
 ## Progress
 
@@ -56,3 +58,17 @@ Work 将深化该边界为统一的 Probe creation command，而不是让 Vue �
   按技术类别重组所有权目录以及膨胀全局 TextObservation。
 - 最终定向门禁通过：Desktop Shell 来源/ownership 合同 9/9、Probe Playwright 12/12、前端生产构建
   与 Rust fmt check 均通过；未运行全仓测试。
+- 用户实机审阅发现空资料库 Tab 被禁用、普通字段被错误折叠且缺少运行中软件列表。纠正切片已将
+  空资料库改为可进入空态，任务名称/目标语言常显，并以 Desktop API `/25` 增加去重的可见运行软件
+  列表；快捷键捕获保留为同一 Active Process 来源的补充选择方式。
+- 第二次实机审阅发现已结束临时 Probe 的清理会被悬空 active run 阻断、Software 页存在两个新增
+  入口、Dictionary 创建缺失已有元数据。实现已改为容忍缺失 Probe Run 的所有权清理、单一 Software
+  新建 Modal 三种目标获取方式，以及新建/设置复用的 Dictionary metadata 表单；尚未按用户要求验证。
+- 第三次实机审阅指出 Probe 虽持有 `dictionaryId`，但详情与设置没有形成可理解的词典工作流。当前
+  Desktop API `/26` 已支持释放连接后切换绑定与批量保存非空译文；详情常显绑定词典并提供打开、单条/
+  多选保存和从词典移除操作。Observation 不自动制造空译文词条，切换绑定不复制旧词典。
+- 收尾定向门禁通过：Capture 15/15、Windows Controller 单元 9/9、目标 Hook 合同 4/4、Controller
+  inventory 6/6（另有 1 项授权本机目标按设计忽略）、Desktop Backend 8/8、Desktop Shell 78/78，
+  各包文档测试通过；前端生产构建通过。未运行全仓测试。
+- Probe Playwright 单文件在 64 秒内没有产生运行输出并被超时终止，未观察到用例断言失败；这项残余
+  风险保留给测试启动链路修复，不阻塞当前功能 checkpoint。

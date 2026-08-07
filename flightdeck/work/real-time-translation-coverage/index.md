@@ -140,8 +140,18 @@ Adapter 技术说明入口也已补齐。正式清单新增可选 `documentation
 兼容缺少字段的旧 Bundle。帮助页为每行提供“查看文档”，由受限 Tauri Opener 交给系统默认浏览器，
 不展示裸 URL、DLL 目标或内部 Adapter ID。
 
+Unity / Unreal Engine 的引擎感知可实施性已完成一手资料复核。两者都在内部保留过完整字符串，但任意
+第三方 Shipping 游戏没有稳定外部 ABI；不能从引擎名推导覆盖率，更不能承诺 90%。Unity 只进入严格
+限界的 Windows x64 Standard UI 原型候选，Mono 与 IL2CPP 必须分别立证；UE 暂留研究态。任何生产
+实现开始前，每个技术分层必须先有至少两个无反作弊、未预装插件、可重复的外部 Shipping 真实目标，
+并另有负例证明不支持路径会可靠拒绝。
+
 ## Next
 
+- 不直接建设 Unity / UE 生产 Adapter。只有先满足
+  [Unity / UE 真实样本 gate](references/unity-unreal-engine-adapter-feasibility.md)，才允许建立
+  Shipping-like 合成合同和有界原型；若 IL2CPP 或 UE 需要逐游戏符号、偏移或机器码签名，立即按
+  No-Go 收口。
 - 等待新的、明确授权且可重复的 Windows 真实目标；按
   [raylib 之后的候选复核](references/post-raylib-next-adapter-primary-source-review.md)先查 PE import、运行模块
   与公开文字导出，固定可见词条命中后才恢复 Adapter 原型。
@@ -246,6 +256,9 @@ Adapter 技术说明入口也已补齐。正式清单新增可选 `documentation
 - 完成 [Adapter 技术文档链接](slices/adapter-technical-documentation-links.md)：清单、Runtime 与桌面快照
   贯通可选 `documentationUrl`，正式目录 10/10 使用官方 HTTPS；帮助页通过系统默认浏览器打开，桌面
   Capability 只放行当前官方域名。完整 workspace、Clippy、架构、关键 Playwright 与双尺寸视觉回归通过。
+- 完成 [Unity / Unreal Engine 游戏文字 Adapter 可实施性复核](references/unity-unreal-engine-adapter-feasibility.md)：
+  Unity Mono、IL2CPP、Localization 与标准/自研 UI，以及 UE `FText`、Slate/UMG、Canvas、shaping、
+  Shipping 链接和反作弊边界已分层；结论是不按引擎名承诺覆盖，真实样本 gate 通过前不新增生产实现。
 
 ## References
 
@@ -267,5 +280,6 @@ Adapter 技术说明入口也已补齐。正式清单新增可选 `documentation
 - [raylib 之后的下一 Adapter 第一方资料复核](references/post-raylib-next-adapter-primary-source-review.md)
 - [raylib 之后的下一写回 Adapter 选择](slices/post-raylib-next-writeback-adapter.md)
 - [Adapter 技术文档链接](slices/adapter-technical-documentation-links.md)
+- [Unity / Unreal Engine 游戏文字 Adapter 可实施性复核](references/unity-unreal-engine-adapter-feasibility.md)
 - [WPF 真实目标缺口验收](slices/wpf-real-target-gap.md)
 - [下一真实目标候选筛选](references/next-real-target-candidates.md)

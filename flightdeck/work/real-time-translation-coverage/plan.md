@@ -115,3 +115,12 @@
 - [x] 为正式目录 10 个技术条目补齐官方 HTTPS 文档；桌面端只通过受限 Tauri Opener 在系统默认浏览器
   打开，界面不显示裸 URL 或内部制品位置。
 - [x] 完成 Bundle、Rust、Clippy、架构、Playwright 和双尺寸视觉回归；缺文档时显示明确空状态。
+
+## Stage 12：Unity / Unreal Engine 引擎感知可实施性
+
+- [x] 完成 [Unity / Unreal Engine 游戏文字 Adapter 可实施性复核](references/unity-unreal-engine-adapter-feasibility.md)：
+  区分 Unity Mono / IL2CPP / Localization / 标准与自研 UI，以及 UE localized `FText`、非本地化文字、
+  Slate/UMG、Canvas、shaping 与 Shipping 构建边界；不从引擎名推导覆盖率。
+- [ ] 只有每个准备实施的技术分层先取得至少两个无反作弊、未预装插件、可重复的外部 Shipping 真实
+  目标，并另有可靠拒绝的负例，才建立 Shipping-like 合成合同与有界原型；逐游戏符号、偏移或机器码
+  签名依赖直接触发 No-Go，不新增生产 crate、Catalog 或 Runtime Bundle 项。
