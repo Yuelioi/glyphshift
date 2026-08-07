@@ -2,6 +2,10 @@
 
 Status: Complete
 
+> 该入口合同已由[探针创建来源统一](../../probe-creation-sources/index.md)深化：Probe 页不再区分
+> “快速测试”和手工创建，目标与词典来源在同一个 Modal 中独立选择。下文保留为 ownership ledger
+> 的历史交付记录。
+
 ## Outcome
 
 用户从 Probe 页只需选择一个正在运行的程序并点击“开始测试”，Desktop 即可建立测试会话并打开结果页；

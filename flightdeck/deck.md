@@ -4,7 +4,7 @@
 
 - [通用实时翻译覆盖](work/real-time-translation-coverage/index.md) — 正式 Adapter 已补齐
   可验证的官方技术文档入口；raylib 之后暂无满足门槛的真实动态目标，等待新缺口触发。
-- **Focus:** [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — Runtime 兼容性路由与
+- [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — Runtime 兼容性路由与
   一键快速探针、Desktop Acquisition Command 与 UIA 取词翻译产品入口已完成。生产 OCR 的技术评审
   、候选 Worker、Region 调度及 UIA 无文本后的显式 OCR 产品入口已完成。精简 Tesseract 支持集、
   完整许可/notice、体积、延迟与峰值内存门禁也已通过；负坐标、受保护窗口及退出边界已由真实 WGC
@@ -12,6 +12,11 @@
   光标附近悬浮翻译气泡现已交付；软件快速捕获与取词翻译快捷键设置也已实现真实按键录制、占用/内部
   冲突探测和原子重绑。本轮按用户要求未运行自动化验证；当前剩余提交/发布前定向门禁与物理多显示器/
   混合缩放 smoke。OCR 与取词翻译不再抢占近期产品工作，只作为最后阶段的可选兜底继续保留。
+- [探针创建来源统一](work/probe-creation-sources/index.md) — 已完成。Software/Dictionary 资料库现为
+  可选创建来源；当前程序和系统命名临时词典通过 ownership ledger 原子解析，Probe 页只保留一个
+  新建入口，Desktop API `/24` 不保留旧 quick-test payload。
+- **Focus:** [运行时能力升级 Roadmap](work/runtime-capability-roadmap/index.md) — 恢复为后续议程；OCR 与
+  取词翻译继续作为最后阶段的可选兜底，不抢占新的真实 Adapter 覆盖缺口。
   Observation Stream、共享 Hook、区域 Binding 和 Web 宿主协作继续不抢占当前路径。
 
 ## Project links
