@@ -113,6 +113,80 @@ Runtime Bundle 或版本签名表之前，必须先找到**至少两个可重复
 这道 gate 的含义是：**没有真实候选，先不写 Adapter；只有合成 harness，也不新增产品技术条目。**
 即使某个 lane 通过，也只能发布该 lane 的兼容范围，不能把它外推为整个 Unity 或 UE 的覆盖率。
 
+### 公开实现源码交叉验证（匿名）
+
+既有公开实现证明 Unity 标准 UI 并非只能停留在理论层：Mono 路径可从运行时导出解析 domain、assembly、
+image、class 与 method，IL2CPP 路径也可从公开运行时导出取得对应元数据；在进程内部定位标准组件后，
+可以拦截 TMP `set_text` / `SetText`、uGUI `Text.set_text`、UI Toolkit `TextElement.set_text` 与
+`TextField.set_value`，再替换传入的托管字符串。这给 Unity Standard UI 外部原型提供了比逐游戏偏移更
+可信的方向。
+
+但该实现同时暴露出 Glyphshift 产品合同缺失的两部分：只挂 setter 会漏掉附加前已经存在的文字；直接
+替换 retained widget 状态也无法天然证明停止后能枚举并恢复全部仍存活对象。因此原型必须补上“初始对象
+枚举 + 后续变更捕获 + 所有权记录 + 停止恢复”，不能把 setter 命中直接算作 `TextReplace` 已完成。
+
+同一批公开源码中的 Godot 与 UE 路线仍主要依赖内部函数的字节模式、版本特征或目标专用过滤。这类做法
+可以形成固定版本 Recipe 或研究候选，但不能作为跨游戏、跨版本的通用 Adapter 基线，也不会改变本文的
+No-Go 条件。
+
+### 公开真实样本候选筛选
+
+公开资料筛选后已获得授权下载两份正式 Windows 发布包，完成只读二进制盘点和无注入启动；仍未对
+候选执行外部 attach 或写回，因此**真实样本 gate 仍未通过**：
+
+| 候选 | 公开证据 | 可承担的样本角色 | 当前判定 |
+| --- | --- | --- | --- |
+| [PacManUnity](https://github.com/Im-Rises/PacManUnity) | 正式 Windows 1.0 包为 x64、Unity 2021.3.9 Mono；业务程序集实际引用 TMP `set_text` / `SetText` | 跨启动与动态 TMP 文本正例候选 | **运行候选通过**；主菜单、关卡选择及动态 `Score` / `High Score` 均可见，日志无异常并可正常退出；二进制版本与 README 不同，矩阵必须以发布包为准 |
+| [Unity Open Project #1](https://github.com/UnityTechnologies/open-project-1) | Unity 2020.3 LTS；工程同时声明 Localization、TMP 与 uGUI，并提供公开 Alpha 发布 | 本地化数据源与标准 UI 候选 | **降级**；发布说明明确对话未进入当前构建，不能承担“真实本地化动态文本”正例 |
+| [Open Brush](https://github.com/icosa-foundation/open-brush) | 正式 Desktop 2.30.0 包为 x64、Unity 2022.3.62f2 Mono；业务程序集实际引用 TMP、uGUI 与 Unity Localization，并包含 no-headset/monoscopic 类型 | 跨 Unity 代际、本地化与多标准 UI 正例候选 | **运行通过但可见 Localization 正例降级**；公开 `--DisableXrMode --ForceViewOnly` 与 `--EnableMonoscopicMode` 可稳定进入平面模式；同 tag 的 Localization Settings 注册 `-language=` selector，界面 Locale 按钮也更新 `SelectedLocale`，但英语/简体中文三次无注入平面运行都没有形成可判读的本地化文字画面，不能计入可见语言切换 |
+| [MarkovCraft](https://github.com/DevBobcorn/MarkovCraft/releases/tag/v1.5.3) | 正式 Windows zip 为 x64 Unity 6000.3.9f1 Mono；业务程序集引用 TMP/uGUI、Unity Localization、`NextLanguage` 与 `SelectedLocale`，同 tag 提供中文和英语 Locale | Unity 6、可见 Localization 与标准 UI 替代正例 | **运行候选通过**；默认中文欢迎页显示“下载资源 / 简”，将该测试应用自己的 `AppLanguage` 偏好临时设为英语后显示“Download Res / En”，偏好随后逐字节恢复；两次均加载 UnityPlayer + Mono、没有 GameAssembly/Glyphshift 并正常退出 |
+| [Boss Room](https://github.com/Unity-Technologies/com.unity.multiplayer.samples.coop) | Unity 官方多人游戏样例，使用 uGUI，公开 release 主要服务项目获取与教学 | 工程资料对照 | **拒绝作为外部 Shipping 正例**；当前证据不足以证明 release asset 是无需编辑器的独立 Windows Player |
+
+第二轮先得到跨代际的 IL2CPP Windows 候选，随后在单独授权下完成正式包静态盘点；没有启动候选：
+
+| 候选 | 公开证据 | 可承担的样本角色 | 当前判定 |
+| --- | --- | --- | --- |
+| [Random Heroes](https://aetheris.itch.io/gmtk2022) | 官方页面提供 26 MB Windows 成品；[发布脚本](https://github.com/Aetheris743/GMTK-2022/blob/master/Assets/Editor/Itch%20Uploads/UploadGames.cs)明确把 Windows x64 切到 IL2CPP；工程为 Unity 2021.3.5、TMP 3.0.6，主菜单、按钮与 Canvas Prefab 实际引用 `TextMeshProUGUI` | 2021 LTS、轻量、动态游戏 UI 的 IL2CPP 正例候选 | **运行候选通过**；x64 Unity 2021.3.5f1、metadata 29、235 个 `il2cpp_*` API；连续两次启动均显示标准主菜单，随后可重复从 `SCORE: 0` 推进到 `SCORE: 248` 并显示 `Current Score: 248`；公开 `ScoreText` 每帧写入 `TextMeshProUGUI.text`，运行模块与发布包一致、没有 Glyphshift 模块且正常退出 |
+| [HiBoP 5.0.9](https://github.com/hbp-HiBoP/HiBoP/releases/tag/5.0.9) | 官方发布提供 Windows x64 成品；同 tag 为 Unity 6.0 代际，[构建脚本](https://github.com/hbp-HiBoP/HiBoP/blob/5.0.9/Assets/Scripts/HBP/Dev/Editor/HBPBuilder.cs)对 Windows x64 明确选择 IL2CPP；工程实际包含 TMP 与 uGUI | Unity 6、复杂桌面交互 UI 的 IL2CPP 正例候选 | **拒绝作为 Shipping-like 正例**；x64 Unity 6000.4.10f1、metadata 39、241 个 `il2cpp_*` API，菜单与首启 UI 可见，但成品明确标记 `Development Build`；首启模态框还阻断窗口关闭，强制清理后停止复测 |
+| [DeedPlanner 3.2.2](https://github.com/Warlander/DeedPlanner-3/releases/tag/v3.2.2) | 官方发布提供 Windows x64 成品；同 tag 为 Unity 6.0 代际，[构建脚本](https://github.com/Warlander/DeedPlanner-3/blob/v3.2.2/Assets/Warlander/Deedplanner/Editor/BuildSystem.cs)在 Windows Editor 构建 Windows x64 时选择 IL2CPP；工程实际包含 TMP | IL2CPP Unity 6 桌面标准 UI 替代正例 | **运行候选通过**；x64 Unity 6000.3.4f1、metadata 39、241 个 `il2cpp_*` API，TMP/uGUI 标记存在；两次启动均显示完整编辑器文字 UI，随后可重复把搜索框从占位文本改为 `wall`；公开 `TooltipHandler` 还会排序并换行拼接运行时片段，再由 `Tooltip.Value` 写入 `TMP_Text.text`；没有 Development Build/Glyphshift 模块并正常退出 |
+
+IL2CPP 同后端负例的后续筛选严格限制在两个公开搜索方向。唯一进入仓库级核验的候选有正式 Windows
+x64 release，构建脚本也明确选择 IL2CPP，但项目实际携带 TextMeshPro 与 `UnityEngine.UI`，属于
+Standard UI 正例而非自绘负例；另一方向没有得到同时具备同源仓库、Windows 成品、IL2CPP 和自绘文字
+证据的候选。本轮未下载或启动新成品，也没有扩大到来源不明的游戏二进制。
+
+负例已由一份[公开 NGUI 牌类游戏 release](https://github.com/664235822/GwentCard/releases/tag/2.2)补齐。
+正式 Windows 包是 x64 Unity 2022.2 Mono；业务程序集包含 `UILabel`、`UIFont`、`BMFont` 与 `NGUIText`，
+但没有 TMP、TextMeshPro 或 uGUI 标记。release tag 的[业务代码](https://github.com/664235822/GwentCard/blob/2.2/Assets/Scripts/Play/GameOver.cs)
+直接把可见中文与数值写入 `UILabel.text`；[UILabel](https://github.com/664235822/GwentCard/blob/2.2/Assets/NGUI/Scripts/UI/UILabel.cs)
+在 `OnFill` 中调用 `NGUIText.Print(text, verts, uvs, cols)` 生成自有 Mesh，
+[UIFont](https://github.com/664235822/GwentCard/blob/2.2/Assets/NGUI/Scripts/UI/UIFont.cs)则持有 BMFont、atlas、
+material 与 sprite/texture。runtime-only smoke 显示发布包中文主菜单，加载 UnityPlayer + Mono、没有
+Glyphshift 模块并正常退出。它因此能承担 Mono/通用 Standard UI 的进程级 unsupported 合同：Standard
+UI lane 必须明确拒绝，不能把 Unity 引擎身份或窗口文字误报成 TMP/uGUI 成功。但它不能承担 IL2CPP
+专属负例，因为 IL2CPP Adapter 可只凭后端不匹配就拒绝，尚未验证同后端内的 UI 技术识别。
+
+两份发布包都包含 `MonoBleedingEdge` 与 x64 `mono-2.0-bdwgc.dll`，没有 `GameAssembly.dll`；两个 runtime
+分别导出约 1200 个 `mono_*` 符号，domain、assembly、image、class、method、invoke、string 与 thread
+所需入口在 2021.3/2022.3 两代均存在。包内没有 PDB/MDB 等符号文件，native debugger wait 关闭，文件名
+级扫描也没有发现常见反作弊组件；最后一点只能说明“未发现”，不能证明绝对不存在保护。
+
+授权后的 runtime-only smoke 没有加载 Glyphshift 或注入模块。第一份样本稳定显示初始 TMP 菜单、关卡
+选择及运行时 `Score` / `High Score`；第二份默认 OpenXR 启动在没有 OpenXR runtime 的机器上失败，但用
+项目公开的无头显参数后，Sketch Viewer 的标题、作品名、作者和下载状态，以及完整 Monoscopic 工作区均
+稳定可见并可正常退出。第二份的 Locale 已能正常初始化，不过实际语言切换入口尚未完成可见验收。
+
+原第二候选因平面模式没有可判读文字而降级后，替代候选补齐了 **Unity Mono standard UI** 样本矩阵：
+一份 Unity 2021 LTS 动态 TMP 正例、一份 Unity 6 TMP/uGUI + Localization 可见正例，以及一份 Unity
+2022.2 NGUI Mesh/atlas 负例。Mono lane 的外部真实样本 gate 已通过，可以进入 Shipping-like 合成合同
+和 observe-only 原型，但尚未 attach，也不能据此建立生产 Adapter。IL2CPP runtime-only smoke
+先否决了 Development Build，再由备用 release 补齐 Unity 6 正例；目前已有跨 Unity 2021 LTS / Unity 6
+的两个 Shipping-like 运行候选，证明静态门禁必须由运行时构建形态复核。两个候选现已补齐可重复动态
+文本与真实运行时组合字符串来源；另有一份 Mono NGUI Mesh/atlas 负例已固定，但它不能验证 IL2CPP
+后端内的 UI 技术拒绝，有界公开筛选也未找到合格 IL2CPP 自绘成品，因此该样本前置 gate 仍缺同后端
+负例。Shipping-like 合成合同、observe-only 原型、外部 attach、Dictionary 替换和停止恢复也未开始。
+在这些门槛齐备前，不建立生产 crate、Catalog 或 Runtime Bundle 项。
+
 ## Unity
 
 ### Mono 与 IL2CPP 不是同一个 Adapter 后端

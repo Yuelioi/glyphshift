@@ -124,3 +124,37 @@
 - [ ] 只有每个准备实施的技术分层先取得至少两个无反作弊、未预装插件、可重复的外部 Shipping 真实
   目标，并另有可靠拒绝的负例，才建立 Shipping-like 合成合同与有界原型；逐游戏符号、偏移或机器码
   签名依赖直接触发 No-Go，不新增生产 crate、Catalog 或 Runtime Bundle 项。
+  - [x] 匿名公开实现源码已确认 Unity Mono/IL2CPP 运行时元数据与标准 UI setter 路线可作为外部原型
+    候选，同时确认初始枚举、对象所有权和停止恢复仍未被现成方案解决。
+  - [x] 完成第一轮公开发布候选筛选：保留两份 Windows 候选，并降级两份证据不足的项目。
+  - [x] 完成两份正式 Windows 包的只读二进制盘点：均为 x64 Unity Mono，跨 2021.3/2022.3，业务
+    程序集覆盖 TMP setter，后一份同时覆盖 uGUI 与 Localization；盘点阶段未启动或注入候选。
+  - [x] runtime-only smoke 已验证第一份样本的初始菜单、关卡选择和动态分数，以及第二份样本的无头显
+    Viewer 与完整 Monoscopic 工作区；两者均正常退出且未加载 Glyphshift。
+  - [x] 为第二份 Mono Standard UI 样本完成可见 Localization 切换；原候选虽有正式 `-language=` 入口，
+    但平面模式没有可判读文字，已由 x64 Unity 6 Mono 成品替代。新候选的欢迎页在中文和英语偏好下分别
+    显示对应 Localization 文案，连同既有动态 TMP 正例与 NGUI Mesh/atlas 负例通过 Mono 样本 gate。
+  - [x] 完成 [Unity Mono Standard UI observe-only 原型](slices/unity-mono-standard-ui-observe-prototype.md)：
+    先建立 Shipping-like 合同和只读 Runtime seam，证明初始枚举、setter 观察、去重、停用与 unsupported
+    拒绝；本 Slice 不修改目标字符串，不新增生产 Catalog 或 Runtime Bundle。
+  - [x] 完成 [Unity Mono Standard UI TextReplace 原型](slices/unity-mono-standard-ui-writeback-prototype.md)：
+    复用已验证 runtime seam，证明初始写回、动态属性 setter、第二代更新和停用恢复；两个真实正例可见
+    验收前不进入生产 Catalog 或 Runtime Bundle。
+  - [x] 完成 [Unity Mono Standard UI 生产接入](slices/unity-mono-standard-ui-productionization.md)：把已通过
+    双正例与同后端负例的 Adapter 接入 Catalog/Runtime Bundle、中文技术说明和官方文档入口，再用正式
+    Bundle 复核一个正例与负例。
+  - [x] 为 Unity IL2CPP standard UI 完成第一轮公开筛选：一份 Unity 2021.3 轻量游戏和一份 Unity 6
+    桌面交互应用的发布脚本均明确选择 Windows x64 IL2CPP，工程也实际使用 TMP/uGUI；备用候选不占用
+    首轮下载额度。
+  - [x] 获得授权后下载并静态盘点两份 IL2CPP 正式包：均为 x64，metadata 29/39 有效，核心
+    `il2cpp_*` 入口与 TMP/uGUI 标记存在，未发现符号、开发输出目录或常见反作弊文件名；没有启动候选。
+  - [x] 取得单独授权后完成 IL2CPP runtime-only smoke：Unity 2021 LTS 候选两次启动，标准 UI 可见、
+    运行模块与静态盘点一致且正常退出；Unity 6 候选虽可见完整 UI，但成品明确是 Development Build，
+    首启模态框阻断关闭后需要强制清理，按真实样本 gate 否决。两者均未加载 Glyphshift 或注入模块。
+  - [x] 取得单独下载授权后，以备用 Unity 6 release 替换被否决样本：x64 Unity 6000.3.4f1、metadata
+    39、核心 IL2CPP 导出与 TMP/uGUI 标记通过静态门禁；连续两次显示完整编辑器 UI、运行模块一致、
+    无 Development Build/Glyphshift 模块并正常退出。
+  - [ ] 在两个 IL2CPP 发布候选中固定可重复的动态文本触发和真实格式化/本地化来源，并找到一份可可靠
+    拒绝的自研 Mesh/Sprite/texture 负例；两个正例已通过，现有 NGUI Mesh/atlas 负例是 Mono，只能补
+    通用/Mono 拒绝证据；一次有界公开筛选只得到仍使用 TMP/uGUI 的 IL2CPP 标准 UI 候选，没有合格
+    自绘成品，仍需一份 IL2CPP 同后端负例后才允许 observe-only attach。

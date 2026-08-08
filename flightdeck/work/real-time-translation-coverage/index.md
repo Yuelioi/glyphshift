@@ -146,12 +146,96 @@ Unity / Unreal Engine 的引擎感知可实施性已完成一手资料复核。�
 实现开始前，每个技术分层必须先有至少两个无反作弊、未预装插件、可重复的外部 Shipping 真实目标，
 并另有负例证明不支持路径会可靠拒绝。
 
+公开实现源码交叉验证进一步确认：Unity Mono/IL2CPP 可沿运行时元数据定位 TMP、uGUI 与 UI Toolkit
+setter，不必天然退化到逐游戏函数偏移；但只挂 setter 会漏掉附加前已有文字，直接改 retained widget
+也不满足停止恢复合同。两份正式 Windows 候选的只读盘点现已通过：均为 x64 Mono，分别使用 Unity
+2021.3 与 2022.3；业务程序集覆盖 TMP 动态 setter，后一份还实际引用 uGUI 与 Unity Localization。
+两个 runtime 需要的 `mono_*` 元数据入口跨代存在，没有发现符号文件或常见反作弊制品。候选程序仍未
+注入。授权 runtime-only smoke 已确认：第一份样本能稳定显示初始菜单、关卡选择和动态分数；第二份
+通过公开参数稳定进入无头显 Viewer 与完整 Monoscopic 工作区，并正常退出。第二份的语言切换、两份
+样本的外部 attach/停止恢复和可靠负例仍缺，因此样本 gate 仍未通过。
+
+IL2CPP 第一轮正式包静态门禁也已完成：Unity 2021.3.5 与 Unity 6.0 的两份 Windows 包均为 x64
+IL2CPP，`global-metadata.dat` 分别为 metadata 29 与 39；`GameAssembly.dll` 分别导出 235 与 241 个
+`il2cpp_*` API，抽查的 domain、assembly、image、class、method、invoke、string 与 thread 入口全部存在。
+两包 metadata 均含 TMP/uGUI 标记，没有 Mono runtime、符号文件、开发输出目录或常见反作弊文件名，
+native debugger wait 关闭。盘点没有启动候选；文件名级保护扫描只能说明“未发现”。第三份 Unity 6
+release 随后承担替换复核。
+
+授权 runtime-only smoke 随后纠正了候选质量：Unity 2021.3.5 游戏连续两次启动，标准 TMP 主菜单、
+High Score、Start/Quit 可见，两次都加载发布包内的 `UnityPlayer.dll` 与 `GameAssembly.dll`、没有
+Glyphshift 模块，并经窗口关闭正常退出。Unity 6 桌面应用虽能显示完整菜单、工具栏和首启对话框，
+但成品界面明确标记 `Development Build`，而且首启模态框阻断窗口关闭后需要强制清理；它因此不能承担
+Shipping-like 正例，本轮不重复启动。两者都没有注入；首次 runtime smoke 当时只留下一个合格运行候选。
+
+替代 Unity 6 release 随后通过同一门禁：正式 Windows 包为 x64 Unity 6000.3.4f1 IL2CPP，metadata 39
+有效，导出 241 个 `il2cpp_*` API，核心入口与 TMP/uGUI 标记齐全；未发现 Mono、PDB/MDB/DBG、开发
+输出目录、player-connection 调试键或常见反作弊文件名。连续两次启动都显示完整编辑器搜索、地形分类
+和工具标签，运行模块与发布包一致、没有 Glyphshift 或 Development Build 标记，并经窗口关闭正常退出；
+选定异常扫描为零。后续定向运行把两个正例的动态路径固定下来：Unity 2021 LTS 游戏从 `SCORE: 0`
+稳定推进到 `SCORE: 248`，并显示 `Current Score: 248`；Unity 6 桌面应用把可见搜索框从占位文本改为
+`wall`。前者公开源码每帧写入 `TextMeshProUGUI.text`，后者公开源码另有把 tooltip 片段排序、换行拼接
+后写入 `TMP_Text.text` 的真实组合字符串路径。两次均无注入、无 Glyphshift 模块并正常退出。
+
+可靠负例也已补齐。一份公开 Windows x64 Unity 2022.2 Mono 牌类游戏正式包只包含 NGUI `UILabel`、
+`UIFont`、`BMFont` 与 `NGUIText`，业务代码把可见中文菜单和数值写入 `UILabel.text`；同 tag 的
+`UILabel.OnFill` 再调用 `NGUIText.Print` 生成 vertices/UV/colors，字体来自 atlas/material。包内业务
+程序集没有 TMP、TextMeshPro 或 uGUI 标记，runtime-only smoke 显示完整中文菜单、无 Glyphshift 模块并
+正常退出。因此它可承担“Unity 引擎存在但 Standard UI lane 必须拒绝”的进程级 Mesh/atlas 负例，
+也补上 Mono lane 的负例方向。但它不能承担 IL2CPP 专属负例：IL2CPP Adapter 可仅凭 Mono 后端拒绝，
+尚未验证同为 IL2CPP 时能区分标准 UI 与 NGUI/自绘 Mesh。IL2CPP attach gate 因此仍未通过，也没有建立
+生产 Adapter。
+
+IL2CPP 同后端负例随后做了一次有界公开候选复核。唯一具有正式 Windows x64 release 和明确 IL2CPP
+构建脚本的候选，仓库实际携带 TextMeshPro 与 `UnityEngine.UI`，仍属于 Standard UI 正例，不能承担
+自绘 Mesh/Sprite/texture 负例；另一搜索方向没有得到同时具备同源仓库、Windows 成品、IL2CPP 与自绘
+文字证据的目标。本轮没有下载或启动新候选，也不再用无界搜索阻塞主线。
+
+Mono 第二候选的 Localization 路径也已复核。发布 tag 的 Localization Settings 注册了
+`CommandLineLocaleSelector`，参数为 `-language=`，界面 Locale 按钮也直接更新 `SelectedLocale`；这能
+证明真实 Localization 技术和切换入口存在。但英语与简体中文各一次 7 秒、简体中文一次 15 秒的无注入
+平面运行均只显示无可判读文字的场景，三次都加载 UnityPlayer + Mono、没有 GameAssembly/Glyphshift
+并正常退出。因此它不能承担“可见语言切换”正例，Mono attach gate 仍未通过。
+
+替代 Mono 候选随后补齐了缺口。正式 Windows zip 是 x64 Unity 6000.3.9f1 Mono Player，包含
+`MonoBleedingEdge`、Managed 业务程序集、Unity Localization、TMP 与 uGUI，没有 GameAssembly、IL2CPP
+metadata、调试符号或常见反作弊文件名；业务程序集真实引用 `NextLanguage`、`SelectedLocale`、
+`LocalizationSettings` 与 `TMP_Text`。默认中文运行显示“下载资源 / 简”，将该测试应用自己的
+`AppLanguage` 偏好在 `try/finally` 内临时设为英语后，同一欢迎页显示“Download Res / En”；原偏好随后
+逐字节恢复。两次都加载 UnityPlayer + Mono、没有 Glyphshift 并正常退出。Mono lane 至此拥有两个跨
+Unity 代际的 Standard UI 正例和一份 NGUI Mesh/atlas 负例，真实样本 gate 已通过，但尚未 attach。
+
+Unity Mono observe-only 原型现已完成。host-independent Observer 与未入 Bundle 的 native Adapter 用 25 项
+实际使用的 late-attach 导出完成 metadata/JIT 门禁、`CanvasUpdateRegistry.PerformUpdate` 主线程 dispatch、
+一次性对象枚举和 TMP/uGUI `set_text` detour。GC handle 已改为指针宽度 `*_v2`；激活 ACK 还必须等到
+主线程枚举出真实标准 UI 对象，不能再用 Unity 自带程序集的类型存在冒充支持。初始 Observation 会缓存到
+Target Runtime active 后再发布，避免 ACK 前丢失。
+
+合成宿主取得附加前/后 4 条预期文字并验证停用；两个 package 共 23 个定向测试与各自 Clippy 通过。正式
+Controller/Target Runtime 部署链在两个最终正例分别采集 10 条与 15 条唯一非空原文，额外跨代正例采集
+389 条；全部停用并正常退出。NGUI-only 同后端负例被 live-object gate 拒绝且正常退出。动态路径仍只
+承诺属性 `set_text`，不把 TMP `SetText(...)` 多重 ABI 冒充为已覆盖，也尚未提供 Dictionary 写回。
+
+Unity Mono Standard UI TextReplace 原型随后完成，并在发布前把 Observe-only 两个 package 收敛为一个
+host-independent `standard-ui` 状态内核和一个 native Adapter，避免重复持有 Mono FFI、GC handle 与 JIT
+detour。新增 `mono_string_new_utf16` 后共使用 26 项导出；managed string 只在已验证主线程创建并由强
+`*_v2` handle 覆盖 setter 调用。状态机保留最新业务原文、当前译文与 Dictionary generation，支持初始
+写回、属性 setter、第二代热更新、停用恢复以及三秒超时后的延迟主线程恢复。
+
+32 个相关定向测试与 Clippy 通过。确定性 Mono 宿主覆盖正常/延迟恢复；正式部署链在两个跨代 Standard UI
+正例分别捕获 10 / 15 条唯一原文，首代译文、第二代译文和停用后的原文恢复均有可见证据且目标正常退出。
+NGUI-only 同后端负例继续拒绝。
+
+生产接入也已完成。Debug/Release Runtime Bundle 现在都包含该 native Adapter；Desktop Runtime 实际打开
+两种 Bundle 后均将其识别为 Windows x64 Target Process 的 `TextReplace` 技术。前台技术卡显示精确边界并
+链接 Unity 官方 Mono 手册，Playwright CLI 6/6 通过。正式 Debug Bundle 又在一个 Standard UI 正例完成
+首代、generation 2 与停用恢复的可见验收并正常退出，NGUI-only 负例继续拒绝。
+
 ## Next
 
-- 不直接建设 Unity / UE 生产 Adapter。只有先满足
-  [Unity / UE 真实样本 gate](references/unity-unreal-engine-adapter-feasibility.md)，才允许建立
-  Shipping-like 合成合同和有界原型；若 IL2CPP 或 UE 需要逐游戏符号、偏移或机器码签名，立即按
-  No-Go 收口。
+- Unity Mono Standard UI 已完成生产接入并保持窄边界。IL2CPP 同后端自绘 Mesh/Sprite/texture 负例仍缺，
+  一次有界公开
+  筛选也没有合格成品，在出现明确候选前不继续广泛搜索，更不能用 Mono 后端拒绝冒充 UI 技术拒绝。
 - 等待新的、明确授权且可重复的 Windows 真实目标；按
   [raylib 之后的候选复核](references/post-raylib-next-adapter-primary-source-review.md)先查 PE import、运行模块
   与公开文字导出，固定可见词条命中后才恢复 Adapter 原型。
@@ -259,6 +343,36 @@ Unity / Unreal Engine 的引擎感知可实施性已完成一手资料复核。�
 - 完成 [Unity / Unreal Engine 游戏文字 Adapter 可实施性复核](references/unity-unreal-engine-adapter-feasibility.md)：
   Unity Mono、IL2CPP、Localization 与标准/自研 UI，以及 UE `FText`、Slate/UMG、Canvas、shaping、
   Shipping 链接和反作弊边界已分层；结论是不按引擎名承诺覆盖，真实样本 gate 通过前不新增生产实现。
+- 已用匿名公开实现源码交叉验证 Unity 运行时元数据与标准 UI setter 路线，同时确认初始枚举、所有权和
+  停止恢复仍是 Glyphshift 必须自行补齐的合同；Godot/UE 的字节模式路线继续按固定版本 Recipe 对待。
+- 已筛选 Unity 外部样本：保留一份小型桌面标准 UI 候选和一份跨代际条件候选，拒绝把缺少关键内容的
+  Alpha 或仅有工程发布证据的样例算作 Shipping 正例。
+- 两份正式 Windows 包的只读盘点已完成：x64、Unity 2021.3/2022.3、Mono runtime 与 TMP/uGUI/
+  Localization 业务引用均由发布二进制确认；盘点阶段未启动或注入，也没有把文件名扫描误写成无保护
+  证明。
+- runtime-only smoke 已确认第一份样本的初始菜单、关卡选择与动态分数；第二份用公开参数进入无头显
+  Viewer 和完整 Monoscopic 工作区。两者都正常退出且未注入；Localization 可见切换仍未完成。
+- Unity IL2CPP 两份正式包的静态门禁已完成：跨 Unity 2021 LTS / Unity 6，均为 x64，metadata 29/39
+  与核心 `il2cpp_*` 导出有效，TMP/uGUI 标记存在；未启动、未注入，也未运行无关仓库测试。下一步必须
+  先取得单独授权，才做 runtime-only smoke。
+- Unity IL2CPP 首轮 runtime-only smoke 没有加载 Glyphshift：Unity 2021 LTS 候选两次启动、主菜单
+  可见并正常退出；原 Unity 6 候选因明确是 Development Build 被否决，首启模态框阻断关闭后已强制
+  清理。本轮未运行仓库测试。
+- 备用 Unity 6 IL2CPP release 已补位：x64 Unity 6000.3.4f1、metadata 39、核心导出与 TMP/uGUI 标记
+  通过静态门禁；两次启动均显示完整编辑器 UI、没有 Development Build/Glyphshift 模块并正常退出。
+  IL2CPP 两个跨代际运行候选已齐，但动态/格式化路径和可靠负例尚未完成，仍未 attach。
+- Unity Mono 替代 Localization 候选通过：x64 Unity 6 Mono 成品的业务程序集真实引用 TMP/uGUI、
+  `LocalizationSettings` 与 `NextLanguage`；欢迎页在中文和英语偏好下分别显示对应文案，目标均正常退出、
+  无 Glyphshift 模块，测试偏好已恢复。结合既有动态 TMP 正例和 NGUI 负例，Mono 样本 gate 已通过。
+- Unity Mono Observe-only 原型已完成：纯 Observer 与 native 原型共 23 个定向测试通过；合成宿主和
+  正式部署链证明真实对象 ACK、初始 Observation、属性 setter、停用和进程退出。两个最终正例、一个
+  额外跨代正例均采集到非空原文，NGUI-only 同后端负例可靠拒绝；该结论随后由 TextReplace 原型继承。
+- Unity Mono Standard UI TextReplace 原型已完成：未发布的 Observe-only package 已直接收敛改名；32 个
+  定向测试与相关 Clippy 通过。两个跨代真实正例的首代、第二代和停用恢复均可见，NGUI-only 负例继续
+  拒绝；当前转入生产 Catalog/Bundle 接入，不扩大到 IL2CPP、UI Toolkit、NGUI 或 `SetText(...)`。
+- Unity Mono Standard UI 生产接入已完成：Debug/Release Bundle、Desktop Catalog、中文技术说明、官方文档
+  入口、architecture/native-host 合同与 focused Playwright 均通过；正式 Bundle 正例可见更新/恢复，
+  NGUI-only 负例拒绝。该技术现在进入实时翻译覆盖，但只承诺 Windows x64 Mono TMP/uGUI 属性 setter。
 
 ## References
 
