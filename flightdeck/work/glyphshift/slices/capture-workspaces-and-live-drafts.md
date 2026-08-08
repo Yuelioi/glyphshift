@@ -72,7 +72,7 @@ Vue 与 Tauri DTO 不读取内部文件，也不接收完整 5,000 条 catalog�
 - [x] Controller 到 Target Runtime 的暂停/继续与 Preview generation 有合成合同。
 - [x] Playwright 覆盖 960×640、1440×900、搜索、多选、分页、编辑和自动刷新稳定性。
 - [x] 性能检查证明前端 DOM 行数受 page size 限制，1 秒刷新不传输完整 catalog。
-- [x] 工作树内不含 `target/local-test/` 跟踪内容；本轮未 staged/未提交。
+- [x] 工作树内不含 `local-test/` 跟踪内容；本轮未 staged/未提交。
 
 ## Current
 

@@ -9,7 +9,7 @@
 - Native、Isolated Worker 与桌面进程属于真实部署 seam；跨进程协议、Native ABI、制品信任、授权、
   Placement 和 fail-open 语义不能为了减少 crate 数量而被折叠。
 - 现有 `architecture-tests/check.ps1` 精确约束 workspace package 的直接依赖，并检查关键源码禁用项。
-- 机器专属路径、进程值、日志和截图只属于忽略的 `target/local-test/`，不得进入结构文档或提交。
+- 机器专属路径、进程值、日志和截图只属于忽略的 `local-test/`，不得进入结构文档或提交。
 
 ## 设计语言
 

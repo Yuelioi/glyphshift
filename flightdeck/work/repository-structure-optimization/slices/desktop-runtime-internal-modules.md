@@ -12,7 +12,7 @@ Status: Complete
 
 - `src/lib.rs` 2781 行：约 1817 行实现、964 行内嵌测试。
 - 14 项确定性单元测试全绿；12 项本机/授权 Runtime 合同保持 ignored，输入输出仍只在
-  `target/local-test/`。
+  `local-test/`。
 - `tests/windows_runtime_contract.rs` 1117 行，属于后续大型合同测试结构切片，不在本切片混入实机值。
 
 ## Plan

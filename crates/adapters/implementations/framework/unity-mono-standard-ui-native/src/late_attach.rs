@@ -92,8 +92,7 @@ type ObjectGetClass = unsafe extern "C" fn(*mut MonoObject) -> *mut MonoClass;
 type FieldGetValue = unsafe extern "C" fn(*mut MonoObject, *mut MonoClassField, *mut c_void);
 type StringChars = unsafe extern "C" fn(*mut MonoString) -> *mut u16;
 type StringLength = unsafe extern "C" fn(*mut MonoString) -> c_int;
-type StringNewUtf16 =
-    unsafe extern "C" fn(*mut MonoDomain, *const u16, c_int) -> *mut MonoString;
+type StringNewUtf16 = unsafe extern "C" fn(*mut MonoDomain, *const u16, c_int) -> *mut MonoString;
 pub(crate) type MonoGcHandle = usize;
 type GcHandleNew = unsafe extern "C" fn(*mut MonoObject, c_int) -> MonoGcHandle;
 type GcHandleNewWeakRef = unsafe extern "C" fn(*mut MonoObject, c_int) -> MonoGcHandle;
@@ -365,16 +364,14 @@ impl MonoApi {
             return None;
         }
         let length = c_int::try_from(units.len()).ok()?;
-        let string = unsafe {
-            (self.string_new_utf16)(domain as *mut MonoDomain, units.as_ptr(), length)
-        };
+        let string =
+            unsafe { (self.string_new_utf16)(domain as *mut MonoDomain, units.as_ptr(), length) };
         if string.is_null() {
             return None;
         }
         let handle = unsafe { (self.gchandle_new)(string.cast(), 0) };
         (handle != 0).then_some(handle)
     }
-
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

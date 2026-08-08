@@ -90,7 +90,7 @@ SDL_ttf 官方 `showfont` 示例可以作为隔离的**技术 smoke**，用于�
 - [`.gitmodules`](https://github.com/libsdl-org/SDL_ttf/blob/release-3.2.2/.gitmodules)：声明官方 vendored FreeType、HarfBuzz、PlutoSVG 和 PlutoVG 来源；
 - [`release-3.2.2` 发布页](https://github.com/libsdl-org/SDL_ttf/releases/tag/release-3.2.2)：稳定发布并提供 Windows 架构产物。
 
-该标签自身声明 SDL_ttf 3.2.2，并要求 SDL 3.2.6。MSVC 下 vendored 依赖默认开启。`showfont` 运行仍需要明确提供字体文件；具体字体路径必须作为本机测试输入保留在 `target/local-test/`，不得写入跟踪内容。
+该标签自身声明 SDL_ttf 3.2.2，并要求 SDL 3.2.6。MSVC 下 vendored 依赖默认开启。`showfont` 运行仍需要明确提供字体文件；具体字体路径必须作为本机测试输入保留在 `local-test/`，不得写入跟踪内容。
 
 ### 判定
 

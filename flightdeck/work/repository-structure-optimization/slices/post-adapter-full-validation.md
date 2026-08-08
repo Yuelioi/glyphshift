@@ -17,7 +17,7 @@ Status: Complete
 - [x] 运行完整 workspace test、全 workspace Clippy、格式、架构与 diff check。
 - [x] 运行桌面生产构建和仓库 Playwright 全套确定性测试。
 - [x] 复核 1200 行门槛、Cargo/package 集合、旧路径残留、Git rename 语义与文档链接。
-- [x] 扫描 staged/tracked 路径和文本，确保没有 `target/local-test/` 或机器专属信息。
+- [x] 扫描 staged/tracked 路径和文本，确保没有 `local-test/` 或机器专属信息。
 - [x] 完成最终 Review，更新 Work/Plan/Deck 为 Finished；保持工作树未提交。
 
 ## Next
@@ -35,7 +35,7 @@ None.
   55 个 manifest 的 239 个 path 属性均指向存在的相对路径，迁移前平铺路径残留为 0。
 - 236 个代码文件中 0 个达到 1200 行；最大文件 977 行，前序结构优化门槛保持。
 - 13 份相关导航文档的 66 个本地链接全部存在。
-- Git 暂存区、tracked `target/local-test/` 和该目录 status 均为 0；变更文本只含 15 个明确合成的路径解析
+- Git 暂存区、tracked `local-test/` 和该目录 status 均为 0；变更文本只含 15 个明确合成的路径解析
   fixture，没有开发机路径、用户名或本机证据链接。
 
 ## Final review

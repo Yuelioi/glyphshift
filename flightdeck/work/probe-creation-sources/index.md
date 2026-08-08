@@ -1,6 +1,6 @@
 # 探针创建来源统一
 
-Status: Complete
+Status: Finished
 
 ## Goal
 
@@ -10,14 +10,14 @@ Dictionary，也可由系统自动命名并创建为临时资产。用户无需�
 
 ## Current
 
-当前 Probe 页存在两个重叠入口：普通“新建探针任务”只接受资料库 Software，并在新建 Dictionary 时
-要求填写名称和语言；“快速测试”可以捕获前台程序并自动创建临时 Software/Dictionary，但不能选择
-已有 Dictionary。两条路径分别编排同一组领域对象，导致用户必须先理解资产生命周期，入口本身也
-无法表达 Software Library 只是目标来源之一。
+Probe 创建现已统一 Software Library / 运行中程序与已有 / 临时 Dictionary 四种来源组合；临时资产
+使用同一 ownership ledger 支持保留、清理、失败补偿与崩溃恢复。Software 页只有一个“新建软件”入口，
+Modal 内提供运行中列表、按键捕获与手动路径；Dictionary 新建/设置共用元数据表单、标签输入与三段式
+发布版本。Probe 详情常显绑定 Dictionary，并支持切换、打开、批量保存非空译文与移除词典译文。
 
-后端已经具备可复用基础：`QuickProbeSession` 会按程序路径复用或创建 Software、创建 Dictionary、
-选择兼容 Adapter Plan，并通过持久 ownership ledger 处理失败补偿、保留、独占清理和崩溃恢复。本
-Work 将深化该边界为统一的 Probe creation command，而不是让 Vue 串联多个资产命令。
+最终定向页面合同已补齐：空资料库临时 Probe、Probe 详情/词典联动、Software 单入口/前台捕获与
+Dictionary 完整元数据四个相关场景均通过。既有 Rust 定向门禁与前端生产构建继续有效；未运行全仓
+测试。
 
 ## Decisions
 
@@ -42,10 +42,7 @@ acquisition result。
 
 ## Next
 
-- 本 Work 的产品与实现目标已完成，后续产品工作回到实时翻译覆盖；`adapters` 二级目录建议作为独立
-  架构复核处理，不与 Probe 资产工作流继续耦合。
-- Playwright CLI 在单文件运行时 64 秒无输出并被超时终止；后续修复测试启动链路时重跑受影响页面，
-  不因此扩大为全仓测试。
+None.
 
 ## Progress
 
@@ -73,3 +70,5 @@ acquisition result。
   各包文档测试通过；前端生产构建通过。未运行全仓测试。
 - Probe Playwright 单文件在 64 秒内没有产生运行输出并被超时终止，未观察到用例断言失败；这项残余
   风险保留给测试启动链路修复，不阻塞当前功能 checkpoint。
+- 最终清理时修正两条已经落后于产品决策的 Playwright 断言：Software 页头只保留单一入口，Dictionary
+  发布版本与作者分别使用三段数字和标签组件；连同两条 Probe 场景，四个相关页面合同均通过。

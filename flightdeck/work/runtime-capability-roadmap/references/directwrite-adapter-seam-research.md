@@ -265,7 +265,7 @@ family、collection、weight/style/stretch、size 和 locale 创建后不能修�
 
 确定性像素断言先使用目标字体稳定覆盖的短 ASCII 替换，证明 hook/lifecycle；CJK 字体与 fallback 另做
 环境化 smoke，不能让 CI 依赖某台机器安装的字体。若保存本机图片或原始日志，只能进入
-`target/local-test/evidence/`。
+`local-test/evidence/`。
 
 ### 5.2 验收状态机
 
@@ -344,5 +344,5 @@ description 的 `ID2D1DeviceContext::DrawGlyphRun` 可以提供观察证据，�
 - 任何只能在进程启动前捕获的 factory/layout 路径，必须在 Adapter 限制中显式说明；不能把 late attach
   的零命中解释成“不使用 DirectWrite”。
 - 不把 local module address、vtable address、进程信息或截图写入 tracked 文档；真实证据留在
-  `target/local-test/evidence/`。
+  `local-test/evidence/`。
 

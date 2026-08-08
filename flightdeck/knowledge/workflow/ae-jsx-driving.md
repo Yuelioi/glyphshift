@@ -20,4 +20,4 @@ Start-Process -FilePath $aeExe -ArgumentList @('-r', $jsx)
 - 需要 JSX 写文件时，AE 的 “Allow Scripts to Write Files” 权限只能由用户在偏好设置中开启，脚本不能自行提升。
 
 脚本负责制造确定性 UI 状态；注入流程见 [注入与验证流程](inject-verify.md)。日志、截图和
-本机效果清单统一写入 `target/local-test/`，不进入 Git。
+本机效果清单统一写入 `local-test/`，不进入 Git。

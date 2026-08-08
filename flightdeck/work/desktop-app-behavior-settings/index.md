@@ -28,7 +28,7 @@ None
 - 前端构建、桌面壳 43 项测试、Windows Controller 18 项测试和桌面 Playwright 59 项测试通过；另有
   1 项需要真实授权目标的既有测试按设计忽略。
 - 深色/浅色、1440×900/960×640 设置页已由仓库 Playwright runner 截图检查；本机证据只保存在
-  `target/local-test/`。
+  `local-test/`。
 - 真实 UAC 冒烟发现旧 `ShellExecuteW` 在父进程立即退出时没有可靠完成异步交接；已改为
   `ShellExecuteExW` 同步创建、保留子进程句柄并确认提升后的 GUI 进程没有在启动阶段退出。
 - 提升进程不能依赖继承本地测试环境变量；数据根和 Runtime 根现在通过正确引用的内部参数显式

@@ -604,7 +604,7 @@ fn authorized_windows_target_exposes_useful_uia_text_without_modification() {
         .expect("authorized UIA target process environment variable");
     let started_at = process_started_at(process_id).expect("authorized target start time");
     let evidence_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../../../target/local-test/evidence/uia-authorized-smoke");
+        .join("../../../../../local-test/evidence/uia-authorized-smoke");
     fs::create_dir_all(&evidence_root).expect("create local UIA evidence root");
     let output = evidence_root.join("capture.json");
     if output.exists() {

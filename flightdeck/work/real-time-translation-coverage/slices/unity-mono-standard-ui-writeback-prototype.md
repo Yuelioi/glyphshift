@@ -60,10 +60,10 @@ host-independent 写回状态机保存“最新业务原文 / 当前译文 / Dic
 - 正式 Controller → Target Runtime → native Adapter 链在两个跨代 Standard UI 正例均完成首代可见替换、
   同进程 generation 2 可见更新、停用后可见原文恢复与正常退出；分别捕获 10 / 15 条唯一原文。
 - NGUI-only 同 Mono 后端负例继续在 live-object ACK 阶段拒绝并正常退出。
-- 未运行全仓测试；所有真实输入、日志、截图和原文仍仅位于 `target/local-test/`。
+- 未运行全仓测试；所有真实输入、日志、截图和原文仍仅位于 `local-test/`。
 
 ## Boundaries
 
-- 外部程序、日志、截图、进程信息、真实 Dictionary 与可见证据只保存在 `target/local-test/`。
+- 外部程序、日志、截图、进程信息、真实 Dictionary 与可见证据只保存在 `local-test/`。
 - 不覆盖 IL2CPP、UI Toolkit、NGUI、TextMesh、Sprite/texture、自研 Mesh、TMP `SetText(...)` 或字符数组入口。
 - 原型通过前不新增正式 Catalog、Runtime Bundle、软件支持声明或兼容旧格式分支。

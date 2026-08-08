@@ -38,7 +38,7 @@ Status: Complete
 
 - 不把 WPF 与 WinUI 合并；不在本切片建设 CLR Profiler、ReJIT 或 BAML 修改。
 - 不修改目标 PRI 包、资源文件或控件状态；未命中时记录边界，不增加软件名或版本专用扫描。
-- 机器路径、进程信息、截图、PRI 样本和原始日志只进入 `target/local-test/`。
+- 机器路径、进程信息、截图、PRI 样本和原始日志只进入 `local-test/`。
 
 ## References
 

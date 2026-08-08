@@ -55,7 +55,7 @@ Status: Completed
    - 运行 Vue typecheck/build、Playwright 双语言/双主题/窄宽视口、Rust unit/workspace、fmt 与 Clippy。
    - 用仓库 Playwright runner 截取桌面视图并完成一次集中修复、一次确认；再启动真实 Tauri
      桌面验证设置跨重启保留。
-   - 更新 PRODUCT、DESIGN、CONTEXT 与 Flightdeck；本机证据只写入 `target/local-test/evidence/`。
+   - 更新 PRODUCT、DESIGN、CONTEXT 与 Flightdeck；本机证据只写入 `local-test/evidence/`。
 
 ## Acceptance
 

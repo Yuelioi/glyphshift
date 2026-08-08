@@ -314,7 +314,7 @@ Runtime、Decision Engine、Native Adapter 和 Dictionary hot path 不访问网�
 4. Playwright：四个管理页、逐 Target 组合、排序、多选、错误与 960×640/1440×900。
 
 另外保留 workspace test、Clippy、fmt、前端生产构建、架构扫描和本地隐私扫描。真实运行证据仍
-只写 `target/local-test/evidence/`。
+只写 `local-test/evidence/`。
 
 ## 10. 非目标
 

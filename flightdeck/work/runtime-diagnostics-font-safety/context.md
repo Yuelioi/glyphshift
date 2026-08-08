@@ -48,7 +48,7 @@
 - 已有 digest 不再复制成第二套 Snapshot Artifact；只有当它能区分 Generation 相同但内容异常时，
   才把 publication identity 扩展到 Runtime ACK 和桌面诊断。
 - 普通产品 UI 不展示 PID、内部 Adapter ID、Route、DLL 路径或原始调用信息；详细 Trace 只进入本地
-  诊断表面，实机原始证据只存 `target/local-test/evidence/`。
+  诊断表面，实机原始证据只存 `local-test/evidence/`。
 - 诊断表面把内部 Adapter ID 映射为 Runtime Bundle 的公开名称；缺少展示信息时使用通用占位，
   不回退显示内部 ID。Publication identity 可作为本地诊断事实显示，Translation/Font digest 保留在
   查询合同中但不占用普通表格列。

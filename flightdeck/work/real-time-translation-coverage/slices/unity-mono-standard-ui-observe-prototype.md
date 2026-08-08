@@ -87,13 +87,13 @@ workspace 现有 host-independent Observer 状态包和一个未进 Catalog/Bund
   无发布；输出 4 条预期 Observation，进程正常结束。
 - 四份本地真实 Mono runtime 的 25 项 late-attach 导出对照均无缺项；四套 uGUI/TMP 程序集都包含
   `PerformUpdate`、标准字段与 setter，CoreModule 跨代包含 `FindObjectsOfType`。原始文件与结果仅在
-  `target/local-test/`。
+  `local-test/`。
 - 正式 Controller/Target Runtime 本地部署链：两个最终正例分别得到 10 条和 15 条唯一非空 Observation；
   一个额外跨代正例得到 389 条；三次均停用并正常退出。NGUI-only 同后端负例激活被拒绝并正常退出。
 - 未运行全仓测试；两个 package 都未进入 Catalog 或 Runtime Bundle。
 
 ## Boundaries
 
-- 外部成品、源码副本、路径、日志、截图、进程与模块信息只保存在 `target/local-test/`。
+- 外部成品、源码副本、路径、日志、截图、进程与模块信息只保存在 `local-test/`。
 - 生产选择不得按软件品牌、可执行文件名、逐游戏地址或机器码签名分支。
 - 当前结论仅为有界 Observe-only 原型 Go；没有 Dictionary 写回、可见翻译或生产支持声明。

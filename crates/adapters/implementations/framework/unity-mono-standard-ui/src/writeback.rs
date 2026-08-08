@@ -1,6 +1,4 @@
-use crate::{
-    ManagedObjectId, ManagedText, StandardUiKind, MAX_TEXT_UNITS, MAX_TRACKED_OBJECTS,
-};
+use crate::{ManagedObjectId, ManagedText, StandardUiKind, MAX_TEXT_UNITS, MAX_TRACKED_OBJECTS};
 use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -155,31 +153,31 @@ impl UnityMonoWriteback {
 
         let mut decoded = BTreeMap::new();
         for text in snapshot {
-            let Some(text) = text.decode() else {
+            let Some((object_id, kind, source)) = text.into_decoded_parts() else {
                 continue;
             };
-            if decoded.len() == MAX_TRACKED_OBJECTS && !decoded.contains_key(&text.object_id) {
+            if decoded.len() == MAX_TRACKED_OBJECTS && !decoded.contains_key(&object_id) {
                 continue;
             }
-            decoded.insert(text.object_id, text);
+            decoded.insert(object_id, (kind, source));
         }
 
         let mut writes = Vec::new();
-        for (object_id, text) in decoded {
-            let source = text.source.encode_utf16().collect::<Vec<_>>();
+        for (object_id, (kind, source_text)) in decoded {
+            let source = source_text.encode_utf16().collect::<Vec<_>>();
             let decision = if source.is_empty() {
                 TextDecision::keep(0)
             } else {
-                decide(&text.source)
+                decide(&source_text)
             };
             let applied = decision.validated_replacement(&source);
             if let Some(replacement) = &applied {
-                writes.push(TextWrite::new(object_id, text.kind, replacement.clone()));
+                writes.push(TextWrite::new(object_id, kind, replacement.clone()));
             }
             self.tracked.insert(
                 object_id,
                 TrackedWriteback {
-                    kind: text.kind,
+                    kind,
                     source,
                     applied,
                     generation: decision.generation,
@@ -197,20 +195,18 @@ impl UnityMonoWriteback {
         if !self.active {
             return SetterOutcome::Untracked;
         }
-        let Some(text) = text.decode() else {
+        let Some((object_id, kind, source_text)) = text.into_decoded_parts() else {
             return SetterOutcome::Untracked;
         };
-        if self.tracked.len() == MAX_TRACKED_OBJECTS
-            && !self.tracked.contains_key(&text.object_id)
-        {
+        if self.tracked.len() == MAX_TRACKED_OBJECTS && !self.tracked.contains_key(&object_id) {
             return SetterOutcome::Untracked;
         }
 
-        let source = text.source.encode_utf16().collect::<Vec<_>>();
+        let source = source_text.encode_utf16().collect::<Vec<_>>();
         let decision = if source.is_empty() {
             TextDecision::keep(0)
         } else {
-            decide(&text.source)
+            decide(&source_text)
         };
         let applied = decision.validated_replacement(&source);
         let outcome = applied.as_ref().map_or(
@@ -223,9 +219,9 @@ impl UnityMonoWriteback {
             },
         );
         self.tracked.insert(
-            text.object_id,
+            object_id,
             TrackedWriteback {
-                kind: text.kind,
+                kind,
                 source,
                 applied,
                 generation: decision.generation,
@@ -234,10 +230,7 @@ impl UnityMonoWriteback {
         outcome
     }
 
-    pub fn refresh(
-        &mut self,
-        mut decide: impl FnMut(&str) -> TextDecision,
-    ) -> Vec<TextWrite> {
+    pub fn refresh(&mut self, mut decide: impl FnMut(&str) -> TextDecision) -> Vec<TextWrite> {
         if !self.active {
             return Vec::new();
         }

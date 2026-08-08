@@ -53,7 +53,7 @@ opaque target 单独部署同一 Runtime 后，才会在子诊断中观察到 `C
   纯控制调用不产生候选，停用后继续透传。
 - 正式 Runtime Bundle 校验通过，包含一个 Console Observer、总计五个 Adapter。
 - 授权隔离 CMD 实测通过：18 次命中，观察集合为 `Open`、`File`、`Edit`；真实日志与输入只保存在
-  `target/local-test/`。
+  `local-test/`。
 - 真实进程合成 parent/child 合同通过：父进程部署不观察子进程；子进程单独部署后只在自己的诊断流
   中观察，Controller 的两个 target 互不串流。
 - 真实 Process Family capture 合同通过：父子 target 同时部署并写入同一 checkpoint；暂停/恢复、

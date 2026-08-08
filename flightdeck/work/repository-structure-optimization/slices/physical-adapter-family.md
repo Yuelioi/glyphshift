@@ -53,4 +53,4 @@ None. 后续执行[迁移后全仓验证](post-adapter-full-validation.md)。
 - Standards：物理目录只表达 Adapter 能力家族；依赖层仍由 package partition/allow-list 表达。架构源码
   扫描现由 Cargo metadata 派生 package 根，不再绑定平铺路径。
 - Spec：package 名、crate type、ABI、实现源码、测试集合和依赖集合保持；唯一非 manifest 修改是新增
-  目录深度所要求的三个相对路径修正，真实本机证据仍只落入 `target/local-test/`。
+  目录深度所要求的三个相对路径修正，真实本机证据仍只落入 `local-test/`。

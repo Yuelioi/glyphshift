@@ -12,6 +12,7 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 glyphshift-adapter-native-abi = { path = "../../../platform/native-abi" }
 glyphshift-adapter-unity-mono-standard-ui = { path = "../unity-mono-standard-ui" }
+glyphshift-adapter-unity-standard-ui = { path = "../unity-standard-ui" }
 retour = "0.3"
 
 [target.'cfg(windows)'.dependencies]

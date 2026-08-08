@@ -191,6 +191,35 @@ IL2CPP 同后端负例随后做了一次有界公开候选复核。唯一具有�
 自绘 Mesh/Sprite/texture 负例；另一搜索方向没有得到同时具备同源仓库、Windows 成品、IL2CPP 与自绘
 文字证据的目标。本轮没有下载或启动新候选，也不再用无界搜索阻塞主线。
 
+第二次[有界公开复核](references/unity-il2cpp-custom-text-negative-candidate-review.md)把范围固定为 3 条
+方向、5 个官方仓库，仍然是 No-Go：唯一闭环到 Windows x64 IL2CPP release 的候选实际使用 TMP；
+Sprite/font-atlas 自绘候选均为 Standalone Mono 或没有 Windows 成品。一份接近的 stroke 文字候选还暴露
+了两重误判风险：官方 Windows workflow 会临时切回 Mono，monoscopic 路径也会实例化 TMP/uGUI，因而
+既不是同后端，也不是进程级可靠负例。本轮没有下载、启动或注入候选，达到上限后已经停止。
+
+第三次[有界公开复核](references/unity-il2cpp-custom-text-negative-candidate-review-round-3.md)分别从
+NGUI/FairyGUI/NoesisGUI 与 bitmap-font、整帧纹理项目、已有 Windows release 反查三个方向筛选
+8 个不重复候选，结果仍为 0 接受 / 8 拒绝。Daggerfall Unity 与 UnityGB 的自绘结构最接近目标，
+但前者 Windows Standalone 明确为 Mono，后者明确只使用 Mono 且无官方 release；Pianofall 等反查候选
+则再次证明“仓库出现 IL2CPP”不能推出“Windows 发布使用 IL2CPP”。本轮同样没有下载、启动或注入候选。
+
+第四次[有界公开复核](references/unity-il2cpp-custom-text-negative-candidate-review-round-4.md)又从构建脚本、模拟器/整帧纹理和
+Windows release 反查三个方向覆盖 7 个不重复候选，结果为 0 接受 / 7 拒绝。nofun 首次把
+Windows x64 IL2CPP 与 guest bitmap atlas/mesh 自绘 seam 闭环在同一项目，但官方包没有固定 guest 文字触发，
+而 system-font 分支会实例化 TMP，显示面也使用 Canvas/RawImage，因而仍只是混合栈对照。本轮未下载、
+启动、注入或本地重建候选。
+
+连续四轮 No-Go 后，外部 Shipping-like 自绘负例仍缺；这继续阻止可靠拒绝结论与生产 crate、Catalog、
+Runtime Bundle 接入，但不再阻止两个已授权 Standard UI 正例上的未发布 observe-only Hook。此前把仓库
+自建负例误设成只读 attach 前置条件，导致主线被本机缺少 Unity Editor 阻塞；该顺序现已纠正，不安装
+Unity。确定性宿主源码与静态合同保留为后续合成合同，不计入真实软件证据，也不占用当前执行。
+
+当前转入 [Unity IL2CPP Standard UI observe-only 原型](slices/unity-il2cpp-standard-ui-observe-prototype.md)：
+复用已有两个跨代 x64 IL2CPP 正例，只实现初始与增量 TMP/uGUI live object snapshot、Observation 发布
+与停用清理。公共导出没有稳定 setter machine-code 地址，本原型不以私有 `MethodInfo` 布局、逐游戏
+偏移或机器码签名换取 setter detour；因此不承诺两次 snapshot 之间已经消失的瞬时文字。原型不修改
+目标字符串，也不进入 Catalog/Runtime Bundle。
+
 Mono 第二候选的 Localization 路径也已复核。发布 tag 的 Localization Settings 注册了
 `CommandLineLocaleSelector`，参数为 `-language=`，界面 Locale 按钮也直接更新 `SelectedLocale`；这能
 证明真实 Localization 技术和切换入口存在。但英语与简体中文各一次 7 秒、简体中文一次 15 秒的无注入
@@ -233,18 +262,10 @@ NGUI-only 同后端负例继续拒绝。
 
 ## Next
 
-- Unity Mono Standard UI 已完成生产接入并保持窄边界。IL2CPP 同后端自绘 Mesh/Sprite/texture 负例仍缺，
-  一次有界公开
-  筛选也没有合格成品，在出现明确候选前不继续广泛搜索，更不能用 Mono 后端拒绝冒充 UI 技术拒绝。
-- 等待新的、明确授权且可重复的 Windows 真实目标；按
-  [raylib 之后的候选复核](references/post-raylib-next-adapter-primary-source-review.md)先查 PE import、运行模块
-  与公开文字导出，固定可见词条命中后才恢复 Adapter 原型。
-- DirectWrite TextLayout 的底层生产接入已完成；WPF 等不经过公开 TextLayout 绘制入口的目标仍不在
-  覆盖范围，不因加载 DirectWrite 模块而扩大支持声明。
-- 下一轮继续用“真实软件缺口 → 一手入口证据 → 有界原型 → 可见写回”的顺序选择文字技术，不以
-  Adapter 数量或框架名称驱动实现。
-- [交互式取词 Seam](../runtime-capability-roadmap/slices/interactive-text-acquisition-seam.md)的仓库内后端合同
-  已完成；热键、浮层、生产 OCR 与真实翻译服务仍留在 Roadmap，等待独立产品选择与授权目标证据。
+- [Unity IL2CPP Standard UI observe-only 原型](slices/unity-il2cpp-standard-ui-observe-prototype.md)已完成：
+  Unity 2021 LTS 动态分数取得 14 条 Observation，Unity 6 搜索更新取得 72 条；均正常停用退出。
+- 原型保持未发布、仅采集。外部 Shipping-like 自绘负例继续作为可靠拒绝与生产接入硬门槛；仓库负例
+  暂停，不安装 Unity，不开始第五轮无界搜索。
 
 ## Progress
 
@@ -352,15 +373,21 @@ NGUI-only 同后端负例继续拒绝。
   证明。
 - runtime-only smoke 已确认第一份样本的初始菜单、关卡选择与动态分数；第二份用公开参数进入无头显
   Viewer 和完整 Monoscopic 工作区。两者都正常退出且未注入；Localization 可见切换仍未完成。
-- Unity IL2CPP 两份正式包的静态门禁已完成：跨 Unity 2021 LTS / Unity 6，均为 x64，metadata 29/39
-  与核心 `il2cpp_*` 导出有效，TMP/uGUI 标记存在；未启动、未注入，也未运行无关仓库测试。下一步必须
-  先取得单独授权，才做 runtime-only smoke。
-- Unity IL2CPP 首轮 runtime-only smoke 没有加载 Glyphshift：Unity 2021 LTS 候选两次启动、主菜单
-  可见并正常退出；原 Unity 6 候选因明确是 Development Build 被否决，首启模态框阻断关闭后已强制
-  清理。本轮未运行仓库测试。
-- 备用 Unity 6 IL2CPP release 已补位：x64 Unity 6000.3.4f1、metadata 39、核心导出与 TMP/uGUI 标记
-  通过静态门禁；两次启动均显示完整编辑器 UI、没有 Development Build/Glyphshift 模块并正常退出。
-  IL2CPP 两个跨代际运行候选已齐，但动态/格式化路径和可靠负例尚未完成，仍未 attach。
+- Unity IL2CPP 两个跨代发布正例已完成静态、runtime-only 与 observe-only attach 门禁；Unity 2021 LTS
+  动态分数取得 14 条 Observation，Unity 6 搜索更新取得 72 条，均正常停用退出。当前只缺同后端自绘
+  Mesh/Sprite/texture 文字负例，原型保持未发布。
+- 完成第二次 IL2CPP 自绘负例有界公开复核：3 条方向、5 个官方仓库全部拒绝；同时固定“混合栈自绘
+  marker 漏抓不等于进程级可靠拒绝”的门槛。没有下载、运行或注入任何候选。
+- 完成第三次 IL2CPP 自绘负例有界公开复核：3 条方向、8 个不重复候选全部拒绝；最接近的
+  自绘结构仍败在 Mono 或无发布，Windows 发布反查候选则败在 Mono 或 TMP/uGUI。未下载、运行或注入。
+- 完成第四次 IL2CPP 自绘负例有界公开复核：3 条方向、7 个不重复候选全部拒绝；nofun 证明了
+  Windows x64 IL2CPP + guest bitmap atlas/mesh 的局部 seam，但因无固定 guest 触发且存在 TMP/Canvas 混合栈而不是
+  进程级负例。未下载、运行、注入或本地重建。
+- 已纠正 IL2CPP 执行顺序：两个已授权正例可以先进入未发布 observe-only Hook；负例缺失继续阻止可靠
+  拒绝与生产接入，但不再要求先安装 Unity。合成宿主不计入真实软件覆盖。
+- 建立 Unity IL2CPP 自绘负例的 source-only fixture 与定向构建包装器；保留 TMP/uGUI 精确类型身份但以
+  组件 allowlist 和运行时守卫确保 live text 为零。静态合同、PowerShell AST、隐私/空白扫描及两轮独立
+  审核通过。因当前没有匹配 Editor/module，真实构建与 runtime smoke 仍开放。
 - Unity Mono 替代 Localization 候选通过：x64 Unity 6 Mono 成品的业务程序集真实引用 TMP/uGUI、
   `LocalizationSettings` 与 `NextLanguage`；欢迎页在中文和英语偏好下分别显示对应文案，目标均正常退出、
   无 Glyphshift 模块，测试偏好已恢复。结合既有动态 TMP 正例和 NGUI 负例，Mono 样本 gate 已通过。
@@ -395,5 +422,8 @@ NGUI-only 同后端负例继续拒绝。
 - [raylib 之后的下一写回 Adapter 选择](slices/post-raylib-next-writeback-adapter.md)
 - [Adapter 技术文档链接](slices/adapter-technical-documentation-links.md)
 - [Unity / Unreal Engine 游戏文字 Adapter 可实施性复核](references/unity-unreal-engine-adapter-feasibility.md)
+- [Unity IL2CPP 自绘文字负例候选复核](references/unity-il2cpp-custom-text-negative-candidate-review.md)
+- [Unity IL2CPP 自绘文字负例候选第三次复核](references/unity-il2cpp-custom-text-negative-candidate-review-round-3.md)
+- [Unity IL2CPP 自绘文字负例候选第四次复核](references/unity-il2cpp-custom-text-negative-candidate-review-round-4.md)
 - [WPF 真实目标缺口验收](slices/wpf-real-target-gap.md)
 - [下一真实目标候选筛选](references/next-real-target-candidates.md)

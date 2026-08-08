@@ -19,7 +19,7 @@ Status: Complete
 
 ## Privacy
 
-- [x] Git 暂存区为空，`target/local-test/` 没有 tracked/status 路径。
+- [x] Git 暂存区为空，`local-test/` 没有 tracked/status 路径。
 - [x] 变更文件未发现用户名、开发机 home、真实盘符/PID 或本地证据链接。
 - [x] 当时的 13 个盘符候选均为前端确定性 fixture 路径，符合明确合成路径规则；文档不记录具体盘符。
 - [x] Flightdeck 只记录 portable 命令、计数、结论和风险；未引用截图、日志、profile 或真实软件位置。

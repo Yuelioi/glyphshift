@@ -22,8 +22,8 @@
   关闭完整丢弃未提交草稿，发布类元数据留在词典设置中维护。
 - [x] 收敛探针管理列表：创建任务已保存时即关闭 Modal；路径与 Adapter 明细按需展示；重启后的
   旧连接统一恢复为“未连接”，列表只显示“未连接 / 已连接”。
-- [ ] 在干净重启的授权真实目标上完成
-  [Probe 到 GDI+ 实时更新](slices/probe-gdiplus-live-update.md)的用户可见验收。
+- [Probe 到 GDI+ 实时更新](slices/probe-gdiplus-live-update.md)的应用层与确定性 Runtime 合同已交付；
+  授权 AE 可见验收作为不再阻塞当前覆盖主线的旧尾项停止，不计为已完成证据。
 - [x] 根据实际会话 ACK 区分“可直接替换 / 仅采集 / 无信号”，且仅采集明确说明目标界面不会被修改；
   该状态只属于当前连接，不写入持久任务。
 - [x] 同一目标进程内并行候选 Adapter 独立激活；不适用技术只报告自身失败，不撤销健康写回技术，
@@ -121,7 +121,7 @@
 - [x] 完成 [Unity / Unreal Engine 游戏文字 Adapter 可实施性复核](references/unity-unreal-engine-adapter-feasibility.md)：
   区分 Unity Mono / IL2CPP / Localization / 标准与自研 UI，以及 UE localized `FText`、非本地化文字、
   Slate/UMG、Canvas、shaping 与 Shipping 构建边界；不从引擎名推导覆盖率。
-- [ ] 只有每个准备实施的技术分层先取得至少两个无反作弊、未预装插件、可重复的外部 Shipping 真实
+- 准入规则：只有每个准备实施的技术分层先取得至少两个无反作弊、未预装插件、可重复的外部 Shipping 真实
   目标，并另有可靠拒绝的负例，才建立 Shipping-like 合成合同与有界原型；逐游戏符号、偏移或机器码
   签名依赖直接触发 No-Go，不新增生产 crate、Catalog 或 Runtime Bundle 项。
   - [x] 匿名公开实现源码已确认 Unity Mono/IL2CPP 运行时元数据与标准 UI setter 路线可作为外部原型
@@ -154,7 +154,11 @@
   - [x] 取得单独下载授权后，以备用 Unity 6 release 替换被否决样本：x64 Unity 6000.3.4f1、metadata
     39、核心 IL2CPP 导出与 TMP/uGUI 标记通过静态门禁；连续两次显示完整编辑器 UI、运行模块一致、
     无 Development Build/Glyphshift 模块并正常退出。
-  - [ ] 在两个 IL2CPP 发布候选中固定可重复的动态文本触发和真实格式化/本地化来源，并找到一份可可靠
-    拒绝的自研 Mesh/Sprite/texture 负例；两个正例已通过，现有 NGUI Mesh/atlas 负例是 Mono，只能补
-    通用/Mono 拒绝证据；一次有界公开筛选只得到仍使用 TMP/uGUI 的 IL2CPP 标准 UI 候选，没有合格
-    自绘成品，仍需一份 IL2CPP 同后端负例后才允许 observe-only attach。
+  - [x] 完成 [Unity IL2CPP Standard UI observe-only 原型](slices/unity-il2cpp-standard-ui-observe-prototype.md)：
+    直接复用两个已固定的跨代正例，证明初始/增量 live-object snapshot、停用与退出；不扩大到 UI
+    Toolkit、NGUI、两次 snapshot 间的瞬时文字、写回或生产 Catalog/Bundle。Unity 2021 LTS 动态分数
+    正例取得 14 条 Observation，Unity 6 搜索更新正例取得 72 条；均正常停用退出。
+  - [ ] 后续恢复 [Unity IL2CPP Standard UI 同后端负例宿主](slices/unity-il2cpp-standard-ui-negative-harness.md)：
+    source-only fixture 与静态合同已完成；真实构建/smoke 不再阻塞 observe-only Hook，也不为此安装 Unity。
+  - [ ] 新增生产 crate、Catalog 或 Runtime Bundle 项前，另行取得一份外部、可重复的 Windows x64 IL2CPP
+    Shipping-like 自绘负例；四次有界公开筛选均为 No-Go，不用 Mono/混合栈样本或合成宿主冒充该证据。

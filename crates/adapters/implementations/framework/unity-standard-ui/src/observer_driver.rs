@@ -1,8 +1,5 @@
-use glyphshift_adapter_unity_mono_standard_ui::{
-    ObservedText, ObserverEvent, StandardUiKind, UnityMonoObserver,
-};
+use crate::{ObservedText, ObserverEvent, StandardUiKind, UnityStandardUiObserver};
 
-/// Standard Unity UI technologies recognized through managed metadata.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct StandardUiProfile {
     text_mesh_pro: bool,
@@ -36,37 +33,9 @@ impl StandardUiProfile {
     }
 }
 
-/// Narrow seam between Mono-specific callbacks and host-independent observer
-/// state.
-///
-/// A production implementation owns managed-thread attachment, managed-method
-/// detours, GC handles, and unload coordination. The driver only consumes
-/// serialized semantic events and never calls Mono APIs directly.
-pub trait MonoObservationRuntime {
-    /// Recognizes supported managed classes and their text setter methods.
-    ///
-    /// # Errors
-    ///
-    /// Returns a stable failure when the backend or standard UI metadata is not
-    /// supported.
+pub trait StandardUiObservationRuntime {
     fn recognize_standard_ui(&mut self) -> Result<StandardUiProfile, ObserverDriverError>;
-
-    /// Returns the next serialized observation event, if one is ready.
-    ///
-    /// The first event after activation must be an `AttachSnapshot` produced at
-    /// a verified Unity main-thread dispatch point. Implementations must not
-    /// invoke Unity object enumeration from the injection thread.
-    ///
-    /// # Errors
-    ///
-    /// Returns a runtime failure without modifying target text.
     fn next_observer_event(&mut self) -> Result<Option<ObserverEvent>, ObserverDriverError>;
-
-    /// Removes callbacks and releases runtime-owned handles.
-    ///
-    /// # Errors
-    ///
-    /// Returns a cleanup failure after attempting all safe local cleanup.
     fn stop(&mut self) -> Result<(), ObserverDriverError>;
 }
 
@@ -88,23 +57,14 @@ enum DriverPhase {
     Stopped,
 }
 
-/// Owns the observe-only session lifecycle while delegating Mono internals to a
-/// replaceable runtime source.
 pub struct ObserverDriver<R> {
     runtime: R,
     profile: StandardUiProfile,
-    observer: UnityMonoObserver,
+    observer: UnityStandardUiObserver,
     phase: DriverPhase,
 }
 
-impl<R: MonoObservationRuntime> ObserverDriver<R> {
-    /// Recognizes the target's standard Unity UI surface without starting text
-    /// replacement.
-    ///
-    /// # Errors
-    ///
-    /// Returns the runtime's rejection, or `StandardUiUnavailable` when no TMP
-    /// or uGUI text class was recognized.
+impl<R: StandardUiObservationRuntime> ObserverDriver<R> {
     pub fn activate(mut runtime: R) -> Result<Self, ObserverDriverError> {
         let profile = match runtime.recognize_standard_ui() {
             Ok(profile) => profile,
@@ -120,7 +80,7 @@ impl<R: MonoObservationRuntime> ObserverDriver<R> {
         Ok(Self {
             runtime,
             profile,
-            observer: UnityMonoObserver::default(),
+            observer: UnityStandardUiObserver::default(),
             phase: DriverPhase::AwaitingInitialSnapshot,
         })
     }
@@ -130,12 +90,6 @@ impl<R: MonoObservationRuntime> ObserverDriver<R> {
         self.profile
     }
 
-    /// Applies at most one serialized runtime event.
-    ///
-    /// # Errors
-    ///
-    /// Rejects a setter/collection event that arrives before the mandatory
-    /// initial GC snapshot and fails closed on runtime errors.
     pub fn poll(&mut self) -> Result<Vec<ObservedText>, ObserverDriverError> {
         if self.phase == DriverPhase::Stopped {
             return Ok(Vec::new());
@@ -178,12 +132,6 @@ impl<R: MonoObservationRuntime> ObserverDriver<R> {
         Ok(self.observer.apply(event))
     }
 
-    /// Stops the runtime and always clears host-independent observer state.
-    ///
-    /// # Errors
-    ///
-    /// Returns a cleanup failure after local observer state has already been
-    /// cleared.
     pub fn stop(&mut self) -> Result<(), ObserverDriverError> {
         if self.phase == DriverPhase::Stopped {
             return Ok(());

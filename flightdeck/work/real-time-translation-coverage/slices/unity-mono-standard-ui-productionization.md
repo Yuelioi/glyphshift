@@ -28,7 +28,7 @@ NGUI 或 TMP `SetText(...)`，也不得为未发布的旧原型名增加兼容�
 native-host 非 Mono 拒绝合同均已同步。
 
 正式 Debug Bundle 在一个 Standard UI 正例完成首代、generation 2 和停用恢复的可见验收，捕获 10 条唯一
-原文并正常退出；NGUI-only 同后端负例继续拒绝并正常退出。所有真实证据仍只在 `target/local-test/`。
+原文并正常退出；NGUI-only 同后端负例继续拒绝并正常退出。所有真实证据仍只在 `local-test/`。
 
 ## Next
 
@@ -55,9 +55,9 @@ native-host 非 Mono 拒绝合同均已同步。
 - Playwright CLI `tests/settings.spec.ts`：6 passed，中文技术卡与文档按钮可见并打开预期 HTTPS URL。
 - 正式 Debug Bundle：Standard UI 正例首代/第二代/停用恢复可见，10 条捕获、正常退出；NGUI-only 负例
   `activation_rejected=true`、正常退出。
-- 未运行全仓测试；机器输入、日志、截图、Bundle 产物和原文均留在 `target/local-test/`。
+- 未运行全仓测试；机器输入、日志、截图、Bundle 产物和原文均留在 `local-test/`。
 
 ## Boundaries
 
 - 本 Slice 不实现 IL2CPP、UI Toolkit、NGUI、TextMesh、自绘 Mesh/Sprite/texture 或 TMP `SetText(...)`。
-- 不把 `target/local-test/`、真实程序路径、窗口标题、截图或捕获文本写入 tracked source/docs。
+- 不把 `local-test/`、真实程序路径、窗口标题、截图或捕获文本写入 tracked source/docs。

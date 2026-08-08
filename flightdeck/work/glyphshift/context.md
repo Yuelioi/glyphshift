@@ -5,7 +5,7 @@
 - 当前仓库是 Glyphshift 的唯一产品实现，不存在需要兼容的旧 workspace。
 - 所有 Cargo package、桌面应用、测试支持和架构检查都位于当前仓库。
 - `archive/dictionary-sources/` 只保全尚待导入的历史词典数据，不是 Runtime 或产品存储输入。
-- 本机路径、真实软件、进程信息、Runtime Bundle、日志与截图只存在于 `target/local-test/`。
+- 本机路径、真实软件、进程信息、Runtime Bundle、日志与截图只存在于 `local-test/`。
 
 ## 产品决定
 

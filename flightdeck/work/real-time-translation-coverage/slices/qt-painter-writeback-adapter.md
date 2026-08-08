@@ -25,7 +25,7 @@ Adapter，不与这一 slice 混合。
 - [x] 在同一 native package 内分离 Qt 5 与 Qt 6 ABI 分支；仅在目标已经加载对应 Qt Core/Gui
   动态模块时解析受支持导出，不主动把 Qt 加载进非 Qt 进程；同时加载两个 major 时安全拒绝。
 - [x] 使用本机显式配置的合成宿主验证观察、替换、Dictionary 热更新、停用恢复和不兼容诊断；所有
-  路径、日志与截图只进入 `target/local-test/`。
+  路径、日志与截图只进入 `local-test/`。
 - [x] 合成合同通过后再选授权 Qt Widgets 目标做可见 smoke，通过后加入正式 Bundle 与目录。
 
 ## 首版边界

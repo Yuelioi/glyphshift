@@ -1,6 +1,6 @@
 # Probe 到 GDI+ 实时更新
 
-Status: In Progress
+Status: Stopped
 
 ## Outcome
 
@@ -18,9 +18,9 @@ Status: In Progress
 
 ## Current
 
-应用层与 Runtime 层的确定性合同均已通过。真实 AE 验证时诊断为零，检查发现目标进程已残留前序
-Direct2D、DirectWrite 与 GDI+ 实验加载的多代 Runtime/Adapter 模块。Windows 目标内模块不会随工作流
-停止自动卸载，因此该进程不能作为干净验收样本；在用户确认项目已保存前不代替用户重启 AE。
+应用层与 Runtime 层的确定性合同均已通过。授权 AE 的首版、第二版与停止恢复可见验收没有完成；该
+旧尾项已明确停止，不再作为 Unity 引擎覆盖主线或恢复入口。未完成的真实验收不会被记作成功证据；
+只有未来发布证据明确重新需要时，才另开有界 Work。
 
 ## Verification
 
@@ -28,7 +28,7 @@ Direct2D、DirectWrite 与 GDI+ 实验加载的多代 Runtime/Adapter 模块。W
 - `cargo test -p glyphshift-desktop-runtime --test windows_runtime_contract --no-run`
 - 使用带确定性测试目标的本地 Runtime Bundle 运行
   `desktop_runtime_updates_gdiplus_translation_without_restarting_the_target`：通过。
-- 真实目标的原始日志仅保存在 `target/local-test/evidence/`，不进入 Flightdeck。
+- 真实目标的原始日志仅保存在 `local-test/evidence/`，不进入 Flightdeck。
 
 ## Acceptance
 

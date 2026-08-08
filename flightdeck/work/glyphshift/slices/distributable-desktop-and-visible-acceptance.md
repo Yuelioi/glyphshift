@@ -10,7 +10,7 @@ Status: Complete
 
 ## Constraints
 
-- 安装候选、临时 Tauri 配置、Release Runtime、日志和截图全部只进入 `target/local-test/`。
+- 安装候选、临时 Tauri 配置、Release Runtime、日志和截图全部只进入 `local-test/`。
 - 跟踪的 Tauri 基础配置不依赖本机绝对路径；构建脚本在本地生成资源映射并传给 Tauri CLI。
 - 安装候选内必须包含 Runtime Bundle `/2` 的精确 Release 文件集，不能包含 `test-target.exe`。
 - 首个候选只做 Windows NSIS，不增加自动更新、账号、在线发布或证书管理。

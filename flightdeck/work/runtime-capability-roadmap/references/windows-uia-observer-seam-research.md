@@ -318,7 +318,7 @@ Provider 合同均已完成。UIA descriptor 可以进入独立的 observe-only 
 ## 7. 合成验证矩阵
 
 所有 tracked 测试只使用确定性合成 Provider/宿主；真实软件路径、PID、窗口标题、截图、raw tree dump 和
-捕获文字全部放在 `target/local-test/evidence/`，不写入 Flightdeck 或源码。
+捕获文字全部放在 `local-test/evidence/`，不写入 Flightdeck 或源码。
 
 | 维度 | 合成场景 | 必须证明 |
 |---|---|---|

@@ -12,7 +12,7 @@ Status: Complete
 - 根文件混合 4 类场景：Bundle 完整性、集中 Capture、合成目标 Runtime 生命周期、授权真实 Host；另有
   双软件 Runtime Pool 隔离场景。
 - `TargetProcess`、backend/workflow builder 和 Adapter id 是跨场景确定性 fixture；真实软件位置和输出只从
-  环境变量或 `target/local-test/evidence/` 获得。
+  环境变量或 `local-test/evidence/` 获得。
 - 12 项测试全部 ignored，普通 CI 只编译并列出合同；本切片不运行真实软件或读取本机配置。
 
 ## Plan

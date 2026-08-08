@@ -14,7 +14,7 @@ target 名或产品行为。
 - 只移动 `crates/` 下 package；`apps/` 和 `test-support/` 继续作为独立组合根和 fixture 根。
 - 移动前记录精确 source → destination 映射并验证所有路径均位于 `<repo>/crates`、源存在、目标不存在。
 - manifest path 以移动后 package root 重新计算，不做字符串猜测；深度敏感脚本与本地证据路径逐项检查。
-- `target/local-test/` 仍是唯一机器特定证据根，不移动、不跟踪、不写入文档具体值。
+- `local-test/` 仍是唯一机器特定证据根，不移动、不跟踪、不写入文档具体值。
 - 本切片不提交。
 
 ## Steps
@@ -47,7 +47,7 @@ target 名或产品行为。
 - Spec：用户期望的 `runtime/protocol` 和无重复前缀目录已经落实；Cargo package/lib/target 名全部稳定，
   “内部 package”由可执行的 `publish = false` 表达。
 - 完整性：迁移前后 package/target/dependency 集合和文件 hash 一致；唯一有意的非路径 manifest 变化是
-  发布策略。`target/local-test/` 只保存本机迁移证据并继续被 Git ignore。
+  发布策略。`local-test/` 只保存本机迁移证据并继续被 Git ignore。
 - Git 可跟踪性：`git check-ignore crates/runtime/targets/contract/Cargo.toml` 返回未忽略；没有用
   `runtime/target/` 与 Cargo 构建输出目录竞争。
 - 剩余风险：尚需执行完整 workspace tests/Clippy、桌面生产构建和 Playwright，作为独立最终验证切片。

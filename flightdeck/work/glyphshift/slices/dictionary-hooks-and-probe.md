@@ -16,7 +16,7 @@ Status: Complete
 - Native Adapter 已能把 Adapter ID 与 UTF-16 原文送入 Target Runtime；捕获在 Decision 前记录，
   但必须有界、非阻塞并保持 fail-open。
 - Capture Catalog 保存技术证据；Dictionary Draft 只保存 `source + translation`，两者不双写字段。
-- 真实进程输入、日志、截图和捕获结果只放 `target/local-test/`；tracked tests 只使用合成进程和文本。
+- 真实进程输入、日志、截图和捕获结果只放 `local-test/`；tracked tests 只使用合成进程和文本。
 
 ## Delivery
 
@@ -26,7 +26,7 @@ Status: Complete
 - [x] 删除公开 DTO、Tauri model、Vue editor 中的 Location、Context、keep/空译文。
 - [x] 同一 Dictionary 内按 source 校验唯一；冲突诊断按 source 与 Dictionary 优先级报告。
 - [x] Workflow 将每个纯词条编译到 Software 声明的所有内部路由，不把路由泄漏回 payload。
-- [x] 更新现有 `/2` 本机词典；迁移备份与验证证据只进入 `target/local-test/evidence/`。
+- [x] 更新现有 `/2` 本机词典；迁移备份与验证证据只进入 `local-test/evidence/`。
 
 ### 2. Common Adapter coverage
 
@@ -48,7 +48,7 @@ Status: Complete
 - [x] 相关 Rust package 合同与 workspace tests 通过。
 - [x] Frontend build 与仓库 Playwright CLI 全部通过。
 - [x] Runtime fail-open、停止捕获、容量上限、重复文本和多 Adapter 情况有合同覆盖。
-- [x] worktree 范围不含 `target/local-test/`、本机路径、用户名、PID 或本地证据链接。
+- [x] worktree 范围不含 `local-test/`、本机路径、用户名、PID 或本地证据链接。
 
 ## Current
 

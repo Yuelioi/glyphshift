@@ -330,7 +330,7 @@ Microsoft 支持或保证；这强化了“功能 gate + fail-open”而不是�
 ## 6. 最小验证矩阵
 
 仓库内只需使用 deterministic synthetic fixtures；授权 CMD / Terminal 的真实证据继续放在
-`target/local-test/evidence/`。
+`local-test/evidence/`。
 
 ### 合成 client
 

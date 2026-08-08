@@ -113,6 +113,10 @@ Runtime Bundle 或版本签名表之前，必须先找到**至少两个可重复
 这道 gate 的含义是：**没有真实候选，先不写 Adapter；只有合成 harness，也不新增产品技术条目。**
 即使某个 lane 通过，也只能发布该 lane 的兼容范围，不能把它外推为整个 Unity 或 UE 的覆盖率。
 
+> 2026-08-08 门槛分层：连续四次有界公开筛选仍没有找到 IL2CPP 同后端外部自绘负例后，
+> 确定性 Windows x64 IL2CPP 同后端自绘负例可以先解锁**未发布 observe-only 原型**；上述外部
+> 真实样本 gate 继续阻止生产 crate、Catalog 与 Runtime Bundle 接入。合成宿主不计入真实软件覆盖。
+
 ### 公开实现源码交叉验证（匿名）
 
 既有公开实现证明 Unity 标准 UI 并非只能停留在理论层：Mono 路径可从运行时导出解析 domain、assembly、
@@ -183,9 +187,9 @@ UI lane 必须明确拒绝，不能把 Unity 引擎身份或窗口文字误报�
 先否决了 Development Build，再由备用 release 补齐 Unity 6 正例；目前已有跨 Unity 2021 LTS / Unity 6
 的两个 Shipping-like 运行候选，证明静态门禁必须由运行时构建形态复核。两个候选现已补齐可重复动态
 文本与真实运行时组合字符串来源；另有一份 Mono NGUI Mesh/atlas 负例已固定，但它不能验证 IL2CPP
-后端内的 UI 技术拒绝，有界公开筛选也未找到合格 IL2CPP 自绘成品，因此该样本前置 gate 仍缺同后端
-负例。Shipping-like 合成合同、observe-only 原型、外部 attach、Dictionary 替换和停止恢复也未开始。
-在这些门槛齐备前，不建立生产 crate、Catalog 或 Runtime Bundle 项。
+后端内的 UI 技术拒绝。四次有界公开筛选也未找到合格 IL2CPP 自绘成品；当前先建立确定性同后端
+负例宿主，只用于解锁未发布 observe-only 原型。生产前的外部负例、外部 attach、Dictionary 替换和停止恢复仍未开始；
+在这些生产门槛齐备前，不建立生产 crate、Catalog 或 Runtime Bundle 项。
 
 ## Unity
 

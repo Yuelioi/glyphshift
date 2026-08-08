@@ -20,7 +20,7 @@ Status: Complete
 - [x] 所有 Cargo package 的 manifest 都位于当前仓库。
 - [x] 架构检查、workspace test、Clippy 和 fmt 通过。
 - [x] 桌面生产构建与仓库 Playwright 37 项回归全部通过。
-- [x] staged path 不包含 `target/local-test/` 文件；staged text 不包含本机路径、用户名、PID 或本地截图链接。
+- [x] staged path 不包含 `local-test/` 文件；staged text 不包含本机路径、用户名、PID 或本地截图链接。
 - [x] 新仓库有独立初始提交，原仓库只保留用户既有未提交内容。
 
 ## Next

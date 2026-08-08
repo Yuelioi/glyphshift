@@ -58,7 +58,7 @@ Status: Complete
 - [x] Rust 相关 package 合同逐纵切 red → green。
 - [x] 根测试编排、Clippy、fmt 和架构检查通过。
 - [x] 前端生产构建与仓库 Playwright 全部通过。
-- [x] Git diff 不含 `target/local-test/`、本机盘符、用户名、PID、真实软件路径或证据链接。
+- [x] Git diff 不含 `local-test/`、本机盘符、用户名、PID、真实软件路径或证据链接。
 
 ## Current
 

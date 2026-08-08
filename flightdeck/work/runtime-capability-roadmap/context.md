@@ -160,4 +160,4 @@ Target Execution
 
 - 每个升级项必须有目标软件证据或合成 Fixture、明确 Interface owner、失败语义和可见验收。
 - 新能力应通过新增 Extension、Descriptor 或 Adapter 落地；若必须修改 Core 品牌分支，说明 Seam 不合格。
-- 真实软件输入输出全部位于 `target/local-test/`，仓库只保留确定性 harness 和合成 Fixture。
+- 真实软件输入输出全部位于 `local-test/`，仓库只保留确定性 harness 和合成 Fixture。

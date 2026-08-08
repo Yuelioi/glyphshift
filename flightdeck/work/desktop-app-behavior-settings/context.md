@@ -15,7 +15,7 @@
 
 ## 启动时发现的后续问题
 
-- 开发 App 必须通过 `scripts/dev-app.ps1` 启动，确保数据根与运行时证据留在 `target/local-test/`；不能
+- 开发 App 必须通过 `scripts/dev-app.ps1` 启动，确保数据根与运行时证据留在 `local-test/`；不能
   为了本地预览直接读取或改写真实 AppData 工作区。
 - 只读诊断发现历史 `glyphshift.workflow/1` 文件不能被当前 `glyphshift.workflow/3` 直接加载，因为旧
   Target 没有 `adapterPlan`。正式升级前需要单独设计可解释的迁移规则，不能通过删除旧工作流规避。

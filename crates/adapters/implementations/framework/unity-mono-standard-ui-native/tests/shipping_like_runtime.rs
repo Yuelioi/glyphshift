@@ -2,7 +2,7 @@ use glyphshift_adapter_unity_mono_standard_ui::{
     ManagedObjectId, ManagedText, ObserverEvent, StandardUiKind,
 };
 use glyphshift_adapter_unity_mono_standard_ui_native::{
-    MonoObservationRuntime, ObserverDriver, ObserverDriverError, StandardUiProfile,
+    ObserverDriver, ObserverDriverError, StandardUiObservationRuntime, StandardUiProfile,
 };
 use std::cell::Cell;
 use std::collections::{BTreeMap, VecDeque};
@@ -204,7 +204,7 @@ impl ShippingLikeMonoRuntime {
     }
 }
 
-impl MonoObservationRuntime for ShippingLikeMonoRuntime {
+impl StandardUiObservationRuntime for ShippingLikeMonoRuntime {
     fn recognize_standard_ui(&mut self) -> Result<StandardUiProfile, ObserverDriverError> {
         if self.backend != FixtureBackend::Mono {
             return Err(ObserverDriverError::BackendMismatch);

@@ -35,11 +35,7 @@ extern "C" fn decide(
     }
 }
 
-extern "C" fn source_characters(
-    _context: *mut c_void,
-    _output: *mut u16,
-    _capacity: u32,
-) -> u32 {
+extern "C" fn source_characters(_context: *mut c_void, _output: *mut u16, _capacity: u32) -> u32 {
     0
 }
 
@@ -60,11 +56,7 @@ fn unity_mono_standard_ui_package_loads_and_rejects_a_non_mono_process() {
     }));
 
     assert_eq!(
-        package.activate(
-            host,
-            [Feature::TextReplace],
-            [Feature::TextReplace],
-        ),
+        package.activate(host, [Feature::TextReplace], [Feature::TextReplace],),
         Err(NativeHostError::PackageFailure(STATUS_ACTIVATION_FAILED))
     );
 }

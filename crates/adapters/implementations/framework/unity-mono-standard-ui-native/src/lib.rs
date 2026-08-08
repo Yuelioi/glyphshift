@@ -6,12 +6,11 @@
 
 mod late_attach;
 mod native_adapter;
-mod observer_driver;
 
-pub use late_attach::{LateAttachError, LateAttachReadiness};
-pub use observer_driver::{
-    MonoObservationRuntime, ObserverDriver, ObserverDriverError, StandardUiProfile,
+pub use glyphshift_adapter_unity_standard_ui::{
+    ObserverDriver, ObserverDriverError, StandardUiObservationRuntime, StandardUiProfile,
 };
+pub use late_attach::{LateAttachError, LateAttachReadiness};
 
 const MONO_MODULE: &str = "mono-2.0-bdwgc.dll";
 const IL2CPP_MODULE: &str = "GameAssembly.dll";

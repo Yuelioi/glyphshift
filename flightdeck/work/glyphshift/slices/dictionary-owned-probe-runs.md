@@ -55,4 +55,4 @@ commands 和 Dictionary Draft 类型已移除；管理表连续背景、空态�
 
 ## Next
 
-启动本地桌面 App 做手动体验；后续实机观察证据仍只写入 `target/local-test/evidence/`。
+启动本地桌面 App 做手动体验；后续实机观察证据仍只写入 `local-test/evidence/`。

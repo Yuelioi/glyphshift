@@ -27,6 +27,13 @@
 - observe-only 结果可以进入 Probe 与 Dictionary 作业，但不能被包装成实时翻译能力。
 - 同一目标进程的候选 Adapter 必须独立激活；部分不兼容时保留健康技术，且只把 Runtime 明确回执的
   Adapter 能力标记为 Active。
+- 引擎 Standard UI lane 的进程级负例必须在同一后端、同一发布路径中不实例化受支持的 Standard UI
+  live object。混合栈里某个自绘 Mesh/Sprite/texture marker 未被捕获，只能证明局部覆盖缺口，不能
+  冒充整个目标“可靠不支持”。
+- Unity IL2CPP Standard UI 的两个已授权跨代正例足以开始未发布的 observe-only Hook 原型；同后端
+  自绘负例缺失必须保留为可靠拒绝和生产接入风险，但不能要求先安装 Unity 才开始只读实现。
+- 生产 Catalog/Runtime Bundle 接入前仍必须有外部 Shipping-like 自绘负例；仓库自建负例即使后续
+  通过也只提供合成合同，不能冒充外部真实软件覆盖。
 - WPF 的 retained-mode 真实目标已经证明：加载 DirectWrite/Direct2D 模块不等于命中公开绘制入口；
   UIA 可观察而六条 Native 路径零命中时，能力等级仍是“仅采集原文”。
 - 全局设置 WPF Dependency Property 会改变应用对象与 Binding 状态，不属于安全绘制时写回。需要

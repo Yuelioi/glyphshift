@@ -35,7 +35,7 @@ None.
   在最终验证前更正并重新运行完整 Rust 门禁。
 - 236 个代码文件中 0 个达到 1200 行，最大文件 977 行。37 份相关 Markdown 的 92 个本地链接全部存在；
   同时修复一条既有的模型复核失效链接。
-- staged、tracked `target/local-test/`、`Cargo.lock` 状态和生成声明状态均为 0；变更文本没有仓库绝对
+- staged、tracked `local-test/`、`Cargo.lock` 状态和生成声明状态均为 0；变更文本没有仓库绝对
   路径或本地用户名。
 
 ## Final review
@@ -49,7 +49,7 @@ None.
 ## Verification environment note
 
 第二次完整 Rust 重跑前，Cargo 增量缓存耗尽本机磁盘并触发 PDB/rustc I/O 错误；这不是测试断言失败。
-只清理了可再生的 `target/debug/incremental`（约 11.7 GiB），保留 `target/local-test/`，随后用
+只清理了可再生的 `target/debug/incremental`（约 11.7 GiB），保留 `local-test/`，随后用
 `CARGO_INCREMENTAL=0` 重新运行完整 workspace 并通过。
 
 ## Residual risks

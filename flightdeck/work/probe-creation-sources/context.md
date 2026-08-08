@@ -16,7 +16,7 @@
 
 - 不按显示名称、ID 前缀、路径字符串格式或 UI 模式推断资产所有权。
 - 当前程序来源必须由用户明确捕获并通过同一软件 preflight；不扫描或持久化整机进程列表。
-- 真实程序路径、进程值和实机证据只进入 `target/local-test/`，不写入此 Work。
+- 真实程序路径、进程值和实机证据只进入 `local-test/`，不写入此 Work。
 - 未发布请求结构直接演进，不保留旧 command 或旧 payload 的兼容分支。
 - 开发循环只运行 Desktop Shell 与 Probe 页面定向门禁，不运行全 workspace 测试。
 

@@ -1,0 +1,24 @@
+[package]
+name = "glyphshift-adapter-unity-il2cpp-standard-ui-native"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+glyphshift-adapter-native-abi = { path = "../../../platform/native-abi" }
+glyphshift-adapter-unity-il2cpp-standard-ui = { path = "../unity-il2cpp-standard-ui" }
+glyphshift-adapter-unity-standard-ui = { path = "../unity-standard-ui" }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.58", features = [
+    "Win32_System_LibraryLoader",
+    "Win32_System_Memory",
+] }
+
+[lints.rust]
+unsafe_code = "allow"

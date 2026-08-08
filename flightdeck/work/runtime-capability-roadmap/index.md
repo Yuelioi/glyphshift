@@ -1,6 +1,6 @@
 # 运行时能力升级 Roadmap
 
-Status: Open
+Status: Stopped
 
 ## Goal
 
@@ -8,6 +8,12 @@ Status: Open
 多进程接管、观察流复用、Windows 文字技术覆盖、交互式取词、原生隔离和布局适配能力。
 
 ## Current
+
+本 Work 已停止作为活动 Roadmap。它已交付兼容性路由、Process Family、Observation transport、UIA、
+一次性采集、OCR、悬浮气泡与快捷键等阶段成果；剩余条目混合了条件准入规则、被明确延后的设想和需要
+真实缺口后才能另开的独立 Work，已经不再是可顺序执行的任务列表。实时写回覆盖由
+[通用实时翻译覆盖](../real-time-translation-coverage/index.md)继续拥有；发布前 smoke 属于发布检查，
+不再维持本 Roadmap 为 Open。
 
 Stage 4 的底层与组合合同已完成。一次性 Acquisition 深 Interface、Structured / Visual Fixture、独立
 受监督 Worker transport、真实 Windows UIA Point / Text Range Provider，以及 Dictionary 优先、
@@ -121,9 +127,7 @@ Adapter，Console Observer 可供 Probe 选择；Workflow 的翻译候选仍只�
 
 ## Next
 
-- 进入 Stage 5 原生稳定性与布局研究；提交或发布前补
-  [可录制取词快捷键设置](slices/interactive-translation-shortcut-settings.md) 的定向门禁，以及物理
-  多显示器/混合缩放 smoke。
+None.
 
 ## Progress
 

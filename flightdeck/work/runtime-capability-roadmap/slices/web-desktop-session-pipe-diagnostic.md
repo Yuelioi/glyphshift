@@ -34,7 +34,7 @@ GlyphShift 启动并持有 Chromium 子进程时的 transport 可行，不证明
 
 ## Boundaries
 
-- 浏览器位置、profile、进程输出和原始协议记录只位于 `target/local-test/`，不进入 Flightdeck。
+- 浏览器位置、profile、进程输出和原始协议记录只位于 `local-test/`，不进入 Flightdeck。
 - 本切片只回答 transport 可行性，不建设正式 Controller、Extension、Catalog 或 UI。
 - 继承管道仅适用于 GlyphShift 启动并持有生命周期的目标；附加到任意已运行软件仍需宿主接口或明确授权。
 

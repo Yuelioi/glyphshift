@@ -10,6 +10,7 @@ path = "src/lib.rs"
 
 [dependencies]
 glyphshift-adapter-sdk = { path = "../../../platform/sdk" }
+glyphshift-adapter-unity-standard-ui = { path = "../unity-standard-ui" }
 glyphshift-domain = { path = "../../../../core/domain" }
 
 [lints]

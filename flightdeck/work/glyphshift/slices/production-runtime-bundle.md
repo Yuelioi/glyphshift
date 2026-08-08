@@ -11,7 +11,7 @@ Release Bundle。
 
 ## Constraints
 
-- 所有本机 Bundle、日志与验收证据只写入 `target/local-test/`，不跟踪二进制或真实软件信息。
+- 所有本机 Bundle、日志与验收证据只写入 `local-test/`，不跟踪二进制或真实软件信息。
 - Bundle 清单只接受产品内置的第一方 authority；不能由清单自报一个任意 signer 后自行获得信任。
 - Debug 开发启动与 Release 构建必须复用同一个组装实现，不维护两份 artifact 列表或 manifest 逻辑；
   Debug 允许保留被已运行目标锁定的旧 hash artifact，Release staging 必须是精确清单且无陈旧文件。

@@ -44,7 +44,7 @@ Yotta 应替代外部软件成为 GlyphShift 首个真实 Web Desktop 验收目�
 
 在用户明确允许启动第二个隔离实例后：
 
-1. 调试构建产物、Storage Root、WebView profile、协议输出和截图全部放在 `target/local-test/`。
+1. 调试构建产物、Storage Root、WebView profile、协议输出和截图全部放在 `local-test/`。
 2. 动态选择本地端口，仅在测试进程生命周期内使用，不写入仓库、日志或持久配置。
 3. 先只读确认 WebView target、普通 DOM 范围和权限；排除 CodeMirror、用户输入、日志正文及工作流内容。
 4. 复用已验证的 DOM ownership 状态机完成两代字典、应用重渲染与条件恢复。

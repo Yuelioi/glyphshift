@@ -36,7 +36,7 @@ GlyphShift 作为父进程启动一个明确授权、无用户 profile 的 Chrom
 ## Boundaries
 
 - 不启动第三方软件，不读取或复用浏览器/应用真实 profile。
-- profile、endpoint、进程输出和原始协议记录只允许位于 `target/local-test/`，且不进入 Flightdeck。
+- profile、endpoint、进程输出和原始协议记录只允许位于 `local-test/`，且不进入 Flightdeck。
 - 不建设正式 Controller、Extension、Catalog、UI，也不把 CDP 权限缩写成普通 `TextReplace` Adapter。
 - 不把随机端口误称为认证或私有通道；同机其他进程的访问能力必须计入判断。
 

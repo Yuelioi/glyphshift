@@ -22,7 +22,7 @@ $expectedModelHashes = [ordered]@{
 }
 
 $repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
-$localTestRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot 'target\local-test'))
+$localTestRoot = [System.IO.Path]::GetFullPath((Join-Path $repoRoot 'local-test'))
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
     $OutputRoot = Join-Path $localTestRoot 'build\ocr-runtime-support'
 }

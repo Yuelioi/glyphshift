@@ -43,7 +43,7 @@ grant，按 Adapter ID 使用已验证 Bundle Host 完成一个 Point Acquisitio
 - Desktop Runtime 20 个常规合同、Acquisition Host 6 个进程合同、真实 UIA 5 个常规 Windows 合同通过；
   本地正式 Debug Bundle 合同实际启动受验证 UIA Worker，并从合成前台控件取得预期 Point 文本。
 - 60 包 workspace 测试、workspace Clippy `-D warnings`、fmt、architecture checks 与 diff whitespace
-  检查均通过；本机 Bundle 与证据只保存在 `target/local-test/`。
+  检查均通过；本机 Bundle 与证据只保存在 `local-test/`。
 
 ## Next
 

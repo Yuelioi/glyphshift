@@ -21,7 +21,7 @@ Status: Complete
 - 动态 GTK 3 官方参考目标也完成跨进程命中，记录 602 次绘制与 6 次字典替换；这只证明技术入口，
   不单独形成具体软件支持声明。
 - 正式 Bundle 构建已包含版本化 GTK 3 Adapter 文件并校验清单哈希；本机运行库、PNG 与原始日志只位于
-  `target/local-test/`，不进入仓库。
+  `local-test/`，不进入仓库。
 
 ## Delivery
 

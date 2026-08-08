@@ -8,8 +8,11 @@ use glyphshift_adapter_native_abi::{
     STATUS_OK, STATUS_UNAUTHORIZED_FEATURE, STATUS_UNSUPPORTED_FEATURE,
 };
 use glyphshift_adapter_unity_mono_standard_ui::{
-    ManagedObjectId, ManagedText, ObservedText, ObserverEvent, StandardUiKind, UnityMonoObserver,
-    SetterOutcome, TextDecision, TextWrite, UnityMonoWriteback, ADAPTER_ID, MAX_TEXT_UNITS,
+    SetterOutcome, TextDecision, TextWrite, UnityMonoWriteback, ADAPTER_ID,
+};
+use glyphshift_adapter_unity_standard_ui::{
+    ManagedObjectId, ManagedText, ObservedText, ObserverEvent, StandardUiKind,
+    UnityStandardUiObserver, MAX_TEXT_UNITS,
 };
 use retour::GenericDetour;
 use std::cell::Cell;
@@ -79,7 +82,7 @@ impl HostBridge {
 #[derive(Default)]
 struct RuntimeState {
     session: Option<Session>,
-    observer: UnityMonoObserver,
+    observer: UnityStandardUiObserver,
     writeback: UnityMonoWriteback,
     active_feature_bits: u64,
 }
@@ -168,9 +171,7 @@ impl Session {
         }
         let units = unsafe { self.api.copy_string_utf16(string) }?;
         let object_id = unsafe { self.object_id(object) }?;
-        Some(ManagedText::utf16(
-            object_id, kind, units,
-        ))
+        Some(ManagedText::utf16(object_id, kind, units))
     }
 
     unsafe fn object_id(&mut self, object: usize) -> Option<ManagedObjectId> {
@@ -645,9 +646,9 @@ fn process_setter(
             state.session.as_mut()?.translations_applied = false;
         }
         match outcome {
-            SetterOutcome::Replace { units, .. } if on_main_thread => {
-                unsafe { state.session.as_ref()?.managed_string(&units) }
-            }
+            SetterOutcome::Replace { units, .. } if on_main_thread => unsafe {
+                state.session.as_ref()?.managed_string(&units)
+            },
             SetterOutcome::Untracked
             | SetterOutcome::ForwardOriginal { .. }
             | SetterOutcome::Replace { .. } => None,
@@ -713,7 +714,9 @@ fn process_main_thread() -> Option<Vec<ObservedText>> {
         let observations = if active_features & FEATURE_TEXT_OBSERVE != 0
             && active_features & FEATURE_TEXT_REPLACE == 0
         {
-            state.observer.apply(ObserverEvent::AttachSnapshot(snapshot))
+            state
+                .observer
+                .apply(ObserverEvent::AttachSnapshot(snapshot))
         } else {
             Vec::new()
         };

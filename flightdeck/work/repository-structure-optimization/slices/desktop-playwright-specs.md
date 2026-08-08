@@ -10,8 +10,8 @@ Status: Complete
 ## Baseline
 
 - `tests/desktop.spec.ts` 1757 行：前 171 行是共享 model/helper，172-175 是默认 beforeEach，后续 44 项测试。
-- Playwright 固定单 worker、无重试，输出到 `target/local-test/desktop-playwright/`；截图也只写
-  `target/local-test/evidence/`，不进入 tracked 资源。
+- Playwright 固定单 worker、无重试，输出到 `local-test/desktop-playwright/`；截图也只写
+  `local-test/evidence/`，不进入 tracked 资源。
 - 现有测试从页面角色/test id/localStorage/Tauri mock 验证行为，不依赖 in-app browser。
 
 ## Plan
@@ -31,7 +31,7 @@ Status: Complete
   system 和 10 项 visual）。
 
 验证通过：拆分功能 spec 44/44（单 worker，约 1.9 分钟）、`npm run build`；所有截图路径仍在
-`target/local-test/evidence/`，Playwright 输出仍在 `target/local-test/desktop-playwright/`。Vite 构建会
+`local-test/evidence/`，Playwright 输出仍在 `local-test/desktop-playwright/`。Vite 构建会
 刷新 generated declaration，已将无关 `auto-imports.d.ts`/`components.d.ts` 还原为 `HEAD` 内容。
 
 Standards 自审确认每个 spec 低于 600 行、import 只保留实际 helper、没有隐式跨文件 hook。Spec 自审

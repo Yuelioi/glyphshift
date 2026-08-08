@@ -34,7 +34,7 @@
 - [x] Dictionary 新建和设置复用元数据表单；主要字段常显，低频发布字段折叠到“更多”。
 - [x] 标签和作者使用 Nuxt UI 项目输入；发布版本使用三个数字字段生成。
 - [x] 受影响的 Rust 边界与前端生产构建通过；不升级为全仓测试。
-- [ ] Playwright CLI 单文件启动超时，待测试启动链路恢复后重跑 Software/Dictionary 页面用例。
+- [x] Playwright 定向验证 Software 单入口/前台捕获与 Dictionary 完整元数据页面合同。
 
 ## Corrective slice：Probe 与 Dictionary 联动
 
@@ -43,4 +43,4 @@
 - [x] 联合表支持单条或多选非空译文写入绑定 Dictionary，并支持移除译文但保留 Observation。
 - [x] Desktop API `/26` 增加原子批量词条 upsert，Probe Run update 合同纳入 `dictionaryId`。
 - [x] Core、Desktop Backend 与 Desktop Shell 定向门禁通过。
-- [ ] Playwright CLI 单文件启动超时，待测试启动链路恢复后重跑 Probe 页面用例。
+- [x] Playwright 定向验证空资料库临时 Probe 与 Probe 详情/Dictionary 联动页面合同。
