@@ -2,11 +2,6 @@
 
 ## Open Work
 
-- **Focus:** [通用实时翻译覆盖](work/real-time-translation-coverage/index.md) — Unity Mono Standard UI 已
-  完成生产接入。未发布 IL2CPP Standard UI observe-only 原型也已完成：Unity 2021 LTS 动态分数与
-  Unity 6 搜索更新分别取得 14/72 条 Observation，均正常停用退出。当前处于生产准入门槛：仍缺外部
-  Shipping-like 同后端自绘负例，不能建立可靠拒绝或进入 Catalog/Runtime Bundle。当前不安装 Unity、
-  不做第五轮无界搜索，也不回退到 AE 等旧验收尾项。
 
 ## Project links
 

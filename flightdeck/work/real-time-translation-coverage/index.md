@@ -1,6 +1,6 @@
 # 通用实时翻译覆盖
 
-Status: Open
+Status: Stopped
 
 ## Goal
 
@@ -9,6 +9,10 @@ Status: Open
 或成功注入代替真实翻译结果。
 
 ## Current
+
+本 Work 已于产品路线收敛后停止。Glyphshift 的“任意软件实时翻译覆盖”目标被新的 Adobe 专用产品
+YomiFrame 取代；现有实现和实证只作为选择性迁移来源保留，不再继续 Unity、游戏引擎或其他通用
+Adapter 覆盖工作。
 
 现有 GDI、USER32 DrawText、GDI+、Qt、GTK 3/Pango 与 DirectWrite TextLayout Adapter 已进入正式
 Runtime Bundle。Console 与 UI Automation 目前只有采集价值，不能作为实时翻译成功。Direct2D
@@ -262,12 +266,12 @@ NGUI-only 同后端负例继续拒绝。
 
 ## Next
 
-- [Unity IL2CPP Standard UI observe-only 原型](slices/unity-il2cpp-standard-ui-observe-prototype.md)已完成：
-  Unity 2021 LTS 动态分数取得 14 条 Observation，Unity 6 搜索更新取得 72 条；均正常停用退出。
-- 原型保持未发布、仅采集。外部 Shipping-like 自绘负例继续作为可靠拒绝与生产接入硬门槛；仓库负例
-  暂停，不安装 Unity，不开始第五轮无界搜索。
+None.
 
 ## Progress
+
+- 产品路线最终放弃通用软件覆盖并转向独立的 Adobe 专用产品；本 Work 因被取代而停止，未完成的
+  IL2CPP 生产准入项不再属于后续议程。
 
 - 已重新确认产品主线是“探针发现原文 → Dictionary 提供译文 → Adapter 实时写回”，而不是通用观察
   数据平台。
