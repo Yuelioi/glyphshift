@@ -11,8 +11,8 @@ use retour::GenericDetour;
 use std::cell::Cell;
 use std::ffi::c_void;
 use std::mem::MaybeUninit;
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::{OnceLock, RwLock};
+use std::sync::atomic::{AtomicI32, AtomicU64, AtomicUsize, Ordering};
+use std::sync::{Mutex, OnceLock, RwLock};
 use windows::core::{w, PCSTR};
 use windows::Win32::Foundation::HMODULE;
 use windows::Win32::System::LibraryLoader::{GetModuleHandleW, GetProcAddress};
@@ -31,6 +31,14 @@ const QSTRING5_CTOR_SYMBOL: &[u8] = b"??0QString@@QEAA@PEBVQChar@@H@Z\0";
 const QSTRING5_SIZE_SYMBOL: &[u8] = b"?size@QString@@QEBAHXZ\0";
 const QSTRING6_CTOR_SYMBOL: &[u8] = b"??0QString@@QEAA@PEBVQChar@@_J@Z\0";
 const QSTRING6_SIZE_SYMBOL: &[u8] = b"?size@QString@@QEBA_JXZ\0";
+const QAPPLICATION_ALL_WIDGETS_SYMBOL: &[u8] =
+    b"?allWidgets@QApplication@@SA?AV?$QList@PEAVQWidget@@@@XZ\0";
+const QWIDGET_FIND_SYMBOL: &[u8] = b"?find@QWidget@@SAPEAV1@_K@Z\0";
+const QWIDGET_REPAINT_SYMBOL: &[u8] = b"?repaint@QWidget@@QEAAXXZ\0";
+const QLIST_DATA_DISPOSE_SYMBOL: &[u8] = b"?dispose@QListData@@SAXPEAUData@1@@Z\0";
+const QARRAY_DATA_DEALLOCATE_SYMBOL: &[u8] = b"?deallocate@QArrayData@@SAXPEAU1@_J1@Z\0";
+const MAX_WIDGETS: usize = 100_000;
+const REFRESH_MESSAGE_WPARAM: usize = 0x4753_5257;
 
 type RawProc = unsafe extern "system" fn() -> isize;
 type FnDrawPoint = unsafe extern "system" fn(*mut c_void, *const c_void, *const c_void, i32, i32);
@@ -44,6 +52,11 @@ type FnQStringDtor = unsafe extern "system" fn(*mut c_void);
 type FnQString5Size = unsafe extern "system" fn(*const c_void) -> i32;
 type FnQString6Size = unsafe extern "system" fn(*const c_void) -> i64;
 type FnQStringUtf16 = unsafe extern "system" fn(*const c_void) -> *const u16;
+type FnQWidgetFind = unsafe extern "system" fn(u64) -> *mut c_void;
+type FnQWidgetRepaint = unsafe extern "system" fn(*mut c_void);
+type FnQApplicationAllWidgets = unsafe extern "system" fn(*mut c_void) -> *mut c_void;
+type FnQListDataDispose = unsafe extern "system" fn(*mut c_void);
+type FnQArrayDataDeallocate = unsafe extern "system" fn(*mut c_void, i64, i64);
 
 #[derive(Clone, Copy)]
 struct HostBridge {
@@ -138,12 +151,111 @@ impl Drop for QStringGuard {
     }
 }
 
+#[repr(C)]
+struct Qt5WidgetListData {
+    ref_count: AtomicI32,
+    allocation: i32,
+    begin: i32,
+    end: i32,
+}
+
+#[repr(C)]
+struct Qt6ArrayData {
+    ref_count: AtomicI32,
+    flags: u32,
+    allocation: isize,
+}
+
+#[repr(C)]
+struct Qt6WidgetList {
+    data: *mut Qt6ArrayData,
+    widgets: *mut *mut c_void,
+    size: isize,
+}
+
+#[derive(Clone, Copy)]
+enum WidgetListRelease {
+    Qt5(FnQListDataDispose),
+    Qt6(FnQArrayDataDeallocate),
+}
+
+struct WidgetRefreshHooks {
+    all_widgets: FnQApplicationAllWidgets,
+    find_widget: FnQWidgetFind,
+    repaint: FnQWidgetRepaint,
+    release: WidgetListRelease,
+}
+
+impl WidgetRefreshHooks {
+    unsafe fn repaint_all(&self) {
+        match self.release {
+            WidgetListRelease::Qt5(dispose) => {
+                let mut list = std::ptr::null_mut::<Qt5WidgetListData>();
+                (self.all_widgets)(std::ptr::from_mut(&mut list).cast());
+                if list.is_null() {
+                    return;
+                }
+                let header = &*list;
+                let begin = header.begin;
+                let end = header.end;
+                let allocation = header.allocation;
+                if begin >= 0 && end >= begin && end <= allocation {
+                    let count = usize::try_from(end - begin).unwrap_or(MAX_WIDGETS + 1);
+                    if count <= MAX_WIDGETS {
+                        let widgets = list
+                            .cast::<u8>()
+                            .add(std::mem::size_of::<Qt5WidgetListData>())
+                            as *const *mut c_void;
+                        for index in begin..end {
+                            let widget = *widgets.add(index as usize);
+                            if !widget.is_null() {
+                                (self.repaint)(widget);
+                            }
+                        }
+                    }
+                }
+                if release_ref(&header.ref_count) {
+                    dispose(list.cast());
+                }
+            }
+            WidgetListRelease::Qt6(deallocate) => {
+                let mut list = Qt6WidgetList {
+                    data: std::ptr::null_mut(),
+                    widgets: std::ptr::null_mut(),
+                    size: 0,
+                };
+                (self.all_widgets)(std::ptr::from_mut(&mut list).cast());
+                if list.size >= 0 {
+                    let count = usize::try_from(list.size).unwrap_or(MAX_WIDGETS + 1);
+                    if count <= MAX_WIDGETS && (count == 0 || !list.widgets.is_null()) {
+                        for index in 0..count {
+                            let widget = *list.widgets.add(index);
+                            if !widget.is_null() {
+                                (self.repaint)(widget);
+                            }
+                        }
+                    }
+                }
+                if !list.data.is_null() && release_ref(&(*list.data).ref_count) {
+                    deallocate(list.data.cast(), 8, 8);
+                }
+            }
+        }
+    }
+}
+
+fn release_ref(ref_count: &AtomicI32) -> bool {
+    let current = ref_count.load(Ordering::Acquire);
+    current > 0 && ref_count.fetch_sub(1, Ordering::AcqRel) == 1
+}
+
 struct QtHooks {
     strings: QStringApi,
     point: GenericDetour<FnDrawPoint>,
     rect: GenericDetour<FnDrawRect>,
     rect_option: GenericDetour<FnDrawRectOption>,
     rect_f: GenericDetour<FnDrawRect>,
+    widget_refresh: Option<WidgetRefreshHooks>,
 }
 
 struct DecisionBuffers {
@@ -152,8 +264,19 @@ struct DecisionBuffers {
 }
 
 static ACTIVE_FEATURES: AtomicU64 = AtomicU64::new(0);
+static NEXT_REFRESH_GENERATION: AtomicUsize = AtomicUsize::new(0);
+static PENDING_REFRESH_GENERATION: AtomicUsize = AtomicUsize::new(0);
 static HOST: OnceLock<RwLock<HostBridge>> = OnceLock::new();
 static HOOKS: OnceLock<QtHooks> = OnceLock::new();
+static REFRESH_REQUEST_LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+static WINDOW_HOOKS: OnceLock<Mutex<Vec<WindowThreadHook>>> = OnceLock::new();
+
+struct WindowThreadHook {
+    thread_id: u32,
+    handle: isize,
+    generation: usize,
+    windows: Vec<usize>,
+}
 
 thread_local! {
     static IN_CALLBACK: Cell<bool> = const { Cell::new(false) };
@@ -421,6 +544,264 @@ unsafe fn loaded_qt_modules() -> Result<(u8, HMODULE, HMODULE), ()> {
     }
 }
 
+extern "C" fn request_refresh() {
+    let _ = std::panic::catch_unwind(|| unsafe { request_widget_refresh() });
+}
+
+unsafe fn request_widget_refresh() {
+    use windows_sys::Win32::Foundation::{HWND, LPARAM};
+    use windows_sys::Win32::System::Threading::GetCurrentProcessId;
+    use windows_sys::Win32::UI::WindowsAndMessaging::{
+        EnumWindows, GetClassNameW, GetWindowThreadProcessId, PostMessageW, WM_NULL,
+    };
+
+    struct WindowThread {
+        thread_id: u32,
+        windows: Vec<usize>,
+    }
+
+    struct RefreshState {
+        process_id: u32,
+        threads: Vec<WindowThread>,
+    }
+
+    if HOOKS
+        .get()
+        .and_then(|hooks| hooks.widget_refresh.as_ref())
+        .is_none()
+    {
+        return;
+    }
+    // Runtime lifecycle callbacks run on a control thread, while every QWidget API must stay on
+    // the Qt GUI thread. A short-lived native message hook marshals one marked message to each
+    // Qt window thread without calling into Qt from here.
+    let Ok(_request_guard) = REFRESH_REQUEST_LOCK.get_or_init(|| Mutex::new(())).lock() else {
+        return;
+    };
+    let mut generation = NEXT_REFRESH_GENERATION
+        .fetch_add(1, Ordering::Relaxed)
+        .wrapping_add(1);
+    if generation == 0 {
+        generation = NEXT_REFRESH_GENERATION
+            .fetch_add(1, Ordering::Relaxed)
+            .wrapping_add(1);
+    }
+    PENDING_REFRESH_GENERATION.store(generation, Ordering::Release);
+
+    unsafe extern "system" fn refresh_window(window: HWND, state: LPARAM) -> i32 {
+        let state = &mut *(state as *mut RefreshState);
+        let mut process_id = 0;
+        let thread_id = GetWindowThreadProcessId(window, &mut process_id);
+        let mut class_name = [0_u16; 64];
+        let class_length = GetClassNameW(window, class_name.as_mut_ptr(), class_name.len() as i32);
+        // Qt's Windows platform windows use a versioned `Qt...` class. Filtering here keeps the
+        // later QWidget lookup off unrelated process threads that merely own native windows.
+        let is_qt_window = class_length >= 2 && class_name[..2] == ['Q' as u16, 't' as u16];
+        if process_id == state.process_id && thread_id != 0 && is_qt_window {
+            if let Some(thread) = state
+                .threads
+                .iter_mut()
+                .find(|thread| thread.thread_id == thread_id)
+            {
+                thread.windows.push(window as usize);
+            } else {
+                state.threads.push(WindowThread {
+                    thread_id,
+                    windows: vec![window as usize],
+                });
+            }
+        }
+        1
+    }
+
+    let mut state = RefreshState {
+        process_id: GetCurrentProcessId(),
+        threads: Vec::new(),
+    };
+    EnumWindows(
+        Some(refresh_window),
+        std::ptr::from_mut(&mut state) as LPARAM,
+    );
+    for thread in state.threads {
+        let thread_id = thread.thread_id;
+        let marker_window = thread.windows[0] as HWND;
+        if install_window_thread_hook(thread_id, thread.windows, generation)
+            && PostMessageW(
+                marker_window,
+                WM_NULL,
+                REFRESH_MESSAGE_WPARAM,
+                generation as isize,
+            ) == 0
+        {
+            remove_window_thread_hook(thread_id, generation);
+        }
+    }
+}
+
+unsafe fn install_window_thread_hook(
+    thread_id: u32,
+    windows: Vec<usize>,
+    generation: usize,
+) -> bool {
+    use windows_sys::Win32::UI::WindowsAndMessaging::{
+        SetWindowsHookExW, UnhookWindowsHookEx, WH_GETMESSAGE,
+    };
+
+    if thread_id == 0 {
+        return false;
+    }
+    let hooks = WINDOW_HOOKS.get_or_init(|| Mutex::new(Vec::new()));
+    let Ok(mut registered) = hooks.lock() else {
+        return false;
+    };
+    let previous = registered
+        .iter()
+        .position(|hook| hook.thread_id == thread_id)
+        .map(|index| registered.swap_remove(index));
+    drop(registered);
+    if let Some(previous) = previous {
+        if previous.generation == generation {
+            let Ok(mut registered) = hooks.lock() else {
+                return false;
+            };
+            registered.push(previous);
+            return true;
+        }
+        UnhookWindowsHookEx(previous.handle as *mut c_void);
+    }
+    let hook = SetWindowsHookExW(
+        WH_GETMESSAGE,
+        Some(refresh_window_hook),
+        std::ptr::null_mut(),
+        thread_id,
+    );
+    if hook.is_null() {
+        return false;
+    }
+    let Ok(mut registered) = hooks.lock() else {
+        UnhookWindowsHookEx(hook);
+        return false;
+    };
+    registered.push(WindowThreadHook {
+        thread_id,
+        handle: hook as isize,
+        generation,
+        windows,
+    });
+    true
+}
+
+fn take_window_thread_hook(thread_id: u32, generation: usize) -> Option<WindowThreadHook> {
+    WINDOW_HOOKS
+        .get()
+        .and_then(|hooks| hooks.lock().ok())
+        .and_then(|mut hooks| {
+            let index = hooks
+                .iter()
+                .position(|hook| hook.thread_id == thread_id && hook.generation == generation)?;
+            Some(hooks.swap_remove(index))
+        })
+}
+
+unsafe fn remove_window_thread_hook(thread_id: u32, generation: usize) {
+    use windows_sys::Win32::UI::WindowsAndMessaging::UnhookWindowsHookEx;
+
+    if let Some(hook) = take_window_thread_hook(thread_id, generation) {
+        UnhookWindowsHookEx(hook.handle as *mut c_void);
+    }
+}
+
+unsafe extern "system" fn refresh_window_hook(code: i32, wparam: usize, lparam: isize) -> isize {
+    use windows_sys::Win32::System::Threading::GetCurrentThreadId;
+    use windows_sys::Win32::UI::WindowsAndMessaging::{CallNextHookEx, MSG, WM_NULL};
+
+    if code >= 0 && lparam != 0 {
+        let message = &*(lparam as *const MSG);
+        let generation = message.lParam as usize;
+        let thread_id = GetCurrentThreadId();
+        if message.message == WM_NULL && message.wParam == REFRESH_MESSAGE_WPARAM {
+            if let Some(hook) = take_window_thread_hook(thread_id, generation) {
+                use windows_sys::Win32::UI::WindowsAndMessaging::UnhookWindowsHookEx;
+
+                // WH_GETMESSAGE invokes this callback on the window-owning Qt GUI thread.
+                UnhookWindowsHookEx(hook.handle as *mut c_void);
+                if PENDING_REFRESH_GENERATION.load(Ordering::Acquire) == generation {
+                    if let Some(refresh) =
+                        HOOKS.get().and_then(|hooks| hooks.widget_refresh.as_ref())
+                    {
+                        let owns_widget = hook
+                            .windows
+                            .iter()
+                            .any(|window| !(refresh.find_widget)(*window as u64).is_null());
+                        if owns_widget
+                            && PENDING_REFRESH_GENERATION
+                                .compare_exchange(
+                                    generation,
+                                    0,
+                                    Ordering::AcqRel,
+                                    Ordering::Acquire,
+                                )
+                                .is_ok()
+                        {
+                            refresh.repaint_all();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    CallNextHookEx(std::ptr::null_mut(), code, wparam, lparam)
+}
+
+unsafe fn build_widget_refresh_hooks(
+    major: u8,
+    core: HMODULE,
+) -> Result<Option<WidgetRefreshHooks>, ()> {
+    let widgets = match major {
+        5 => GetModuleHandleW(w!("Qt5Widgets.dll")),
+        6 => GetModuleHandleW(w!("Qt6Widgets.dll")),
+        _ => return Err(()),
+    };
+    let Ok(widgets) = widgets else {
+        return Ok(None);
+    };
+    let Ok(all_widgets) = resolve(widgets, QAPPLICATION_ALL_WIDGETS_SYMBOL) else {
+        return Ok(None);
+    };
+    let Ok(repaint) = resolve(widgets, QWIDGET_REPAINT_SYMBOL) else {
+        return Ok(None);
+    };
+    let Ok(find_widget) = resolve(widgets, QWIDGET_FIND_SYMBOL) else {
+        return Ok(None);
+    };
+    let all_widgets = std::mem::transmute::<RawProc, FnQApplicationAllWidgets>(all_widgets);
+    let repaint = std::mem::transmute::<RawProc, FnQWidgetRepaint>(repaint);
+    let find_widget = std::mem::transmute::<RawProc, FnQWidgetFind>(find_widget);
+    let release = match major {
+        5 => {
+            let Ok(dispose) = resolve(core, QLIST_DATA_DISPOSE_SYMBOL) else {
+                return Ok(None);
+            };
+            WidgetListRelease::Qt5(std::mem::transmute::<RawProc, FnQListDataDispose>(dispose))
+        }
+        6 => {
+            let Ok(deallocate) = resolve(core, QARRAY_DATA_DEALLOCATE_SYMBOL) else {
+                return Ok(None);
+            };
+            WidgetListRelease::Qt6(std::mem::transmute::<RawProc, FnQArrayDataDeallocate>(
+                deallocate,
+            ))
+        }
+        _ => return Err(()),
+    };
+    Ok(Some(WidgetRefreshHooks {
+        all_widgets,
+        find_widget,
+        repaint,
+        release,
+    }))
+}
+
 unsafe fn build_hooks() -> Result<QtHooks, ()> {
     let (major, gui, core) = loaded_qt_modules()?;
     let strings = match major {
@@ -469,6 +850,7 @@ unsafe fn build_hooks() -> Result<QtHooks, ()> {
         std::mem::transmute::<RawProc, FnDrawRectOption>(resolve(gui, DRAW_RECT_OPTION_SYMBOL)?);
     let rect_f_target =
         std::mem::transmute::<RawProc, FnDrawRect>(resolve(gui, DRAW_RECT_F_SYMBOL)?);
+    let widget_refresh = build_widget_refresh_hooks(major, core)?;
     Ok(QtHooks {
         strings,
         point: GenericDetour::new(point_target, draw_point_detour).map_err(|_| ())?,
@@ -476,6 +858,7 @@ unsafe fn build_hooks() -> Result<QtHooks, ()> {
         rect_option: GenericDetour::new(rect_option_target, draw_rect_option_detour)
             .map_err(|_| ())?,
         rect_f: GenericDetour::new(rect_f_target, draw_rect_f_detour).map_err(|_| ())?,
+        widget_refresh,
     })
 }
 
@@ -513,5 +896,6 @@ pub extern "C" fn glyphshift_adapter_entry_v1() -> NativeAdapterApiV1 {
         negotiate_features,
         activate,
         deactivate,
+        request_refresh,
     }
 }

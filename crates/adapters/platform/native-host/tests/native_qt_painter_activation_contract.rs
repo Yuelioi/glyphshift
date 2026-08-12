@@ -21,6 +21,16 @@ const QPAINTER_DEVICE_CTOR_SYMBOL: &[u8] = b"??0QPainter@@QEAA@PEAVQPaintDevice@
 const QPAINTER_DTOR_SYMBOL: &[u8] = b"??1QPainter@@QEAA@XZ\0";
 const QGUI_APPLICATION_CTOR_SYMBOL: &[u8] = b"??0QGuiApplication@@QEAA@AEAHPEAPEADH@Z\0";
 const QGUI_APPLICATION_DTOR_SYMBOL: &[u8] = b"??1QGuiApplication@@UEAA@XZ\0";
+const QAPPLICATION_CTOR_SYMBOL: &[u8] = b"??0QApplication@@QEAA@AEAHPEAPEADH@Z\0";
+const QAPPLICATION_DTOR_SYMBOL: &[u8] = b"??1QApplication@@UEAA@XZ\0";
+const QCORE_PROCESS_EVENTS_SYMBOL: &[u8] =
+    b"?processEvents@QCoreApplication@@SAXV?$QFlags@W4ProcessEventsFlag@QEventLoop@@@@@Z\0";
+const QLABEL_CTOR_SYMBOL: &[u8] =
+    b"??0QLabel@@QEAA@AEBVQString@@PEAVQWidget@@V?$QFlags@W4WindowType@Qt@@@@@Z\0";
+const QLABEL_DTOR_SYMBOL: &[u8] = b"??1QLabel@@UEAA@XZ\0";
+const QWIDGET_CLOSE_SYMBOL: &[u8] = b"?close@QWidget@@QEAA_NXZ\0";
+const QWIDGET_RESIZE_SYMBOL: &[u8] = b"?resize@QWidget@@QEAAXHH@Z\0";
+const QWIDGET_SHOW_SYMBOL: &[u8] = b"?show@QWidget@@QEAAXXZ\0";
 const QIMAGE_CTOR_SYMBOL: &[u8] = b"??0QImage@@QEAA@HHW4Format@0@@Z\0";
 const QIMAGE_DTOR_SYMBOL: &[u8] = b"??1QImage@@UEAA@XZ\0";
 const QIMAGE_FILL_SYMBOL: &[u8] = b"?fill@QImage@@QEAAXI@Z\0";
@@ -53,6 +63,16 @@ type FnQStringDtor = unsafe extern "system" fn(*mut c_void);
 type FnQGuiApplicationCtor =
     unsafe extern "system" fn(*mut c_void, *mut i32, *mut *mut i8, i32) -> *mut c_void;
 type FnQGuiApplicationDtor = unsafe extern "system" fn(*mut c_void);
+type FnQApplicationCtor =
+    unsafe extern "system" fn(*mut c_void, *mut i32, *mut *mut i8, i32) -> *mut c_void;
+type FnQApplicationDtor = unsafe extern "system" fn(*mut c_void);
+type FnQCoreProcessEvents = unsafe extern "system" fn(i32);
+type FnQLabelCtor =
+    unsafe extern "system" fn(*mut c_void, *const c_void, *mut c_void, u32) -> *mut c_void;
+type FnQLabelDtor = unsafe extern "system" fn(*mut c_void);
+type FnQWidgetClose = unsafe extern "system" fn(*mut c_void) -> bool;
+type FnQWidgetResize = unsafe extern "system" fn(*mut c_void, i32, i32);
+type FnQWidgetShow = unsafe extern "system" fn(*mut c_void);
 type FnQImageCtor = unsafe extern "system" fn(*mut c_void, i32, i32, i32) -> *mut c_void;
 type FnQImageDtor = unsafe extern "system" fn(*mut c_void);
 type FnQImageFill = unsafe extern "system" fn(*mut c_void, u32);
@@ -142,6 +162,9 @@ fn qt_painter_activation_rejects_a_process_without_qt_modules() {
 
 #[repr(C, align(16))]
 struct OpaqueObject([u8; 256]);
+
+#[repr(C, align(16))]
+struct OpaqueWidgetObject([u8; 4096]);
 
 #[repr(C)]
 struct PointF {
@@ -372,6 +395,145 @@ impl Drop for LocalQtRuntime {
     }
 }
 
+struct LocalQtWidgetsRuntime {
+    major: u8,
+    core: HMODULE,
+    widgets: HMODULE,
+    application: Box<OpaqueObject>,
+    application_dtor: FnQApplicationDtor,
+    process_events: FnQCoreProcessEvents,
+    _argc: Box<i32>,
+    _argument: Vec<u8>,
+    _arguments: Vec<*mut i8>,
+}
+
+impl LocalQtWidgetsRuntime {
+    unsafe fn load(core: &Path, gui: &Path, widgets: &Path) -> Self {
+        let major = match core.file_name().and_then(|name| name.to_str()) {
+            Some(name) if name.eq_ignore_ascii_case("Qt5Core.dll") => 5,
+            Some(name) if name.eq_ignore_ascii_case("Qt6Core.dll") => 6,
+            _ => panic!("configured Qt Core module must be Qt5Core.dll or Qt6Core.dll"),
+        };
+        let core = load_module(core);
+        let _gui = load_module(gui);
+        let widgets = load_module(widgets);
+        let application_ctor = std::mem::transmute::<RawProc, FnQApplicationCtor>(resolve(
+            widgets,
+            QAPPLICATION_CTOR_SYMBOL,
+        ));
+        let application_dtor = std::mem::transmute::<RawProc, FnQApplicationDtor>(resolve(
+            widgets,
+            QAPPLICATION_DTOR_SYMBOL,
+        ));
+        let process_events = std::mem::transmute::<RawProc, FnQCoreProcessEvents>(resolve(
+            core,
+            QCORE_PROCESS_EVENTS_SYMBOL,
+        ));
+        let mut application = Box::new(OpaqueObject([0; 256]));
+        let mut argc = Box::new(1_i32);
+        let mut argument = std::env::current_exe()
+            .expect("current Qt Widgets contract executable")
+            .to_string_lossy()
+            .into_owned()
+            .into_bytes();
+        argument.push(0);
+        let mut arguments = vec![argument.as_mut_ptr().cast::<i8>(), std::ptr::null_mut()];
+        application_ctor(
+            std::ptr::from_mut(application.as_mut()).cast(),
+            std::ptr::from_mut(argc.as_mut()),
+            arguments.as_mut_ptr(),
+            0,
+        );
+        Self {
+            major,
+            core,
+            widgets,
+            application,
+            application_dtor,
+            process_events,
+            _argc: argc,
+            _argument: argument,
+            _arguments: arguments,
+        }
+    }
+
+    unsafe fn label(&self, text: &str) -> LocalQtLabel {
+        let units = text.encode_utf16().collect::<Vec<_>>();
+        let mut string = MaybeUninit::<OpaqueObject>::uninit();
+        let string = string.as_mut_ptr().cast::<c_void>();
+        if self.major == 5 {
+            let ctor = std::mem::transmute::<RawProc, FnQString5Ctor>(resolve(
+                self.core,
+                QSTRING5_CTOR_SYMBOL,
+            ));
+            ctor(string, units.as_ptr(), units.len() as i32);
+        } else {
+            let ctor = std::mem::transmute::<RawProc, FnQString6Ctor>(resolve(
+                self.core,
+                QSTRING6_CTOR_SYMBOL,
+            ));
+            ctor(string, units.as_ptr(), units.len() as i64);
+        }
+        let string_dtor =
+            std::mem::transmute::<RawProc, FnQStringDtor>(resolve(self.core, QSTRING_DTOR_SYMBOL));
+        let mut object = Box::new(OpaqueWidgetObject([0; 4096]));
+        let label = std::ptr::from_mut(object.as_mut()).cast::<c_void>();
+        let label_ctor =
+            std::mem::transmute::<RawProc, FnQLabelCtor>(resolve(self.widgets, QLABEL_CTOR_SYMBOL));
+        label_ctor(label, string, std::ptr::null_mut(), 0);
+        string_dtor(string);
+        let resize = std::mem::transmute::<RawProc, FnQWidgetResize>(resolve(
+            self.widgets,
+            QWIDGET_RESIZE_SYMBOL,
+        ));
+        let show = std::mem::transmute::<RawProc, FnQWidgetShow>(resolve(
+            self.widgets,
+            QWIDGET_SHOW_SYMBOL,
+        ));
+        resize(label, 360, 100);
+        show(label);
+        LocalQtLabel {
+            object,
+            close: std::mem::transmute::<RawProc, FnQWidgetClose>(resolve(
+                self.widgets,
+                QWIDGET_CLOSE_SYMBOL,
+            )),
+            dtor: std::mem::transmute::<RawProc, FnQLabelDtor>(resolve(
+                self.widgets,
+                QLABEL_DTOR_SYMBOL,
+            )),
+        }
+    }
+
+    unsafe fn process_events(&self) {
+        (self.process_events)(0);
+    }
+}
+
+impl Drop for LocalQtWidgetsRuntime {
+    fn drop(&mut self) {
+        unsafe {
+            (self.application_dtor)(std::ptr::from_mut(self.application.as_mut()).cast());
+        }
+    }
+}
+
+struct LocalQtLabel {
+    object: Box<OpaqueWidgetObject>,
+    close: FnQWidgetClose,
+    dtor: FnQLabelDtor,
+}
+
+impl Drop for LocalQtLabel {
+    fn drop(&mut self) {
+        unsafe {
+            let object = std::ptr::from_mut(self.object.as_mut()).cast();
+            (self.close)(object);
+            (self.dtor)(object);
+        }
+    }
+}
+
 unsafe fn load_module(path: &Path) -> HMODULE {
     let wide = path
         .as_os_str()
@@ -447,4 +609,86 @@ fn configured_qt_runtime_observes_hot_updates_and_deactivates_without_crashing()
     assert_eq!(OBSERVED.load(Ordering::Acquire), 8);
 
     package.deactivate().expect("leave hooks in pass-through");
+}
+
+#[test]
+#[ignore = "requires configured Qt Core, Gui, Widgets and platform plugin modules"]
+fn configured_qt_widgets_refreshes_every_widget_after_publication_change() {
+    let core = PathBuf::from(
+        std::env::var_os("GLYPHSHIFT_QT_CORE_DLL").expect("configured Qt Core module"),
+    );
+    let gui =
+        PathBuf::from(std::env::var_os("GLYPHSHIFT_QT_GUI_DLL").expect("configured Qt Gui module"));
+    let widgets = PathBuf::from(
+        std::env::var_os("GLYPHSHIFT_QT_WIDGETS_DLL").expect("configured Qt Widgets module"),
+    );
+    std::env::set_var(
+        "QT_QPA_PLATFORM",
+        std::env::var_os("GLYPHSHIFT_QT_PLATFORM").unwrap_or_else(|| "windows".into()),
+    );
+    let plugin_directory = PathBuf::from(
+        std::env::var_os("GLYPHSHIFT_QT_PLATFORM_PLUGIN_DIR")
+            .expect("configured Qt platform plugin directory"),
+    );
+    std::env::set_var("QT_QPA_PLATFORM_PLUGIN_PATH", &plugin_directory);
+    if let Some(plugin_root) = plugin_directory.parent() {
+        std::env::set_var("QT_PLUGIN_PATH", plugin_root);
+    }
+    let qt = unsafe { LocalQtWidgetsRuntime::load(&core, &gui, &widgets) };
+    let _translated_label = unsafe { qt.label("Open") };
+    let _trigger_label = unsafe { qt.label("Refresh trigger") };
+    unsafe { qt.process_events() };
+    let package = unsafe {
+        LoadedNativeAdapter::load(
+            &native_package(),
+            &glyphshift_adapter_qt_painter::descriptor(),
+        )
+        .expect("load verified Qt Painter package")
+    };
+    package
+        .activate(
+            host(),
+            [Feature::TextObserve, Feature::TextReplace],
+            [Feature::TextObserve, Feature::TextReplace],
+        )
+        .expect("activate Qt Painter hooks");
+
+    OBSERVED.store(0, Ordering::Release);
+    MODE.store(1, Ordering::Release);
+    // Do not repaint either label directly: the assertion must be driven solely by the Adapter's
+    // refresh callback and the real Qt event loop.
+    package.request_refresh();
+    for _ in 0..10 {
+        unsafe { qt.process_events() };
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    let first_count = OBSERVED.load(Ordering::Acquire);
+    assert!(first_count > 0, "first publication must repaint the label");
+
+    MODE.store(2, Ordering::Release);
+    package.request_refresh();
+    for _ in 0..10 {
+        unsafe { qt.process_events() };
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    assert!(
+        OBSERVED.load(Ordering::Acquire) > first_count,
+        "next publication must repaint the same label"
+    );
+
+    let active_count = OBSERVED.load(Ordering::Acquire);
+    package.deactivate().expect("deactivate Qt Painter hooks");
+    package.request_refresh();
+    for _ in 0..10 {
+        unsafe { qt.process_events() };
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    assert_eq!(
+        OBSERVED.load(Ordering::Acquire),
+        active_count,
+        "deactivation refresh must repaint in pass-through mode"
+    );
+    // Native hook packages live for the target process lifetime. Unloading this test DLL while
+    // Qt still owns the detoured functions would make Qt teardown jump into unloaded code.
+    std::mem::forget(package);
 }

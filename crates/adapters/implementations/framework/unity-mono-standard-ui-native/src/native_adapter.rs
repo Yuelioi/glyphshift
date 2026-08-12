@@ -848,6 +848,7 @@ pub extern "C" fn glyphshift_adapter_entry_v1() -> NativeAdapterApiV1 {
         negotiate_features,
         activate,
         deactivate,
+        request_refresh: glyphshift_adapter_native_abi::request_refresh_noop,
     }
 }
 
