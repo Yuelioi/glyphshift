@@ -2,7 +2,7 @@
 
 ## Open Work
 
-- **Focus:** None
+当前无 Open Work。
 
 ## Project links
 
