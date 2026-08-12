@@ -101,10 +101,10 @@
 - Font Policy 的 coverage 使用紧凑“应用范围”选择器；字体目录标题显示缓存数量和显式刷新动作，
   不用两个满宽按钮承载二选一状态。
 - 标题栏提供 Help 与 Settings 图标，不展示桌面服务连接状态；真实桌面后端不可用是阻断错误。
-- Help 从 Runtime Bundle Catalog 展示公开 Adapter 信息；Settings 不保存在线翻译服务地址，只导航
-  到本地资产与工作流页面，并说明未来网站/字典市场的下载方向。
+- Help 从 Runtime Bundle Catalog 展示公开 Adapter 信息；Settings 维护设备偏好、全局 AI 批次策略与
+  独立持久化的 AI Profiles，供应商服务地址只存在于 Profile，不进入 AppSettings。
 - GUI 使用仓库 Playwright 验证，实际桌面与实机证据只存本地忽略目录。
-- AppSettings 只承载全局且已有执行路径的偏好；当前 `/1` 包含 UI locale 与 theme，生命周期、
-  更新、诊断、账号和市场能力存在后才进入设置 UI。
+- AppSettings 只承载全局且已有执行路径的偏好；当前 `/1` 包含 UI locale、theme、设备行为、软件捕获
+  快捷键与 AI 单批条目/输入 Token 策略。模型、供应商端点、凭据和过滤规则属于独立 AI Profile。
 - Vue I18n 管理 Glyphshift 核心 UI；Rust/Tauri 跨 seam 返回稳定语义错误码和类型化参数，不返回
   vue-i18n key 或本地化句子。Dictionary 内容语言与动态 Artifact presentation locale 独立。

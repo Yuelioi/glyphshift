@@ -81,12 +81,18 @@ AiProfile
   project_id?          # OpenAI/Google/Azure 可选
   timeout_ms
   max_concurrency
-  max_items_per_request
-  max_input_chars_per_request
   temperature?
   structured_output_preference
   custom_headers[]     # 加密值或 secret_ref；禁止覆盖 Host/Content-Length
   capability_overrides
+```
+
+批次策略与 Profile 分离，由应用设置统一持有：
+
+```text
+TranslationBatchPolicy
+  max_items_per_request
+  max_input_tokens_per_request
 ```
 
 设计注意：
@@ -218,7 +224,8 @@ AiProfile
 即时路径建议：
 
 1. 上层先选出“尚无有效译文”的条目，再应用过滤器；Provider 不负责判断哪些词典项已翻译。
-2. 按字符数/token 估算和 `max_items_per_request` 切成小批；每项携带 opaque `item_id`。
+2. 按全局输入 token 预算和 `max_items_per_request` 切成小批；每项携带 opaque `item_id`。tokenizer
+   因供应商而异时先使用保守估算，供应商实际计数仍是最终权威。
 3. 云端 Profile 默认低并发（例如 2），根据 429/503 和 rate-limit hints 自适应降低；Ollama 默认并发 1。
 4. 优先严格 JSON Schema；不支持时降级 JSON mode，再降级 prompt-only JSON。每次都做语法和业务校验。
 5. 每个成功小批独立提交词典，失败批次可重试，不回滚已经成功且仍满足版本前置条件的其他批次。
