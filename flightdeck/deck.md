@@ -2,7 +2,7 @@
 
 ## Open Work
 
-当前无 Open Work。
+- **Focus** [AE 临时界面观测丢失](work/ae-transient-observation-loss/index.md)
 
 ## Project links
 

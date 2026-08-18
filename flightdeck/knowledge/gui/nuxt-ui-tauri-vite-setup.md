@@ -42,6 +42,10 @@ GUI 使用 Vue 3、Vite、Nuxt UI 4、Tailwind CSS 4 和 Tauri 2。Vite 固定�
 
 无边框窗口的拖拽区域和窗口按钮必须是不同元素。窗口最小化、最大化、关闭和拖拽需要在 Tauri capabilities 中逐项授权。
 
+品牌 SVG 可由前端标题栏直接导入，并生成 Tauri 的 PNG、ICO 与 ICNS 资源。Windows EXE 使用的
+`icons/icon.ico` 必须在 `build.rs` 中显式输出 `cargo:rerun-if-changed`；否则只修改图标文件时，前端
+可能已经更新，但 Cargo 会复用仍嵌有旧图标的可执行文件。
+
 ## 验证
 
 ```powershell

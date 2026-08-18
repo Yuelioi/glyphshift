@@ -32,13 +32,11 @@ TranslationProvider
   capabilities(profile) -> ProviderCapabilities
 ```
 
-`TranslationBatch` 建议包含稳定的本地 `item_id`、原文、源/目标语言、可选上下文和术语提示。统一输出使用 JSON Schema，核心形状保持简单：
+`TranslationBatch` 在内部保留稳定的本地 `item_id`、原文、源/目标语言、可选上下文和术语提示。HTTP Provider Adapter 在 wire seam 隐藏本地 ID，只发送有序原文数组；统一输出使用相同顺序的译文数组：
 
 ```json
 {
-  "translations": [
-    { "item_id": "opaque-id", "text": "translated text" }
-  ]
+  "translations": ["translated text"]
 }
 ```
 
@@ -46,7 +44,7 @@ TranslationProvider
 
 - 把统一请求转换成厂商的 `input`、`messages` 或 `contents`。
 - 根据实际能力选择严格 JSON Schema、JSON mode 或纯文本 JSON fallback。
-- 校验 `item_id` 一一对应、无新增、无遗漏、无重复；任何 schema 合法但语义不合法的结果都不得直接写入词典。
+- 要求译文与原文严格同序，并校验返回数量、非空译文和保护 token；Adapter 按位置恢复内部 `item_id`，任何 schema 合法但语义不合法的结果都不得直接写入词典。
 - 归一化 token usage、请求 ID、限流提示、可重试性、拒绝/安全拦截与取消状态。
 - 保存原始 HTTP 状态和安全裁剪后的错误摘要供诊断，但绝不记录 API key、Authorization header 或完整用户文本。
 
@@ -126,7 +124,7 @@ TranslationBatchPolicy
 ### 结构化输出
 
 - Responses 使用 `text.format`；Chat Completions 使用 `response_format`。严格 JSON Schema 与只保证合法 JSON 的 JSON mode 是不同能力，必须分别建模。[OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
-- 对翻译批次应优先严格 schema；仍需做业务校验，因为 schema 不能保证译文质量、语言正确或 `item_id` 与原输入语义匹配。
+- 对翻译批次应优先严格 schema；仍需做业务校验，因为 schema 不能保证译文质量、语言正确或同序数组的语义对应关系。
 - 模型拒绝、输出截断或 incomplete 不应被当作可写入的成功翻译。
 
 ### 流、限流、错误与批处理
@@ -224,7 +222,7 @@ TranslationBatchPolicy
 即时路径建议：
 
 1. 上层先选出“尚无有效译文”的条目，再应用过滤器；Provider 不负责判断哪些词典项已翻译。
-2. 按全局输入 token 预算和 `max_items_per_request` 切成小批；每项携带 opaque `item_id`。tokenizer
+2. 按全局输入 token 预算和 `max_items_per_request` 切成小批；内部批次保留 `item_id` 映射，wire 只发送有序原文数组。tokenizer
    因供应商而异时先使用保守估算，供应商实际计数仍是最终权威。
 3. 云端 Profile 默认低并发（例如 2），根据 429/503 和 rate-limit hints 自适应降低；Ollama 默认并发 1。
 4. 优先严格 JSON Schema；不支持时降级 JSON mode，再降级 prompt-only JSON。每次都做语法和业务校验。
