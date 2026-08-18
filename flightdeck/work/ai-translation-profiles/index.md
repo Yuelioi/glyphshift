@@ -9,9 +9,9 @@ Status: Finished
 
 ## Current
 
-单批条目数与输入 Token 预算已成为 AppSettings 中的唯一全局策略，默认分别为 100 与 16,000。
-Profile `/2` 不再保存这两个字段；桌面和浏览器任务在启动时读取同一策略，并按条目数与保守 Token
-估算自动排空全部候选。设置页提供立即持久化的全局控件，Dictionary 与 Probe 预览显示全局值。
+AI Profile 独立保存供应商协议、连接参数、单批条目上限、超时、并发、重试与过滤策略；输入 Token
+只在执行前本机估算。Dictionary 与 Probe 会保留已完成结果，并允许重试剩余空白项。完成、部分完成
+或主动停止后的通知现在始终提供关闭动作；关闭通知会同时收起终态批次详情，不丢弃任何结果。
 
 ## Next
 
@@ -50,6 +50,9 @@ None
   估算共同切批；切换任何 Profile 都不改变策略。
 - 最终回归通过：AI Rust 14 项、桌面壳 71 项、Settings / AI Playwright 13 项、生产构建、Rust 格式、
   架构与界面反模式检查；最新本地实例真实 IPC 通过并停在全局 AI 批次设置页面。
+- 修复 Dictionary 与 Probe 的 AI 终态通知只有“重试剩余”而无法关闭的问题；显式“关闭”动作会
+  清除通知与终态批次详情，同时保留已完成译文。AI Playwright 10 项、Probe Playwright 17 项、
+  生产构建与界面机械检测通过。
 
 ## References
 
