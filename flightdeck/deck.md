@@ -2,7 +2,8 @@
 
 ## Open Work
 
-- **Focus** [AE 临时界面观测丢失](work/ae-transient-observation-loss/index.md)
+- [AE 临时界面观测丢失](work/ae-transient-observation-loss/index.md)
+- **Focus** [发布根文档对齐](work/release-root-docs/index.md)
 
 ## Project links
 
