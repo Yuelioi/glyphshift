@@ -18,6 +18,9 @@ Runtime 注入全新的 AE 2022 进程后，合成设置对话框、启用态合
 Observation Index，本机精确回归脚本已转绿。正在运行的 AE 2020 仍驻留旧 Runtime DLL，
 需要重启目标进程后才能完成同版本实机复验。
 
+桌面审阅脚本现显式启用 Tauri 的生产 `custom-protocol`，同步 Release Shell 已通过实际 WebView
+回归从嵌入资源加载界面，不再意外依赖本地 Vite 服务。
+
 ## Next
 
 重启 AE 2020，让它加载本次候选 Runtime，并重复合成设置对话框、启用态菜单和二级菜单的
@@ -40,6 +43,8 @@ Observation Index，本机精确回归脚本已转绿。正在运行的 AE 2020 
   目标进程确认加载该候选的新 Runtime 与全部 Adapter。
 - AE 2022 实机已捕获 `Composition Settings...`、`Composition Name:`、`Save Frame As` 与
   `Responsive Design — Time`；来源分别覆盖 ExtTextOut、GDI+ 与 DrawText，精确脚本通过。
+- 修正原始 Cargo 审阅构建缺少 Tauri `custom-protocol` 的问题；同步 Release 的 WebView 已确认
+  加载 `tauri.localhost` 嵌入资源，拒绝连接回归转绿。
 
 ## References
 

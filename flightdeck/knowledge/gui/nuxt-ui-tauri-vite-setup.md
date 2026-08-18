@@ -60,3 +60,6 @@ npm test
 主题与语言切换可持久化、顶栏按钮可访问、核心页面翻译完整且无溢出。
 
 完整发布验证由当前 Work 的生产 Extension/Runtime Bundle 与首个可分发桌面构建阶段负责。
+不经过 Tauri CLI、直接调用 Cargo 生成自包含审阅 Shell 时，必须显式启用应用的
+`custom-protocol` feature；Release 优化级别本身不会让 Tauri 从 `devUrl` 切换到嵌入的
+`frontendDist`。
