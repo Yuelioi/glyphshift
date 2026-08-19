@@ -219,7 +219,7 @@ $editorDirectory = Split-Path -Parent $editorItem.FullName
 $windowsIl2CppModule = Join-Path $editorDirectory 'Data\PlaybackEngines\windowsstandalonesupport\Variations\win64_player_il2cpp'
 Assert-Contract (Test-Path -LiteralPath $windowsIl2CppModule -PathType Container) 'The Unity Windows IL2CPP module is required.'
 
-$evidenceRoot = Join-Path $repositoryRoot 'target\local-test\evidence\unity-il2cpp-negative-harness'
+$evidenceRoot = Join-Path $repositoryRoot 'local-test\evidence\unity-il2cpp-negative-harness'
 $runId = (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [guid]::NewGuid().ToString('N').Substring(0, 8)
 $runRoot = Join-Path $evidenceRoot $runId
 $projectRoot = Join-Path $runRoot 'project'
@@ -265,4 +265,4 @@ Assert-Contract ($metadataText.Contains('UnityEngine.UI.Text')) 'IL2CPP metadata
 Assert-Contract ($metadataText.Contains('TMP_UGUI_TYPES_PRESENT_LIVE_TEXT_ZERO')) 'IL2CPP metadata does not retain the live-object guard.'
 
 Write-Output 'unity_negative_harness_build=passed'
-Write-Output ('unity_negative_harness_evidence=target/local-test/evidence/unity-il2cpp-negative-harness/' + $runId)
+Write-Output ('unity_negative_harness_evidence=local-test/evidence/unity-il2cpp-negative-harness/' + $runId)

@@ -12,7 +12,7 @@ Catalog 或 Runtime Bundle。
 ## Delivery
 
 - [x] 在 `test-support/` 下建立可跟踪的最小 Unity 工程源码；源码与合成资产可提交，Unity 缓存、
-  构建物、日志、截图与本机路径只能进入 `target/local-test/evidence/`。
+  构建物、日志、截图与本机路径只能进入 `local-test/evidence/`。
 - [x] 实现运行时生成的 bitmap atlas、`MeshFilter` 与 `MeshRenderer` 固定/动态文字 marker；
   工程保留官方 TMP/uGUI package 与类型，但场景不创建 Canvas、TMP 或 uGUI Text，并由运行时守卫持续
   断言两类 live text object 都为零。

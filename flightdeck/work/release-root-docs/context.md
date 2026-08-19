@@ -13,3 +13,5 @@
 - 用户已授权当前发布前改动创建 Git commit；最终截图仍是后续独立补充。
 - tag 发布属于当前仓库：`vMAJOR.MINOR.PATCH` 必须与三处桌面版本一致，使用仓库 `GITHUB_TOKEN`
   创建 Release，不硬编码账户或依赖个人 PAT。
+- Glyphshift 自有代码使用 MIT License；根 `LICENSE`、Rust workspace、桌面 npm package 与中英文
+  README 必须保持一致。首个公开仓库位于 `Yuelioi/glyphshift`，首个 tag 使用桌面版本 `v0.2.0`。
