@@ -16,14 +16,16 @@ package 已统一声明 MIT，并新增根 `LICENSE`。`v*` tag push 会校验�
 当前仓库 `GITHUB_TOKEN` 创建 GitHub Release。
 
 本机原始截图与证据已在知识提炼后清理，未加入 README，也未进入跟踪文档。原 README 引用的两个
-预览文件当前不存在，因此引用已移除，避免发布后出现破图。GitHub CLI 已登录 `Yuelioi`；目标仓库
-尚不存在，桌面三处版本一致为 `0.2.0`，本地与远端均没有既有 tag。发布前 Playwright 合同、全仓
-Rust 测试、Unity 静态合同和正式 NSIS Release 构建均通过；当前只待提交、双轴审查和远端发布验收。
+预览文件当前不存在，因此引用已移除，避免发布后出现破图。GitHub CLI 已认证为目标个人账号；目标
+仓库尚不存在，桌面三处版本一致为 `0.2.0`，本地与远端均没有既有 tag。发布前 Playwright 合同、
+全仓 Rust 测试、Unity 静态合同和正式 NSIS Release 构建均通过；当前只待修正提交、复审和远端发布
+验收。`nanoid` 锁定到修复 GHSA-2v37-7h3g-55p8 的 `3.3.18` 后，`npm audit` 已无 high/critical；仍有
+一个仅影响本地开发服务器的 low 级 `esbuild` 告警。
 
 ## Next
 
-按[执行计划](plan.md)完成本地 Release 构建与发布门禁；通过后提交当前改动，审查相对发布前 `HEAD`
-的完整 diff，再创建 `Yuelioi/glyphshift`、push `main` 与 `v0.2.0` 并监控 GitHub Release。
+按[执行计划](plan.md)提交发布前审查修正并复审相对发布前 `HEAD` 的完整 diff；通过后创建个人
+`glyphshift` 仓库、push `main` 与 `v0.2.0` 并监控 GitHub Release。
 
 ## Progress
 
@@ -39,6 +41,8 @@ Rust 测试、Unity 静态合同和正式 NSIS Release 构建均通过；当前�
 - 用户最终选择 MIT；已补齐标准许可证文件及中英文 README、npm package 元数据。
 - 发布前门禁已通过：Playwright 发布合同 4/4、AI 配置定向回归 3/3、全仓 Rust 测试退出码 0、Unity
   静态合同通过；正式构建的 9 个 Runtime Adapter 通过生产加载器校验并生成唯一 NSIS 安装包。
+- 发布前依赖审计将传递依赖 `nanoid` 从 `3.3.16` 锁定到 `3.3.18`，消除一个 high 级告警；剩余一个
+  low 级 `esbuild` 本地开发服务器告警，不影响打包后的桌面应用。
 
 ## References
 

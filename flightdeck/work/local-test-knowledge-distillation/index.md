@@ -9,10 +9,10 @@ Status: Finished
 
 ## Current
 
-本机实验已经完成脱敏审读和逐族判定，完整研究稿与跨任务 Knowledge 均已落盘。`local-test/` 已从
-构建、Runtime、第三方源码、授权输入和原始证据混合区收敛为 26 个最小源码/控制文件；浏览器 profile
-与其他敏感运行状态已删除。整个 `target/` 已删除，后续 IL2CPP negative harness 也已改写到根
-`local-test/evidence/`，不会再次创建旧的本机测试根。
+本机实验已经完成脱敏审读和逐族判定，脱敏研究稿与跨任务 Knowledge 均已落盘。`local-test/` 已从
+构建、Runtime、第三方源码、授权输入和原始证据混合区收敛为最小手写源码集；浏览器 profile 与其他
+敏感运行状态已删除。整个 `target/` 已删除，后续 IL2CPP negative harness 也已改写为使用仓库统一的
+本机证据根，不会再次创建旧的本机测试根。
 
 白名单、生成目录、PowerShell 语法、Unity 静态合同、Markdown 链接、Git ignore、staged/tracked 路径和
 隐私模式扫描均通过；没有运行全仓测试，也没有重建桌面 App。
@@ -29,8 +29,7 @@ None.
   边界、tracked 对照和最小源码白名单。
 - 将跨任务复用的 Adapter 晋级门槛与实现约束提升为
   [项目 Knowledge](../../knowledge/rendering/runtime-text-adapter-validation.md)。
-- 删除 Cargo 报告的 190,300 个 `target/` 文件及全部本机生成物；`local-test/` 最终仅余 26 个文件、
-  约 138 KiB。
+- 删除整个 `target/` 及全部本机生成物；`local-test/` 最终只保留有独立复现价值的手写源码和控制文件。
 - 修复 Unity IL2CPP negative harness 的旧证据根，并通过 `-ValidateOnly` 静态合同。
 
 ## References
