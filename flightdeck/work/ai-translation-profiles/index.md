@@ -53,6 +53,8 @@ None
 - 修复 Dictionary 与 Probe 的 AI 终态通知只有“重试剩余”而无法关闭的问题；显式“关闭”动作会
   清除通知与终态批次详情，同时保留已完成译文。AI Playwright 10 项、Probe Playwright 17 项、
   生产构建与界面机械检测通过。
+- 删除 Profile 已确认自动清除 Windows Credential Manager 中的对应凭据；编辑表单移除了会制造残缺
+  Profile 的“删除已保存的凭据”复选框，并补充前后端回归。
 
 ## References
 

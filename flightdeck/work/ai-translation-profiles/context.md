@@ -34,6 +34,8 @@
 - 首批实现 OpenAI Responses、OpenAI Chat Completions、OpenAI-compatible、Anthropic Messages、
   Gemini generateContent 与 Ollama native；Azure OpenAI 预留数据形状、第二阶段实现。
 - API 凭据使用 Windows Credential Manager；Profile 仅保存不可逆的凭据引用和是否已配置状态。
+- 编辑 Profile 时 API Key 留空表示保留、填写表示替换；删除 Profile 会自动删除对应系统凭据。普通
+  编辑表单不提供单独清除凭据的开关，避免保留必然无法工作的残缺 Profile。
 
 ## 已收敛建议
 

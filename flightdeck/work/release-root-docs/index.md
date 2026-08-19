@@ -10,9 +10,9 @@ Status: Open
 
 ## Current
 
-AGENTS 已增加经用户确认且通过隐私检查的发布截图窄例外。CONTEXT 已收敛为无实现细节的领域 glossary；PRODUCT 已按定位、用户成功路径、
-产品表面、承诺和边界重写；DESIGN 已从当前 token 与共享组件重建为标准八段格式，并同步设计面板
-sidecar。中英文 README 已完成用户导向内容，但暂不引用截图。
+AGENTS 已增加经用户确认且通过隐私检查的发布截图窄例外。CONTEXT、PRODUCT 与 DESIGN 已收敛；
+中英文 README 已完成用户导向内容并明确支持任意源语言与目标语言，当前仍暂不引用截图。`v*` tag
+push 会校验版本、构建 Windows NSIS，并用当前仓库 `GITHUB_TOKEN` 创建 GitHub Release。
 
 当前仅有的 AE/探针截图包含真实安装路径，已移入 `local-test/evidence/`，未加入 README，也未进入
 跟踪文档。原 README 引用的两个预览文件当前不存在，因此引用已移除，避免发布后出现破图。
@@ -28,6 +28,10 @@ sidecar。中英文 README 已完成用户导向内容，但暂不引用截图�
 - 已重写 CONTEXT、PRODUCT 与 DESIGN，并同步 `.impeccable/design.json`。
 - README 当前不引用截图；一张含真实路径的截图已移入本机证据区，等待最终匿名截图后再编排。
 - 根文档内容合同 2/2 通过，6 份根 Markdown 隐私扫描为 0，JSON 与差异检查通过。
+- 用户确认产品不只面向中文；README 与 PRODUCT 已改为任意源语言到任意目标语言。
+- 已新增当前仓库 tag push 自动构建、校验并发布 Windows NSIS 的 GitHub Actions workflow。
+- workflow YAML、tag 与三处版本合同、发布内容测试和安全扫描通过；本机完整 Release 已生成唯一 NSIS，
+  9 个 Runtime Adapter 通过生产加载器校验，安装包哈希与候选清单一致。
 
 ## References
 

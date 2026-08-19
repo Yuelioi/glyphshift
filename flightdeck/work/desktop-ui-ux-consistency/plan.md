@@ -7,6 +7,8 @@
   - [x] [Probe 任务动作与临时命名](slices/probe-task-actions-and-naming.md)
   - [x] [Help 任务入口与全局键盘语义](slices/help-and-keyboard-semantics.md)
 - [x] 4. 用定向 Playwright、生产构建、可访问性/反模式检查和代表性桌面实机复核完成收口。
+- [x] 5. 系统调查并重写面向普通用户的中英文产品文案，建立术语与消息合同后统一验证。
+- [x] 6. 删除不提供新信息的页头、分区和字段说明，并让共享组件自然收起空白说明位。
 
 ## Acceptance
 
