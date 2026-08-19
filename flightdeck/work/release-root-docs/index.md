@@ -16,16 +16,19 @@ package 已统一声明 MIT，并新增根 `LICENSE`。`v*` tag push 会校验�
 当前仓库 `GITHUB_TOKEN` 创建 GitHub Release。
 
 本机原始截图与证据已在知识提炼后清理，未加入 README，也未进入跟踪文档。原 README 引用的两个
-预览文件当前不存在，因此引用已移除，避免发布后出现破图。GitHub CLI 已认证为目标个人账号；目标
-仓库尚不存在，桌面三处版本一致为 `0.2.0`，本地与远端均没有既有 tag。发布前 Playwright 合同、
-全仓 Rust 测试、Unity 静态合同和正式 NSIS Release 构建均通过；当前只待修正提交、复审和远端发布
-验收。`nanoid` 锁定到修复 GHSA-2v37-7h3g-55p8 的 `3.3.18` 后，`npm audit` 已无 high/critical；仍有
-一个仅影响本地开发服务器的 low 级 `esbuild` 告警。
+预览文件当前不存在，因此引用已移除，避免发布后出现破图。公开个人仓库已创建，`main` 与 annotated
+tag `v0.2.0` 已推送；GitHub Actions 完成版本校验、Windows NSIS 构建和 Release 发布。公开 Release
+包含安装包、候选清单与 SHA-256 文件，下载后交叉校验一致，并已成为 latest release。
+
+发布前 Playwright 合同、全仓 Rust 测试、Unity 静态合同、正式 NSIS Release 构建和双轴审查均通过。
+`nanoid` 锁定到修复 GHSA-2v37-7h3g-55p8 的 `3.3.18` 后，`npm audit` 已无 high/critical；仍有一个仅
+影响本地开发服务器的 low 级 `esbuild` 告警。安装包当前未签名，Actions 另有 `actions/cache@v4`
+旧 Node 运行时被 runner 兼容执行的非阻塞注解。
 
 ## Next
 
-按[执行计划](plan.md)提交发布前审查修正并复审相对发布前 `HEAD` 的完整 diff；通过后创建个人
-`glyphshift` 仓库、push `main` 与 `v0.2.0` 并监控 GitHub Release。
+等待用户后续提供最终匿名截图；收到后先做隐私检查，再同步加入中英文 README。当前公开 Release
+无需移动或重建 tag。
 
 ## Progress
 
@@ -43,6 +46,10 @@ package 已统一声明 MIT，并新增根 `LICENSE`。`v*` tag push 会校验�
   静态合同通过；正式构建的 9 个 Runtime Adapter 通过生产加载器校验并生成唯一 NSIS 安装包。
 - 发布前依赖审计将传递依赖 `nanoid` 从 `3.3.16` 锁定到 `3.3.18`，消除一个 high 级告警；剩余一个
   low 级 `esbuild` 本地开发服务器告警，不影响打包后的桌面应用。
+- 双轴审查最终为 Standards 0 hard / 0 judgement、Spec 0 finding；隐私问题与 Flightdeck 自洽问题均已
+  在 tag 前修正。
+- 已创建公开个人仓库并推送 `main` 与 annotated tag `v0.2.0`；GitHub Actions Release job 全部通过，
+  三个发布资产齐全，安装包 SHA-256 与校验文件及候选清单一致。
 
 ## References
 

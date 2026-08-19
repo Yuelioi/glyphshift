@@ -14,6 +14,7 @@
 - tag 发布属于当前仓库：`vMAJOR.MINOR.PATCH` 必须与三处桌面版本一致，使用仓库 `GITHUB_TOKEN`
   创建 Release，不硬编码账户或依赖个人 PAT。
 - Glyphshift 自有代码使用 MIT License；根 `LICENSE`、Rust workspace、桌面 npm package 与中英文
-  README 必须保持一致。首个公开仓库由当前用户的个人账号拥有，首个 tag 使用桌面版本 `v0.2.0`。
+  README 必须保持一致。首个公开仓库由当前用户的个人账号拥有，首个 tag `v0.2.0` 已发布并保留
+  安装包、候选清单和 SHA-256 校验文件。
 - 首个公开 tag 不携带 `npm audit` high/critical 告警；允许在既有 semver 范围内更新传递依赖锁版本以
   消除发布阻塞的安全告警，并记录剩余低风险。
