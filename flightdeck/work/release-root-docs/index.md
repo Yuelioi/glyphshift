@@ -25,10 +25,13 @@ tag `v0.2.0` 已推送；GitHub Actions 完成版本校验、Windows NSIS 构建
 影响本地开发服务器的 low 级 `esbuild` 告警。安装包当前未签名，Actions 另有 `actions/cache@v4`
 旧 Node 运行时被 runner 兼容执行的非阻塞注解。
 
+`v0.2.1` 可靠性更新已完成版本同步、正式 NSIS 候选构建与提交；annotated tag 指向发布提交并已与
+`main` 原子推送。GitHub Release 工作流已接单，当前仍在执行 Windows 构建与发布。
+
 ## Next
 
-等待用户后续提供最终匿名截图；收到后先做隐私检查，再同步加入中英文 README。当前公开 Release
-无需移动或重建 tag。
+等待 `v0.2.1` GitHub Release 工作流结束并核对三个发布资产；之后继续等待用户提供最终匿名截图，
+收到后先做隐私检查，再同步加入中英文 README。已推送的 tag 不移动或重建。
 
 ## Progress
 
@@ -50,6 +53,8 @@ tag `v0.2.0` 已推送；GitHub Actions 完成版本校验、Windows NSIS 构建
   在 tag 前修正。
 - 已创建公开个人仓库并推送 `main` 与 annotated tag `v0.2.0`；GitHub Actions Release job 全部通过，
   三个发布资产齐全，安装包 SHA-256 与校验文件及候选清单一致。
+- 已将桌面版本同步到 `0.2.1`，正式候选的 9 个 Runtime Adapter 通过生产加载器校验；发布提交、
+  `main` 与 annotated tag `v0.2.1` 已推送，GitHub Release 工作流正在执行。
 
 ## References
 
