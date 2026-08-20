@@ -338,7 +338,8 @@ fn acquire_selection(
 }
 
 #[test]
-fn uia_acquisition_worker_reads_point_control_word_and_multiline_text_range() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_acquisition_worker_reads_point_control_word_and_multiline_text_range() {
     let mut target = StandardControlTarget::start();
     let geometry = target.interactive_geometry();
     let binding = acquisition_binding(&target);
@@ -394,7 +395,8 @@ fn uia_acquisition_worker_reads_point_control_word_and_multiline_text_range() {
 }
 
 #[test]
-fn uia_acquisition_worker_times_out_a_blocked_provider_and_rejects_an_exited_target() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_acquisition_worker_times_out_a_blocked_provider_and_rejects_an_exited_target() {
     let mut target = StandardControlTarget::start();
     let geometry = target.interactive_geometry();
     let binding = acquisition_binding(&target);
@@ -421,7 +423,8 @@ fn uia_acquisition_worker_times_out_a_blocked_provider_and_rejects_an_exited_tar
 }
 
 #[test]
-fn uia_worker_observes_standard_controls_and_rejects_password_text() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_worker_observes_standard_controls_and_rejects_password_text() {
     let root = tempdir().expect("temporary capture root");
     let output = root.path().join("windows-uia-capture.json");
     let sink = FileCaptureSink::start(
@@ -489,7 +492,8 @@ fn uia_worker_observes_standard_controls_and_rejects_password_text() {
 }
 
 #[test]
-fn uia_worker_recovers_after_the_target_recreates_its_window_tree() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_worker_recovers_after_the_target_recreates_its_window_tree() {
     let root = tempdir().expect("temporary capture root");
     let output = root.path().join("windows-uia-recreation.json");
     let sink = FileCaptureSink::start(
@@ -547,7 +551,8 @@ fn uia_worker_recovers_after_the_target_recreates_its_window_tree() {
 }
 
 #[test]
-fn uia_worker_timeout_releases_a_blocked_provider_and_reconnects() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_worker_timeout_releases_a_blocked_provider_and_reconnects() {
     let root = tempdir().expect("temporary capture root");
     let output = root.path().join("windows-uia-provider-block.json");
     let sink = FileCaptureSink::start(
@@ -595,8 +600,8 @@ fn uia_worker_timeout_releases_a_blocked_provider_and_reconnects() {
 }
 
 #[test]
-#[ignore = "requires an explicitly authorized running Windows target process"]
-fn authorized_windows_target_exposes_useful_uia_text_without_modification() {
+#[ignore = "archive-only UIA; also requires an explicitly authorized running Windows target"]
+fn archive_uia_authorized_windows_target_exposes_useful_text_without_modification() {
     let process_id = std::env::var("GLYPHSHIFT_UIA_TARGET_PID")
         .ok()
         .and_then(|value| value.parse::<u32>().ok())
@@ -665,8 +670,8 @@ fn authorized_windows_target_exposes_useful_uia_text_without_modification() {
 }
 
 #[test]
-#[ignore = "requires an explicitly authorized elevated synthetic target process"]
-fn high_integrity_target_fails_closed_before_partial_observation() {
+#[ignore = "archive-only UIA; also requires an explicitly authorized elevated synthetic target"]
+fn archive_uia_high_integrity_target_fails_closed_before_partial_observation() {
     let process_id = std::env::var("GLYPHSHIFT_UIA_HIGH_INTEGRITY_TARGET_PID")
         .ok()
         .and_then(|value| value.parse::<u32>().ok())

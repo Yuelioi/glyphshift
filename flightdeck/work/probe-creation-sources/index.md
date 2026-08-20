@@ -25,8 +25,8 @@ Dictionary 完整元数据四个相关场景均通过。既有 Rust 定向门禁
   “已有 / 临时”只属于创建输入，不改变运行时模型。
 - 当前程序来源在用户明确捕获后产生短期 preflight；若路径已在 Software Library 中则复用，否则创建
   有显式 ownership 的临时 Software。
-- 临时 Dictionary 不要求用户命名。系统根据目标显示名生成名称，源语言默认 `auto`，目标语言使用
-  当前创建设置；用户保留后它就是普通 Dictionary。
+- 临时 Dictionary 不要求用户命名。系统根据目标显示名生成名称，创建器明确要求源语言与目标语言，
+  默认 `en-US → zh-CN`；用户保留后它就是普通 Dictionary。
 - 任一临时资产存在时，Probe 显示“临时”状态并提供“保留 / 结束并清理”；全部引用资料库资产时就是
   普通 Probe，不制造无意义的临时会话。
 - OCR 与交互式取词降为最后阶段 fallback，不占用本 Work。
@@ -72,3 +72,5 @@ None.
   风险保留给测试启动链路修复，不阻塞当前功能 checkpoint。
 - 最终清理时修正两条已经落后于产品决策的 Playwright 断言：Software 页头只保留单一入口，Dictionary
   发布版本与作者分别使用三段数字和标签组件；连同两条 Probe 场景，四个相关页面合同均通过。
+- 后续“探针语言方向”Work 删除了无检测能力支撑的源语言 `auto`：临时词典创建器与请求合同改为显式
+  `sourceLocale → targetLocale`，既有 Dictionary 复用语义不变。

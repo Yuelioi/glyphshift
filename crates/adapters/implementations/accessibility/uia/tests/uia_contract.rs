@@ -13,7 +13,8 @@ fn observed(outcome: UiaObservationOutcome) -> glyphshift_adapter_uia::UiaTextOb
 }
 
 #[test]
-fn uia_001_descriptor_is_an_observe_only_isolated_worker() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_001_descriptor_is_an_observe_only_isolated_worker() {
     let descriptor = descriptor();
     assert_eq!(descriptor.adapter_id().as_str(), ADAPTER_ID);
     assert_eq!(descriptor.version(), AdapterVersion::new(1, 0, 0));
@@ -26,7 +27,8 @@ fn uia_001_descriptor_is_an_observe_only_isolated_worker() {
 }
 
 #[test]
-fn uia_002_selects_one_primary_channel_per_element() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_002_selects_one_primary_channel_per_element() {
     let mut observer = UiaObserver::default();
     let label = observed(observer.observe(UiaElementSnapshot::new("label").with_name("Open")));
     let document = observed(
@@ -53,7 +55,8 @@ fn uia_002_selects_one_primary_channel_per_element() {
 }
 
 #[test]
-fn uia_003_rejects_password_empty_invalid_and_excessive_text() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_003_rejects_password_empty_invalid_and_excessive_text() {
     let mut observer = UiaObserver::default();
     let cases = [
         (
@@ -84,7 +87,8 @@ fn uia_003_rejects_password_empty_invalid_and_excessive_text() {
 }
 
 #[test]
-fn uia_004_emits_changes_including_a_to_b_to_a_but_not_duplicates() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_004_emits_changes_including_a_to_b_to_a_but_not_duplicates() {
     let mut observer = UiaObserver::default();
     assert!(matches!(
         observer.observe(UiaElementSnapshot::new("field").with_value("A")),
@@ -105,7 +109,8 @@ fn uia_004_emits_changes_including_a_to_b_to_a_but_not_duplicates() {
 }
 
 #[test]
-fn uia_005_invalidation_allows_a_recreated_element_to_emit_again() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_005_invalidation_allows_a_recreated_element_to_emit_again() {
     let mut observer = UiaObserver::default();
     let snapshot = || UiaElementSnapshot::new("recreated").with_name("Open");
     assert!(matches!(

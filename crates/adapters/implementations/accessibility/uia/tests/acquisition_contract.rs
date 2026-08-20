@@ -46,7 +46,8 @@ fn acquire(
 }
 
 #[test]
-fn uia_acquisition_001_point_returns_a_word_and_its_virtual_desktop_anchor() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_acquisition_001_point_returns_a_word_and_its_virtual_desktop_anchor() {
     let word_anchor = rect(-310, 120, -246, 148);
     let result = acquire(
         InteractiveSelection::Point(DesktopPoint::new(-280, 132)),
@@ -66,7 +67,8 @@ fn uia_acquisition_001_point_returns_a_word_and_its_virtual_desktop_anchor() {
 }
 
 #[test]
-fn uia_acquisition_002_text_range_preserves_multiple_display_line_anchors() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_acquisition_002_text_range_preserves_multiple_display_line_anchors() {
     let first_line = rect(200, 300, 410, 326);
     let second_line = rect(200, 326, 355, 352);
     let result = acquire(
@@ -88,7 +90,8 @@ fn uia_acquisition_002_text_range_preserves_multiple_display_line_anchors() {
 }
 
 #[test]
-fn uia_acquisition_003_name_only_element_degrades_explicitly_to_control() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_acquisition_003_name_only_element_degrades_explicitly_to_control() {
     let control_anchor = rect(40, 50, 180, 86);
     let result = acquire(
         InteractiveSelection::Point(DesktopPoint::new(70, 66)),
@@ -102,7 +105,8 @@ fn uia_acquisition_003_name_only_element_degrades_explicitly_to_control() {
 }
 
 #[test]
-fn uia_acquisition_004_password_and_cross_target_snapshots_fail_closed() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_acquisition_004_password_and_cross_target_snapshots_fail_closed() {
     let password = acquire(
         InteractiveSelection::Point(DesktopPoint::new(1, 1)),
         UiaAcquisitionSnapshot::new(target("target-a"))
@@ -120,7 +124,8 @@ fn uia_acquisition_004_password_and_cross_target_snapshots_fail_closed() {
 }
 
 #[test]
-fn uia_acquisition_005_region_is_not_silently_promoted_to_a_point_query() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_acquisition_005_region_is_not_silently_promoted_to_a_point_query() {
     let result = acquire(
         InteractiveSelection::Region(rect(0, 0, 100, 100)),
         UiaAcquisitionSnapshot::new(target("target-a")).with_name("ignored", rect(0, 0, 100, 100)),
@@ -130,7 +135,8 @@ fn uia_acquisition_005_region_is_not_silently_promoted_to_a_point_query() {
 }
 
 #[test]
-fn uia_acquisition_006_text_range_without_text_pattern_does_not_degrade_to_a_control() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_acquisition_006_text_range_without_text_pattern_does_not_degrade_to_a_control() {
     let result = acquire(
         InteractiveSelection::TextRange {
             start: DesktopPoint::new(10, 10),
@@ -144,7 +150,8 @@ fn uia_acquisition_006_text_range_without_text_pattern_does_not_degrade_to_a_con
 }
 
 #[test]
-fn uia_acquisition_007_rejects_a_point_snapshot_with_stale_geometry() {
+#[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+fn archive_uia_acquisition_007_rejects_a_point_snapshot_with_stale_geometry() {
     let stale_point = acquire(
         InteractiveSelection::Point(DesktopPoint::new(200, 200)),
         UiaAcquisitionSnapshot::new(target("target-a")).with_text(

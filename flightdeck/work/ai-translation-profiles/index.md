@@ -27,7 +27,7 @@ None
 - Dictionary 已升级为 `/3`：pending 条目可保存，Runtime 与 Probe 发布快照只包含 completed 条目。
 - `AiTranslation` 已覆盖 OpenAI Responses、OpenAI Chat、OpenAI-compatible、Anthropic Messages、
   Gemini generateContent 与 Ollama native，并统一处理批次、重试、取消、结构与占位符校验。
-- Settings 已提供多 Profile 管理、系统凭据保存和分阶段连接测试；Dictionary 与 Probe 已提供只补空白、
+- Settings 已提供多 Profile 管理、明文 Key 保存/显示和分阶段连接测试；Dictionary 与 Probe 已提供只补空白、
   过滤预览、进度、取消及 compare-and-set 写回。
 - 相关 Rust 回归全部通过：AI 11 项、Capture 17 项、Desktop Backend 9 项、Desktop Shell 70 项、
   Dictionary 5 项；架构合同通过。
@@ -53,8 +53,9 @@ None
 - 修复 Dictionary 与 Probe 的 AI 终态通知只有“重试剩余”而无法关闭的问题；显式“关闭”动作会
   清除通知与终态批次详情，同时保留已完成译文。AI Playwright 10 项、Probe Playwright 17 项、
   生产构建与界面机械检测通过。
-- 删除 Profile 已确认自动清除 Windows Credential Manager 中的对应凭据；编辑表单移除了会制造残缺
-  Profile 的“删除已保存的凭据”复选框，并补充前后端回归。
+- 后续按用户明确选择把 Key 保存到 Profile `/4` 明文字段；编辑表单支持显示/隐藏，删除 Profile 直接删除
+  同一 artifact 中的 Key。
+- 首次发布前的存储清理已移除系统凭据和 schema 迁移代码；Profile 只保留当前明文 artifact 读写。
 
 ## References
 

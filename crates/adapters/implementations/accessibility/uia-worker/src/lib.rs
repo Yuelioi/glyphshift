@@ -743,7 +743,8 @@ mod windows_worker {
         use super::*;
 
         #[test]
-        fn access_denied_has_a_stable_permission_reason() {
+        #[ignore = "archive-only UIA; run explicitly with archive_uia_ and --ignored"]
+        fn archive_uia_access_denied_has_a_stable_permission_reason() {
             let denied = windows::core::Error::from_hresult(E_ACCESSDENIED);
             let unavailable =
                 windows::core::Error::from_hresult(windows::core::HRESULT(0x8000_4005_u32 as i32));

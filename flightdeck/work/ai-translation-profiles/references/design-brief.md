@@ -25,7 +25,9 @@ Status: Implemented
 
 连接测试分开报告网络/认证、模型发现、模型调用和结构化输出，避免一个兼容端点没有 `/models` 就被误判为完全不可用。会产生模型调用费用的探测必须显式标注。
 
-凭据推荐保存到 Windows Credential Manager。Profile 只持久化 `secret_ref` 和 `has_credential`，界面、日志、导出与错误信息都不能读回或显示明文密钥。本机 loopback HTTP 可用于无密钥 Ollama；远程明文 HTTP 必须明确警告，携带密钥时默认禁止。
+该初版凭据建议已被后续用户决策替代：API Key 随 Profile `/4` 明文保存在本机配置文件中，编辑界面默认
+遮蔽并支持显式显示。日志、任务记录、词典和错误信息仍不得复制 Key。本机 loopback HTTP 可用于无密钥
+Ollama；远程明文 HTTP 携带 Key 时继续拒绝。
 
 ### Dictionary / Probe 的一键入口
 

@@ -11,6 +11,8 @@
 - Quick Probe 命令按可执行路径复用/创建 Software，始终创建系统命名的临时 Dictionary，并自动选择
   兼容 Adapter；ownership ledger 已覆盖失败补偿、保留、引用保护和崩溃恢复。
 - Vue 不能通过多个已有 command 自行模拟原子创建；临时资产的所有权必须由 Desktop 单一 Module 落盘。
+- 临时 Dictionary 的 `sourceLocale` 与 `targetLocale` 都由用户显式选择并进入同一个原子创建请求；没有
+  可靠检测能力时不使用 `auto` 代替源语言。
 
 ## Constraints
 

@@ -19,7 +19,8 @@ Status: Finished
 
 1. [x] Red → green：pending Dictionary 可保存、加载，但不会编译进 Translation Snapshot。
 2. [x] Red → green：过滤规划只选择空白译文，并给每个跳过项稳定原因。
-3. [x] Red → green：Profile 元数据存储不持久化明文密钥，凭据通过系统 Adapter 引用。
+3. [x] 初版 Red → green：Profile 元数据通过系统 Adapter 引用凭据；该决策后续已由用户明确改为
+   Profile `/4` 明文 Key，并由当前发行修复 Work 接管迁移与回归。
 4. [x] Red → green：一个合成 Provider 完成小批任务、结构校验、取消与迟到结果丢弃。
 5. [x] 接入首个 HTTP Adapter，并为六种协议建立独立 codec 合同。
 6. [x] 接入桌面后端命令，运行本 Slice 的定向 Rust 回归。
