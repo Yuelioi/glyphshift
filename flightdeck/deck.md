@@ -2,7 +2,8 @@
 
 ## Open Work
 
-- **Focus** [AE 临时界面观测丢失](work/ae-transient-observation-loss/index.md)
+- **Focus** [游戏文字适配器](work/game-text-adapters/index.md)
+- [AE 临时界面观测丢失](work/ae-transient-observation-loss/index.md)
 - [发布根文档对齐](work/release-root-docs/index.md)
 
 ## Project links
