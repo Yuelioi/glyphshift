@@ -27,11 +27,15 @@ tag `v0.2.0` 已推送；GitHub Actions 完成版本校验、Windows NSIS 构建
 
 `v0.2.1` 可靠性更新的 GitHub Release 工作流已成功，安装包、候选清单与 SHA-256 三个资产均已发布。
 `v0.2.2` 已完成一级页面满宽页头、About Tab、版本同步和正式 NSIS 候选构建；annotated tag 指向发布
-提交并已与 `main` 原子推送，新一轮 GitHub Release 工作流正在执行。
+提交并已与 `main` 原子推送，GitHub Release 工作流已成功。
+
+`v0.2.3` 已同步版本，包含持续捕获的周期性落盘修复，以及审阅启动脚本显式使用原用户数据的
+选项。实机效果参数捕获和中文回写、针对性 Rust 回归、合成性能对比与发布内容测试通过，
+准备提交并推送 annotated tag，由现有工作流构建和校验 NSIS 资产。
 
 ## Next
 
-等待 `v0.2.2` GitHub Release 工作流结束并核对三个发布资产；之后继续等待用户提供最终匿名截图，
+推送 `v0.2.3` 后核对 GitHub Release 工作流和三个发布资产；之后继续等待用户提供最终匿名截图，
 收到后先做隐私检查，再同步加入中英文 README。已推送的 tag 不移动或重建。
 
 ## Progress
