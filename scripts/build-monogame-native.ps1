@@ -3,9 +3,13 @@ param([string]$OutputRoot, [switch]$Fixture)
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $localRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot 'local-test'))
-if ([string]::IsNullOrWhiteSpace($OutputRoot)) { $OutputRoot = Join-Path $localRoot 'monogame-native' }
+if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
+    . (Join-Path $PSScriptRoot 'cargo-target.ps1')
+    $OutputRoot = Join-Path (Get-GlyphshiftCargoTargetDirectory -RepoRoot $repoRoot) 'debug'
+}
 $output = [IO.Path]::GetFullPath($OutputRoot)
-if (-not $output.StartsWith($localRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) { throw 'Native build output must be below local-test.' }
+# This directory contains regenerable compiler output; Runtime evidence is staged
+# separately by build-runtime-bundle. Explicit caller output paths are supported.
 $deps = Join-Path $output 'deps'
 New-Item -ItemType Directory -Force $deps | Out-Null
 $managedProject = Join-Path $repoRoot 'crates/adapters/implementations/framework/monogame-native/managed/FontFallback.csproj'

@@ -1,0 +1,24 @@
+[package]
+name = "glyphshift-adapter-qt-quick-native"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+glyphshift-adapter-native-abi = { path = "../../../platform/native-abi" }
+glyphshift-adapter-qt-quick = { path = "../qt-quick" }
+retour = "0.3"
+
+[dependencies.windows-sys]
+version = "0.61"
+features = ["Win32_Foundation", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"]
+
+[lints.rust]
+unsafe_code = "allow"
+
+[dev-dependencies]
+libloading = "0.8"
