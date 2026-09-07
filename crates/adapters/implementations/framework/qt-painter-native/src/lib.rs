@@ -1,5 +1,7 @@
 //! Native Qt 5/6 MSVC x64 `QPainter::drawText` package.
 
+mod symbols;
+
 use glyphshift_adapter_native_abi::{
     DecideUtf16V1, NativeAdapterApiV1, NativeAdapterDescriptorV1, NativeDecisionV1,
     NativeNegotiationV1, NativeRuntimeHostV1, ARCH_X86_64, DECISION_TEXT_REPLACE,
@@ -756,7 +758,9 @@ unsafe extern "system" fn refresh_window_hook(code: i32, wparam: usize, lparam: 
 unsafe fn build_widget_refresh_hooks(
     major: u8,
     core: HMODULE,
+    namespace: symbols::Namespace,
 ) -> Result<Option<WidgetRefreshHooks>, ()> {
+    let resolve = |module, symbol| resolve(module, namespace.symbol(symbol)?);
     let widgets = match major {
         5 => GetModuleHandleW(w!("Qt5Widgets.dll")),
         6 => GetModuleHandleW(w!("Qt6Widgets.dll")),
@@ -804,6 +808,8 @@ unsafe fn build_widget_refresh_hooks(
 
 unsafe fn build_hooks() -> Result<QtHooks, ()> {
     let (major, gui, core) = loaded_qt_modules()?;
+    let namespace = symbols::Namespace::detect(major, |symbol| resolve(core, symbol).is_ok())?;
+    let resolve = |module, symbol| resolve(module, namespace.symbol(symbol)?);
     let strings = match major {
         5 => QStringApi::Qt5 {
             ctor: std::mem::transmute::<RawProc, FnQString5Ctor>(resolve(
@@ -850,7 +856,7 @@ unsafe fn build_hooks() -> Result<QtHooks, ()> {
         std::mem::transmute::<RawProc, FnDrawRectOption>(resolve(gui, DRAW_RECT_OPTION_SYMBOL)?);
     let rect_f_target =
         std::mem::transmute::<RawProc, FnDrawRect>(resolve(gui, DRAW_RECT_F_SYMBOL)?);
-    let widget_refresh = build_widget_refresh_hooks(major, core)?;
+    let widget_refresh = build_widget_refresh_hooks(major, core, namespace)?;
     Ok(QtHooks {
         strings,
         point: GenericDetour::new(point_target, draw_point_detour).map_err(|_| ())?,
