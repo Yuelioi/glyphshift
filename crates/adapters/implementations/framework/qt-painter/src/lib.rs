@@ -19,7 +19,7 @@ pub fn descriptor() -> AdapterDescriptor {
         [Feature::TextObserve, Feature::TextReplace],
     )
     .with_platforms(["windows"])
-    .with_architectures(["x86_64"])
+    .with_architectures(["x86", "x86_64"])
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

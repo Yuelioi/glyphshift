@@ -23,7 +23,7 @@ pub fn descriptor() -> AdapterDescriptor {
         [Feature::TextObserve, Feature::TextReplace],
     )
     .with_platforms(["windows"])
-    .with_architectures(["x86_64"])
+    .with_architectures(["x86", "x86_64"])
 }
 
 #[cfg(test)]
@@ -41,6 +41,9 @@ mod tests {
             [Feature::TextObserve, Feature::TextReplace]
         );
         assert_eq!(descriptor.platforms().collect::<Vec<_>>(), ["windows"]);
-        assert_eq!(descriptor.architectures().collect::<Vec<_>>(), ["x86_64"]);
+        assert_eq!(
+            descriptor.architectures().collect::<Vec<_>>(),
+            ["x86", "x86_64"]
+        );
     }
 }

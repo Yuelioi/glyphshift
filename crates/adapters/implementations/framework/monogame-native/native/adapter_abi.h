@@ -38,5 +38,5 @@ struct Api {
 static_assert(sizeof(FixedUtf8) == 98);
 static_assert(sizeof(Descriptor) == 136);
 static_assert(sizeof(Decision) == 32);
-static_assert(sizeof(Host) == 32);
-static_assert(sizeof(Api) == 176);
+static_assert(sizeof(Host) == (sizeof(void*) == 8 ? 32 : 16));
+static_assert(sizeof(Api) == (sizeof(void*) == 8 ? 176 : 160));

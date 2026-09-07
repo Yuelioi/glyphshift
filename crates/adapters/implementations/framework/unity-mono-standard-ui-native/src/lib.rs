@@ -1,8 +1,6 @@
-//! Native runtime gate and observe-only Unity Mono standard-UI adapter
-//! prototype.
-//!
-//! The crate builds a callable native adapter for focused validation, but is
-//! deliberately absent from the production Catalog and Runtime Bundle.
+//! Windows x86/x64 Unity Mono standard-UI observation and retained-text replacement.
+//! Activation requires the public Mono exports, recognized standard UI metadata,
+//! a live object snapshot, and main-thread dispatch; IL2CPP is a different backend.
 
 mod late_attach;
 mod native_adapter;
@@ -74,8 +72,11 @@ const fn required_export(name: &'static str, nul_terminated: &'static [u8]) -> R
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum HostPlatform {
-    WindowsX64,
-    #[cfg(any(test, all(windows, not(target_arch = "x86_64"))))]
+    WindowsX86Family,
+    #[cfg(any(
+        test,
+        all(windows, not(any(target_arch = "x86", target_arch = "x86_64")))
+    ))]
     WindowsOther,
     #[cfg(any(test, not(windows)))]
     Other,
@@ -139,8 +140,11 @@ pub enum RuntimeGateError {
 
 fn inspect_with(source: &impl RuntimeSource) -> Result<MonoRuntimeGate, RuntimeGateError> {
     match source.platform() {
-        HostPlatform::WindowsX64 => {}
-        #[cfg(any(test, all(windows, not(target_arch = "x86_64"))))]
+        HostPlatform::WindowsX86Family => {}
+        #[cfg(any(
+            test,
+            all(windows, not(any(target_arch = "x86", target_arch = "x86_64")))
+        ))]
         HostPlatform::WindowsOther => return Err(RuntimeGateError::UnsupportedArchitecture),
         #[cfg(any(test, not(windows)))]
         HostPlatform::Other => return Err(RuntimeGateError::UnsupportedPlatform),
@@ -170,11 +174,11 @@ impl RuntimeSource for CurrentProcessRuntime {
     type Module = CurrentModule;
 
     fn platform(&self) -> HostPlatform {
-        #[cfg(all(windows, target_arch = "x86_64"))]
+        #[cfg(all(windows, any(target_arch = "x86", target_arch = "x86_64")))]
         {
-            HostPlatform::WindowsX64
+            HostPlatform::WindowsX86Family
         }
-        #[cfg(all(windows, not(target_arch = "x86_64")))]
+        #[cfg(all(windows, not(any(target_arch = "x86", target_arch = "x86_64"))))]
         {
             HostPlatform::WindowsOther
         }
@@ -257,7 +261,7 @@ mod tests {
     impl FakeRuntime {
         fn compatible() -> Self {
             Self {
-                platform: HostPlatform::WindowsX64,
+                platform: HostPlatform::WindowsX86Family,
                 mono: true,
                 il2cpp: false,
                 exports: REQUIRED_EXPORTS
@@ -295,7 +299,7 @@ mod tests {
     }
 
     #[test]
-    fn accepts_windows_x64_mono_with_the_complete_common_contract() {
+    fn accepts_windows_x86_family_mono_with_the_complete_common_contract() {
         let gate = inspect_with(&FakeRuntime::compatible()).expect("runtime should pass");
 
         assert_eq!(gate.resolved_export_count(), REQUIRED_EXPORTS.len());

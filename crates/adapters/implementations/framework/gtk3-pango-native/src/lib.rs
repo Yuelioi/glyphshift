@@ -3,7 +3,7 @@
 use glyphshift_adapter_gtk3_pango::ADAPTER_ID;
 use glyphshift_adapter_native_abi::{
     DecideUtf16V1, NativeAdapterApiV1, NativeAdapterDescriptorV1, NativeDecisionV1,
-    NativeNegotiationV1, NativeRuntimeHostV1, ARCH_X86_64, DECISION_TEXT_REPLACE,
+    NativeNegotiationV1, NativeRuntimeHostV1, ARCH_X86, ARCH_X86_64, DECISION_TEXT_REPLACE,
     FEATURE_TEXT_OBSERVE, FEATURE_TEXT_REPLACE, PLATFORM_WINDOWS, STATUS_ACTIVATION_FAILED,
     STATUS_INVALID_HOST, STATUS_OK, STATUS_UNAUTHORIZED_FEATURE, STATUS_UNSUPPORTED_FEATURE,
 };
@@ -408,7 +408,7 @@ pub extern "C" fn glyphshift_adapter_entry_v1() -> NativeAdapterApiV1 {
             (1, 0, 0),
             SUPPORTED_FEATURES,
             PLATFORM_WINDOWS,
-            ARCH_X86_64,
+            ARCH_X86 | ARCH_X86_64,
         ),
         negotiate_features,
         activate,

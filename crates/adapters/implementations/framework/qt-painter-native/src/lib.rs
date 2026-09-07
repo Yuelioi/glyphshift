@@ -1,10 +1,10 @@
-//! Native Qt 5/6 MSVC x64 `QPainter::drawText` package.
+//! Native Qt 5 MSVC x86/x64 and Qt 6 MSVC x64 `QPainter::drawText` package.
 
 mod symbols;
 
 use glyphshift_adapter_native_abi::{
     DecideUtf16V1, NativeAdapterApiV1, NativeAdapterDescriptorV1, NativeDecisionV1,
-    NativeNegotiationV1, NativeRuntimeHostV1, ARCH_X86_64, DECISION_TEXT_REPLACE,
+    NativeNegotiationV1, NativeRuntimeHostV1, ARCH_X86, ARCH_X86_64, DECISION_TEXT_REPLACE,
     FEATURE_TEXT_OBSERVE, FEATURE_TEXT_REPLACE, PLATFORM_WINDOWS, STATUS_ACTIVATION_FAILED,
     STATUS_INVALID_HOST, STATUS_OK, STATUS_UNAUTHORIZED_FEATURE, STATUS_UNSUPPORTED_FEATURE,
 };
@@ -43,22 +43,12 @@ const MAX_WIDGETS: usize = 100_000;
 const REFRESH_MESSAGE_WPARAM: usize = 0x4753_5257;
 
 type RawProc = unsafe extern "system" fn() -> isize;
-type FnDrawPoint = unsafe extern "system" fn(*mut c_void, *const c_void, *const c_void, i32, i32);
-type FnDrawRect =
-    unsafe extern "system" fn(*mut c_void, *const c_void, i32, *const c_void, *mut c_void);
-type FnDrawRectOption =
-    unsafe extern "system" fn(*mut c_void, *const c_void, *const c_void, *const c_void);
-type FnQString5Ctor = unsafe extern "system" fn(*mut c_void, *const u16, i32) -> *mut c_void;
-type FnQString6Ctor = unsafe extern "system" fn(*mut c_void, *const u16, i64) -> *mut c_void;
-type FnQStringDtor = unsafe extern "system" fn(*mut c_void);
-type FnQString5Size = unsafe extern "system" fn(*const c_void) -> i32;
-type FnQString6Size = unsafe extern "system" fn(*const c_void) -> i64;
-type FnQStringUtf16 = unsafe extern "system" fn(*const c_void) -> *const u16;
-type FnQWidgetFind = unsafe extern "system" fn(u64) -> *mut c_void;
-type FnQWidgetRepaint = unsafe extern "system" fn(*mut c_void);
-type FnQApplicationAllWidgets = unsafe extern "system" fn(*mut c_void) -> *mut c_void;
-type FnQListDataDispose = unsafe extern "system" fn(*mut c_void);
-type FnQArrayDataDeallocate = unsafe extern "system" fn(*mut c_void, i64, i64);
+use member::*;
+mod member;
+type FnQWidgetFind = unsafe extern "C" fn(usize) -> *mut c_void;
+type FnQApplicationAllWidgets = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
+type FnQListDataDispose = unsafe extern "C" fn(*mut c_void);
+type FnQArrayDataDeallocate = unsafe extern "C" fn(*mut c_void, isize, isize);
 
 #[derive(Clone, Copy)]
 struct HostBridge {
@@ -123,7 +113,7 @@ impl QStringApi {
                 Some(result)
             }
             Self::Qt6 { ctor, dtor, .. } => {
-                let length = i64::try_from(units.len()).ok()?;
+                let length = isize::try_from(units.len()).ok()?;
                 let mut storage = MaybeUninit::<Qt6StringStorage>::uninit();
                 let object = storage.as_mut_ptr().cast::<c_void>();
                 ctor(object, units.as_ptr(), length);
@@ -402,86 +392,6 @@ fn drawn_point_text(text: &str, from: i32, length: i32) -> Option<String> {
     String::from_utf16(&units[from..end]).ok()
 }
 
-unsafe extern "system" fn draw_point_detour(
-    painter: *mut c_void,
-    point: *const c_void,
-    text: *const c_void,
-    from: i32,
-    length: i32,
-) {
-    let Some(hooks) = HOOKS.get() else {
-        return;
-    };
-    if ACTIVE_FEATURES.load(Ordering::Acquire) == 0 {
-        return hooks.point.call(painter, point, text, from, length);
-    }
-    let Some(_guard) = CallbackGuard::enter() else {
-        return hooks.point.call(painter, point, text, from, length);
-    };
-    let Some(full_text) = hooks.strings.read(text) else {
-        return hooks.point.call(painter, point, text, from, length);
-    };
-    let Some(source) = drawn_point_text(&full_text, from, length) else {
-        return hooks.point.call(painter, point, text, from, length);
-    };
-    let Some(replacement) = replacement_for(&source) else {
-        return hooks.point.call(painter, point, text, from, length);
-    };
-    if hooks
-        .strings
-        .with_temporary(&replacement, |replacement| {
-            hooks.point.call(painter, point, replacement, 0, -1);
-        })
-        .is_none()
-    {
-        hooks.point.call(painter, point, text, from, length);
-    }
-}
-
-unsafe extern "system" fn draw_rect_detour(
-    painter: *mut c_void,
-    rect: *const c_void,
-    flags: i32,
-    text: *const c_void,
-    bounding_rect: *mut c_void,
-) {
-    let Some(hooks) = HOOKS.get() else {
-        return;
-    };
-    draw_rect_with(
-        hooks,
-        text,
-        || hooks.rect.call(painter, rect, flags, text, bounding_rect),
-        |replacement| {
-            hooks
-                .rect
-                .call(painter, rect, flags, replacement, bounding_rect);
-        },
-    );
-}
-
-unsafe extern "system" fn draw_rect_f_detour(
-    painter: *mut c_void,
-    rect: *const c_void,
-    flags: i32,
-    text: *const c_void,
-    bounding_rect: *mut c_void,
-) {
-    let Some(hooks) = HOOKS.get() else {
-        return;
-    };
-    draw_rect_with(
-        hooks,
-        text,
-        || hooks.rect_f.call(painter, rect, flags, text, bounding_rect),
-        |replacement| {
-            hooks
-                .rect_f
-                .call(painter, rect, flags, replacement, bounding_rect);
-        },
-    );
-}
-
 unsafe fn draw_rect_with(
     hooks: &QtHooks,
     text: *const c_void,
@@ -509,25 +419,6 @@ unsafe fn draw_rect_with(
     }
 }
 
-unsafe extern "system" fn draw_rect_option_detour(
-    painter: *mut c_void,
-    rect: *const c_void,
-    text: *const c_void,
-    option: *const c_void,
-) {
-    let Some(hooks) = HOOKS.get() else {
-        return;
-    };
-    draw_rect_with(
-        hooks,
-        text,
-        || hooks.rect_option.call(painter, rect, text, option),
-        |replacement| {
-            hooks.rect_option.call(painter, rect, replacement, option);
-        },
-    );
-}
-
 unsafe fn resolve(module: HMODULE, symbol: &'static [u8]) -> Result<RawProc, ()> {
     GetProcAddress(module, PCSTR(symbol.as_ptr())).ok_or(())
 }
@@ -541,7 +432,7 @@ unsafe fn loaded_qt_modules() -> Result<(u8, HMODULE, HMODULE), ()> {
         .zip(GetModuleHandleW(w!("Qt6Core.dll")).ok());
     match (qt5, qt6) {
         (Some((gui, core)), None) => Ok((5, gui, core)),
-        (None, Some((gui, core))) => Ok((6, gui, core)),
+        (None, Some((gui, core))) if cfg!(target_arch = "x86_64") => Ok((6, gui, core)),
         _ => Err(()),
     }
 }
@@ -734,7 +625,7 @@ unsafe extern "system" fn refresh_window_hook(code: i32, wparam: usize, lparam: 
                         let owns_widget = hook
                             .windows
                             .iter()
-                            .any(|window| !(refresh.find_widget)(*window as u64).is_null());
+                            .any(|window| !(refresh.find_widget)(*window).is_null());
                         if owns_widget
                             && PENDING_REFRESH_GENERATION
                                 .compare_exchange(
@@ -897,7 +788,7 @@ pub extern "C" fn glyphshift_adapter_entry_v1() -> NativeAdapterApiV1 {
             (1, 0, 0),
             SUPPORTED_FEATURES,
             PLATFORM_WINDOWS,
-            ARCH_X86_64,
+            ARCH_X86 | ARCH_X86_64,
         ),
         negotiate_features,
         activate,

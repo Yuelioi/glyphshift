@@ -7,12 +7,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const root = path.resolve(__dirname, '../..');
-const evidence = path.join(root, 'local-test/evidence/monogame-text');
-const managed = path.join(root, 'local-test/monogame-text/managed/bin');
+const evidence = process.env.GLYPHSHIFT_MONOGAME_EVIDENCE || path.join(root, 'local-test/evidence/monogame-text');
+const managed = process.env.GLYPHSHIFT_MONOGAME_MANAGED || path.join(root, 'local-test/monogame-text/managed/bin');
 const production = process.env.GLYPHSHIFT_MONOGAME_PRODUCTION === '1';
 const actualRuntime = Boolean(process.env.GLYPHSHIFT_TEST_RUNTIME);
-const native = production ? path.join(root, 'local-test/monogame-native/glyphshift_adapter_monogame_native.dll')
-  : path.join(root, 'local-test/coreclr-late-attach/glyphshift_coreclr_fixture.dll');
+const native = process.env.GLYPHSHIFT_MONOGAME_NATIVE || (production ? path.join(root, 'local-test/monogame-native/glyphshift_adapter_monogame_native.dll')
+  : path.join(root, 'local-test/coreclr-late-attach/glyphshift_coreclr_fixture.dll'));
 const hostAssembly = path.join(managed, 'Host/release/Glyphshift.MonoGame.SyntheticHost.dll');
 const framework = path.join(managed, 'Host/release/MonoGame.Framework.dll');
 const dotnet = process.env.GLYPHSHIFT_TEST_DOTNET;

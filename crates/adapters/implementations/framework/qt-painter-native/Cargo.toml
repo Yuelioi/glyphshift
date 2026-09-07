@@ -12,7 +12,7 @@ crate-type = ["cdylib"]
 [dependencies]
 glyphshift-adapter-native-abi = { path = "../../../platform/native-abi" }
 glyphshift-adapter-qt-painter = { path = "../qt-painter" }
-retour = "0.3"
+retour = { version = "0.3", features = ["thiscall-abi"] }
 
 [dependencies.windows]
 version = "0.58"

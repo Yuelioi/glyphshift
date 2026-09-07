@@ -3,7 +3,7 @@ use crate::late_attach::{
 };
 use glyphshift_adapter_native_abi::{
     DecideUtf16V1, NativeAdapterApiV1, NativeAdapterDescriptorV1, NativeNegotiationV1,
-    NativeRuntimeHostV1, ARCH_X86_64, DECISION_TEXT_REPLACE, FEATURE_TEXT_OBSERVE,
+    NativeRuntimeHostV1, ARCH_X86, ARCH_X86_64, DECISION_TEXT_REPLACE, FEATURE_TEXT_OBSERVE,
     FEATURE_TEXT_REPLACE, PLATFORM_WINDOWS, STATUS_ACTIVATION_FAILED, STATUS_INVALID_HOST,
     STATUS_OK, STATUS_UNAUTHORIZED_FEATURE, STATUS_UNSUPPORTED_FEATURE,
 };
@@ -197,7 +197,7 @@ impl Session {
 
     unsafe fn sweep_if_due(&mut self) -> Vec<ManagedObjectId> {
         self.sweep_frame = self.sweep_frame.wrapping_add(1);
-        if self.sweep_frame % SWEEP_INTERVAL_FRAMES != 0 {
+        if !self.sweep_frame.is_multiple_of(SWEEP_INTERVAL_FRAMES) {
             return Vec::new();
         }
 
@@ -223,7 +223,7 @@ impl Session {
 
     fn refresh_due(&mut self) -> bool {
         self.refresh_frame = self.refresh_frame.wrapping_add(1);
-        self.refresh_frame % REFRESH_INTERVAL_FRAMES == 0
+        self.refresh_frame.is_multiple_of(REFRESH_INTERVAL_FRAMES)
     }
 
     fn is_main_thread(&self) -> bool {
@@ -749,7 +749,21 @@ fn process_main_thread() -> Option<Vec<ObservedText>> {
         }
     }
 
-    if active_features & FEATURE_TEXT_REPLACE != 0 && (!translations_applied || refresh_due) {
+    // The initial snapshot wakes the controller before it installs setter hooks.
+    // Do not advance writeback generations until every original setter is callable.
+    let setters_ready = state
+        .session
+        .as_ref()?
+        .bindings
+        .iter()
+        .all(|binding| match binding.kind {
+            StandardUiKind::TextMeshPro => TMP_SETTER_HOOK.get().is_some(),
+            StandardUiKind::UGui => UGUI_SETTER_HOOK.get().is_some(),
+        });
+    if active_features & FEATURE_TEXT_REPLACE != 0
+        && setters_ready
+        && (!translations_applied || refresh_due)
+    {
         let host = HOST
             .get()
             .and_then(|host| host.read().ok())
@@ -843,7 +857,7 @@ pub extern "C" fn glyphshift_adapter_entry_v1() -> NativeAdapterApiV1 {
             (0, 1, 0),
             FEATURE_TEXT_OBSERVE | FEATURE_TEXT_REPLACE,
             PLATFORM_WINDOWS,
-            ARCH_X86_64,
+            ARCH_X86 | ARCH_X86_64,
         ),
         negotiate_features,
         activate,
@@ -866,7 +880,7 @@ mod tests {
             FEATURE_TEXT_OBSERVE | FEATURE_TEXT_REPLACE
         );
         assert_eq!(api.descriptor.platform_bits, PLATFORM_WINDOWS);
-        assert_eq!(api.descriptor.architecture_bits, ARCH_X86_64);
+        assert_eq!(api.descriptor.architecture_bits, ARCH_X86 | ARCH_X86_64);
         assert_eq!(api.descriptor.version_major, 0);
         assert_eq!(api.descriptor.version_minor, 1);
         assert_eq!(api.descriptor.version_patch, 0);

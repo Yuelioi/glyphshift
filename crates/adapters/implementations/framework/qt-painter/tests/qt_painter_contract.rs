@@ -17,7 +17,7 @@ fn translated(text: &str) -> RenderDecision {
 }
 
 #[test]
-fn descriptor_declares_a_bounded_x64_inline_render_adapter() {
+fn descriptor_declares_a_bounded_dual_architecture_inline_render_adapter() {
     let descriptor = descriptor();
 
     assert_eq!(descriptor.adapter_id().as_str(), ADAPTER_ID);
@@ -25,7 +25,7 @@ fn descriptor_declares_a_bounded_x64_inline_render_adapter() {
     assert_eq!(descriptor.platforms().collect::<Vec<_>>(), vec!["windows"]);
     assert_eq!(
         descriptor.architectures().collect::<Vec<_>>(),
-        vec!["x86_64"]
+        vec!["x86", "x86_64"]
     );
     assert_eq!(
         descriptor.features().collect::<Vec<_>>(),

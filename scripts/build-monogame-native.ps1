@@ -1,11 +1,13 @@
 [CmdletBinding()]
-param([string]$OutputRoot, [switch]$Fixture)
+param([string]$OutputRoot, [switch]$Fixture,
+    [ValidateSet('x86','x64')][string]$Architecture = 'x64')
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $localRoot = [IO.Path]::GetFullPath((Join-Path $repoRoot 'local-test'))
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
     . (Join-Path $PSScriptRoot 'cargo-target.ps1')
-    $OutputRoot = Join-Path (Get-GlyphshiftCargoTargetDirectory -RepoRoot $repoRoot) 'debug'
+    $profileDirectoryName = if ($Architecture -eq 'x86') { 'i686-pc-windows-msvc/debug' } else { 'debug' }
+    $OutputRoot = Join-Path (Get-GlyphshiftCargoTargetDirectory -RepoRoot $repoRoot) $profileDirectoryName
 }
 $output = [IO.Path]::GetFullPath($OutputRoot)
 # This directory contains regenerable compiler output; Runtime evidence is staged
@@ -49,7 +51,7 @@ $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer
 if (-not (Test-Path $vswhere)) { throw 'Visual Studio C++ tools discovery is unavailable.' }
 $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
 if (-not $vs) { throw 'Visual Studio x64 C++ tools are required.' }
-$vcvars = Join-Path $vs 'VC/Auxiliary/Build/vcvars64.bat'
+$vcvars = Join-Path $vs "VC/Auxiliary/Build/$(if ($Architecture -eq 'x86') { 'vcvars32.bat' } else { 'vcvars64.bat' })"
 $source = Join-Path $repoRoot 'crates/adapters/implementations/framework/monogame-native/native/profiler.cpp'
 $dllName = if ($Fixture) { 'glyphshift_coreclr_fixture.dll' } else { 'glyphshift_adapter_monogame_native.dll' }
 $dll = Join-Path $output $dllName

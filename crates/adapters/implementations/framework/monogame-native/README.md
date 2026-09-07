@@ -10,7 +10,7 @@ Adapter 通过可选 `glyphshift_adapter_source_policy_v1` export 声明 `SpaceP
 
 缺字回退辅助程序集编译为字节并嵌入本 DLL，由目标内存桥接类型加载；没有外置程序集搜索路径或独立插件安装。辅助程序集只引用系统运行库，通过反射使用目标已经加载的 MonoGame 类型。
 
-`scripts/build-monogame-native.ps1` 使用固定版本和哈希的官方 CoreCLR 头文件构建组件；`scripts/build-runtime-bundle.ps1` 将其按内容哈希命名并收入 Bundle。常规构建不含合成宿主门槛；`-Fixture` 显式编译隔离实验 profile。原始构建依赖与产物只存在 local-test/。
+`scripts/build-monogame-native.ps1` 使用固定版本和哈希的官方 CoreCLR 头文件构建组件；`-Architecture x86` / `x64` 生成匹配目标的 DLL，默认遵循全局 Cargo target 配置。`scripts/build-runtime-bundle.ps1` 同步构建双架构并按内容哈希收入 Bundle。常规构建不含合成宿主门槛；`-Fixture` 显式编译隔离实验 profile。实机证据与测试产物留在本地测试目录。
 
 激活先检查当前进程的 CoreCLR 和 MonoGame 模块，再连接当前进程的 Diagnostics IPC，请求 CLR 加载本 DLL 的 Profiler。Profiler 按完整 MonoGame 签名选择四个 DrawString 叶子与两个 MeasureString 入口，在目标内存中增加桥接方法并发起 ReJIT。接口直接使用 Runtime 提供的 `decide_utf16`，由真实 Kernel 作词典决策，Capture 作批次采集；没有游戏类名规则。
 

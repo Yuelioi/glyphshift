@@ -13,16 +13,40 @@ impl Namespace {
         major: u8,
         mut present: impl FnMut(&'static [u8]) -> bool,
     ) -> Result<Self, ()> {
-        if present(QSTRING_UTF16_SYMBOL) {
+        if present(Self::Global.symbol(QSTRING_UTF16_SYMBOL)?) {
             return Ok(Self::Global);
         }
-        if major == 6 && present(Self::Qt.symbol(QSTRING_UTF16_SYMBOL)?) {
+        if cfg!(target_arch = "x86_64")
+            && major == 6
+            && present(Self::Qt.symbol(QSTRING_UTF16_SYMBOL)?)
+        {
             return Ok(Self::Qt);
         }
         Err(())
     }
     pub(super) fn symbol(self, symbol: &'static [u8]) -> Result<&'static [u8], ()> {
         if self == Self::Global {
+            #[cfg(target_arch = "x86")]
+            return Ok(match symbol {
+                DRAW_POINT_SYMBOL => b"?drawText@QPainter@@QAEXABVQPointF@@ABVQString@@HH@Z\0",
+                DRAW_RECT_SYMBOL => b"?drawText@QPainter@@QAEXABVQRect@@HABVQString@@PAV2@@Z\0",
+                DRAW_RECT_OPTION_SYMBOL => {
+                    b"?drawText@QPainter@@QAEXABVQRectF@@ABVQString@@ABVQTextOption@@@Z\0"
+                }
+                DRAW_RECT_F_SYMBOL => b"?drawText@QPainter@@QAEXABVQRectF@@HABVQString@@PAV2@@Z\0",
+                QSTRING_UTF16_SYMBOL => b"?utf16@QString@@QBEPBGXZ\0",
+                QSTRING_DTOR_SYMBOL => b"??1QString@@QAE@XZ\0",
+                QSTRING5_CTOR_SYMBOL => b"??0QString@@QAE@PBVQChar@@H@Z\0",
+                QSTRING5_SIZE_SYMBOL => b"?size@QString@@QBEHXZ\0",
+                QAPPLICATION_ALL_WIDGETS_SYMBOL => {
+                    b"?allWidgets@QApplication@@SA?AV?$QList@PAVQWidget@@@@XZ\0"
+                }
+                QWIDGET_FIND_SYMBOL => b"?find@QWidget@@SAPAV1@I@Z\0",
+                QWIDGET_REPAINT_SYMBOL => b"?repaint@QWidget@@QAEXXZ\0",
+                QLIST_DATA_DISPOSE_SYMBOL => b"?dispose@QListData@@SAXPAUData@1@@Z\0",
+                _ => return Err(()),
+            });
+            #[cfg(not(target_arch = "x86"))]
             return Ok(symbol);
         }
         Ok(match symbol {
@@ -55,6 +79,7 @@ impl Namespace {
 mod tests {
     use super::*;
     #[test]
+    #[cfg(target_arch = "x86_64")]
     fn namespaced_core_selects_a_consistent_profile() {
         let utf16 = b"?utf16@QString@QT@@QEBAPEBGXZ\0";
         let namespace = Namespace::detect(6, |symbol| symbol == utf16).unwrap();
@@ -69,6 +94,7 @@ mod tests {
         );
     }
     #[test]
+    #[cfg(target_arch = "x86_64")]
     fn standard_qt_preserves_existing_symbols() {
         for major in [5, 6] {
             let namespace =
@@ -86,8 +112,23 @@ mod tests {
     #[test]
     fn unknown_profiles_and_unverified_qt5_namespace_fail_closed() {
         assert!(Namespace::detect(6, |_| false).is_err());
-        assert!(Namespace::detect(5, |symbol| symbol != QSTRING_UTF16_SYMBOL).is_err());
+        let utf16 = Namespace::Global.symbol(QSTRING_UTF16_SYMBOL).unwrap();
+        assert!(Namespace::detect(5, |symbol| symbol != utf16).is_err());
         assert!(Namespace::Qt.symbol(QSTRING5_CTOR_SYMBOL).is_err());
         assert!(Namespace::Qt.symbol(b"unknown\0").is_err());
+    }
+    #[test]
+    #[cfg(target_arch = "x86")]
+    fn qt5_x86_selects_member_and_static_decorations() {
+        let utf16 = b"?utf16@QString@@QBEPBGXZ\0";
+        assert_eq!(
+            Namespace::detect(5, |symbol| symbol == utf16),
+            Ok(Namespace::Global)
+        );
+        assert_eq!(
+            Namespace::Global.symbol(QWIDGET_FIND_SYMBOL).unwrap(),
+            b"?find@QWidget@@SAPAV1@I@Z\0"
+        );
+        assert!(Namespace::Global.symbol(QSTRING6_CTOR_SYMBOL).is_err());
     }
 }

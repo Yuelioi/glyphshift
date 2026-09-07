@@ -37,8 +37,8 @@ unsafe sealed class NativeHarness
         this.sourceText = sourceText; this.firstText = firstText; this.secondText = secondText; this.renderer = renderer;
         library = NativeLibrary.Load(path);
         api = Marshal.GetDelegateForFunctionPointer<Entry>(NativeLibrary.GetExport(library, "glyphshift_adapter_entry_v1"))();
-        if (sizeof(Descriptor) != 136 || sizeof(Api) != 176 || api.Size != sizeof(Api) || api.Descriptor.Size != sizeof(Descriptor)
-            || sizeof(Decision) != 32 || sizeof(Host) != 32) throw new InvalidOperationException("Native ABI layout mismatch");
+        if (sizeof(Descriptor) != 136 || sizeof(Api) != (IntPtr.Size == 8 ? 176 : 160) || api.Size != sizeof(Api) || api.Descriptor.Size != sizeof(Descriptor)
+            || sizeof(Decision) != 32 || sizeof(Host) != (IntPtr.Size == 8 ? 32 : 16)) throw new InvalidOperationException("Native ABI layout mismatch");
         var negotiate = Marshal.GetDelegateForFunctionPointer<NegotiateFn>(api.Negotiate);
         if (negotiate(3, 1).Status != 2 || negotiate(4, 7).Status != 1) throw new InvalidOperationException("Authorization negotiation failed");
         decide = DecideText;

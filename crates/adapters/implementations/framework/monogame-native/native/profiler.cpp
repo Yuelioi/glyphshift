@@ -445,7 +445,7 @@ extern "C" __declspec(dllexport) Api __cdecl glyphshift_adapter_entry_v1() {
     descriptor.major = descriptor.abi_major = 1;
     descriptor.apply_model = descriptor.placement = 1;
     descriptor.features = 3;
-    descriptor.platforms = 1; descriptor.architectures = 2;
+    descriptor.platforms = 1; descriptor.architectures = 3;
     return {sizeof(Api), descriptor, negotiate, activate, deactivate, refresh};
 }
 extern "C" __declspec(dllexport) uint32_t __cdecl glyphshift_adapter_source_policy_v1() {
