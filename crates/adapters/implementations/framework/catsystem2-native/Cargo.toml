@@ -14,7 +14,7 @@ iced-x86 = { version = "1.21", default-features = false, features = ["std", "dec
 
 [target.'cfg(all(windows, target_arch = "x86"))'.dependencies]
 retour = { version = "0.3", features = ["thiscall-abi"] }
-windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_LibraryLoader", "Win32_System_Memory", "Win32_System_Threading", "Win32_System_Diagnostics_Debug"] }
+windows-sys = { version = "0.61", features = ["Win32_Globalization", "Win32_Foundation", "Win32_System_LibraryLoader", "Win32_System_Memory", "Win32_System_Threading", "Win32_System_Diagnostics_Debug"] }
 
 [lints.rust]
 unsafe_code = "allow"

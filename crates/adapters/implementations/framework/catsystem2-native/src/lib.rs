@@ -1,4 +1,4 @@
-//! CatSystem2 MSVC x86 UTF-8 retained text objects.
+//! CatSystem2 MSVC x86 UTF-8 and classic ANSI retained text objects.
 #[cfg(all(windows, target_arch = "x86"))]
 mod platform;
 pub mod shape;

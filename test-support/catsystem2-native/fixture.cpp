@@ -17,6 +17,10 @@ struct Object { void** table; uint32_t padding[OBJECT_PADDING]; char* text; int 
 enum { TextMember = 4 + OBJECT_PADDING * 4, LimitMember = TextMember + 4,
     DirtyMember = TextMember + 8, GlyphMember = TextMember + 12, FinishMember = TextMember + 16 };
 extern "C" void __cdecl set_text();
+#ifdef CLASSIC
+extern "C" void __cdecl finish_text();
+extern "C" void __cdecl show_text();
+#endif
 extern "C" void __cdecl append_text();
 extern "C" void __cdecl get_text();
 extern "C" void __cdecl destroy_text();
@@ -27,6 +31,8 @@ extern "C" void __cdecl history_tick_text();
 struct Type { void* table; void* spare; char name[64]; };
 #ifdef WRONG_TYPE
 const Type type = {nullptr, nullptr, ".?AVUnrelatedTextOwner@@"};
+#elif defined(CLASSIC)
+const Type type = {nullptr, nullptr, ".?AVkcFEScriptObjString@@"};
 #else
 const Type type = {nullptr, nullptr, ".?AVkcFEScriptObjStringUTF8@@"};
 #endif
@@ -34,7 +40,11 @@ const uint32_t hierarchy[4]{};
 struct Locator { uint32_t signature, offset, constructor; const Type* type; const void* hierarchy; };
 const Locator locator = {0, 0, 0, &type, hierarchy};
 struct Table { const Locator* locator; void* slots[4]; };
+#ifdef CLASSIC
+extern "C" const Table object_table = {&locator, {deleting, reserved, tick_text, nullptr}};
+#else
 extern "C" const Table object_table = {&locator, {deleting, reserved, tick_text, reserved}};
+#endif
 const Type history_type = {nullptr, nullptr, ".?AVkcFEScriptObjLogStringUTF8@@"};
 const Locator history_locator = {0, 0, 0, &history_type, hierarchy};
 extern "C" const Table history_table = {&history_locator, {reserved, reserved, history_tick_text, reserved}};
@@ -60,6 +70,9 @@ extern "C" __declspec(naked) void tick_text() {
     __asm { mov eax, 1 }
     __asm { ret 4 }
 }
+#ifdef CLASSIC
+#include "classic-functions.inc"
+#else
 extern "C" __declspec(naked) void deleting() {
     __asm { push ebp }
     __asm { mov ebp, esp }
@@ -226,6 +239,7 @@ extern "C" __declspec(naked) void name() { \
 }
 NO_ARGUMENT_HANDLER(marker_command, append_marker)
 NO_ARGUMENT_HANDLER(skip_command, finish_text)
+#endif
 struct Command { char name[16]; void* function; };
 extern "C" __declspec(dllexport) const Command commands[] = {
     {"str", set_command}, {"reset", reserved}, {"apend", append_command}, {"apendmark", marker_command},
@@ -243,10 +257,16 @@ using Text = void(__thiscall*)(Object*, const char*);
 using Tick = size_t(__thiscall*)(Object*, size_t);
 using Destroy = void(__thiscall*)(Object*);
 using Show = void(__thiscall*)(Object*, int);
+#ifdef CLASSIC
+void set(Object& o, const char* s) { Object* p = &o; __asm { mov edi, p } __asm { mov esi, s } __asm { call set_text } }
+void append(Object& o, const char* s) { Object* p = &o; __asm { mov ebx, p } __asm { push s } __asm { call append_text } }
+void destroy(Object& o) { Object* p = &o; __asm { mov edi, p } __asm { call destroy_text } }
+#else
 void set(Object& o, const char* s) { reinterpret_cast<Text>(set_text)(&o, s); }
 void append(Object& o, const char* s) { reinterpret_cast<Text>(append_text)(&o, s); }
-void tick(Object& o) { reinterpret_cast<Tick>(o.table[2])(&o, 0); }
 void destroy(Object& o) { reinterpret_cast<Destroy>(destroy_text)(&o); }
+#endif
+void tick(Object& o) { reinterpret_cast<Tick>(o.table[2])(&o, 0); }
 Object create(const char* s) { Object o{}; o.table = const_cast<void**>(object_table.slots); set(o, s); return o; }
 std::wstring source, translation;
 std::vector<std::wstring> observed;
@@ -293,8 +313,18 @@ int main(int argc, char** argv) {
     assert(display == std::string("First visible translation.") + suffix);
     publication(api, source, L"Second visible translation."); tick(marked);
     assert(display == std::string("Second visible translation.") + suffix);
+#ifndef CLASSIC
     publication(api, source, L"合成对话刷新"); tick(marked);
     assert(display == std::string(u8"合成对话刷新") + suffix);
+#else
+    publication(api, source, L"🦀"); tick(marked); assert(display == marked_source);
+    const std::string controlled = std::string("\\cd0xff123456;\\c0xffabcdef;Colored source") + suffix;
+    auto colored = create(controlled.c_str());
+    publication(api, L"Colored source", L"Colored translation"); tick(colored);
+    assert(std::string(colored.text) == std::string("\\cd0xff123456;\\c0xffabcdef;Colored translation") + suffix);
+    publication(api, source, L""); tick(colored); assert(std::string(colored.text) == controlled); destroy(colored);
+    source = L"Visible dialogue.";
+#endif
     publication(api, source, std::wstring(8192, L'x')); tick(marked);
     assert(display == marked_source); // Marker bytes also count against the limit.
     publication(api, source, L"Before release"); tick(marked);
@@ -303,6 +333,7 @@ int main(int argc, char** argv) {
     while (release_marked < 0) { tick(marked); Sleep(1); }
     release_control.join(); tick(marked); assert(release_marked == 0); assert(display == marked_source);
     assert(api.activate(&host, 3, 3).status == 0);
+#ifndef CLASSIC
     // History displays plain strings and pumps only its container, never row.tick.
     Object history{}; history.table = const_cast<void**>(history_table.slots);
     auto history_row = create("History source"); std::string history_display = "History source";
@@ -323,6 +354,7 @@ int main(int argc, char** argv) {
     assert(history_stopped == 0 && history_display == "History source");
     history_rows.clear(); destroy(history_row);
     assert(api.activate(&host, 3, 3).status == 0);
+#endif
     publication(api, source, L""); tick(marked); assert(display == marked_source);
     destroy(marked);
     publication(api, L"A complete synthetic sentence.", L"First translated sentence.");

@@ -1,8 +1,15 @@
-//! Narrow MSVC x86 CatSystem2 UTF-8 object profile. Addresses and member offsets
+//! Narrow MSVC x86 CatSystem2 object profiles. Addresses and member offsets
 //! come from the loaded image; ambiguous tables and unsupported code are rejected.
 use iced_x86::{Decoder, DecoderOptions, Instruction, Mnemonic as M, OpKind, Register as R};
 use std::collections::BTreeSet;
 use std::ops::Range;
+mod classic;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Profile {
+    Utf8,
+    Classic,
+}
 
 pub struct Image {
     pub base: usize,
@@ -12,6 +19,7 @@ pub struct Image {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Shape {
+    pub profile: Profile,
     pub table: usize,
     pub setter: usize,
     pub append: usize,
@@ -63,6 +71,9 @@ impl Image {
         self.named_table(b".?AVkcFEScriptObjStringUTF8@@\0")
     }
     fn named_table(&self, type_name: &[u8]) -> Option<usize> {
+        self.named_table_slots(type_name, 4)
+    }
+    fn named_table_slots(&self, type_name: &[u8], slots: usize) -> Option<usize> {
         let mut tables = BTreeSet::new();
         for name in self.occurrences(type_name) {
             let descriptor = name.checked_sub(8)?;
@@ -82,7 +93,8 @@ impl Image {
                 }
                 for reference in self.references(locator) {
                     let table = reference + 4;
-                    if (0..4).all(|slot| self.word(table + slot * 4).is_some_and(|p| self.code(p)))
+                    if (0..slots)
+                        .all(|slot| self.word(table + slot * 4).is_some_and(|p| self.code(p)))
                     {
                         tables.insert(table);
                     }
@@ -215,6 +227,9 @@ impl Image {
         (found.len() == 1).then(|| *found.first().unwrap())
     }
     pub fn discover(&self) -> Option<Shape> {
+        self.discover_utf8().or_else(|| self.discover_classic())
+    }
+    fn discover_utf8(&self) -> Option<Shape> {
         let table = self.table()?;
         let history = self
             .named_table(b".?AVkcFEScriptObjLogStringUTF8@@\0")
@@ -304,6 +319,7 @@ impl Image {
                             continue;
                         };
                         shapes.push(Shape {
+                            profile: Profile::Utf8,
                             table,
                             setter: *setter,
                             append,

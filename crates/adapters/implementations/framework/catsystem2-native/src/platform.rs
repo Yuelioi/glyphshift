@@ -1,4 +1,7 @@
-use crate::shape::{Image, Shape};
+use crate::shape::{Image, Profile, Shape};
+mod abi;
+mod encoding;
+use abi::{Convention, Function, Method};
 use glyphshift_adapter_native_abi::*;
 use retour::GenericDetour;
 use std::{
@@ -24,17 +27,19 @@ use windows_sys::Win32::{
 const LIMIT: usize = 8192;
 const MAX_BYTES: usize = 4 * 1024 * 1024;
 const MAX_OWNERS: usize = MAX_BYTES / (2 * LIMIT);
-type Text = unsafe extern "thiscall" fn(*mut c_void, *const u8);
-type Destroy = unsafe extern "thiscall" fn(*mut c_void);
+type Text = unsafe extern "thiscall" fn(*mut c_void, *const u8) -> usize;
+type Destroy = unsafe extern "thiscall" fn(*mut c_void) -> usize;
 type Tick = unsafe extern "thiscall" fn(*mut c_void, usize) -> usize;
-type Show = unsafe extern "thiscall" fn(*mut c_void, i32);
+type Show = unsafe extern "thiscall" fn(*mut c_void, i32) -> usize;
 struct Hooks {
     shape: Shape,
-    setter: GenericDetour<Text>,
-    append: GenericDetour<Text>,
-    destroy: GenericDetour<Destroy>,
+    code_page: u32,
+    finish: Function<Destroy>,
+    setter: Method<Text>,
+    append: Method<Text>,
+    destroy: Method<Destroy>,
     tick: GenericDetour<Tick>,
-    show: GenericDetour<Show>,
+    show: Method<Show>,
     history_tick: Option<GenericDetour<Tick>>,
 }
 static HOOKS: OnceLock<Hooks> = OnceLock::new();
@@ -181,22 +186,34 @@ fn image() -> Option<Image> {
 fn install() -> Result<(), ()> {
     if HOOKS.get().is_none() {
         let shape = image().and_then(|i| i.discover()).ok_or(())?;
+        let convention = |classic| {
+            if shape.profile == Profile::Classic {
+                classic
+            } else {
+                Convention::Thiscall
+            }
+        };
         let hooks = unsafe {
             Hooks {
                 shape,
-                setter: GenericDetour::new(
-                    std::mem::transmute::<usize, Text>(shape.setter),
+                code_page: windows_sys::Win32::Globalization::GetACP(),
+                finish: Function::new(shape.finish, convention(Convention::Finish))?,
+                setter: Method::new(
+                    shape.setter,
                     set_hook as Text,
+                    convention(Convention::Setter),
                 )
                 .map_err(|_| ())?,
-                append: GenericDetour::new(
-                    std::mem::transmute::<usize, Text>(shape.append),
+                append: Method::new(
+                    shape.append,
                     append_hook as Text,
+                    convention(Convention::Append),
                 )
                 .map_err(|_| ())?,
-                destroy: GenericDetour::new(
-                    std::mem::transmute::<usize, Destroy>(shape.destroy),
+                destroy: Method::new(
+                    shape.destroy,
                     destroy_hook as Destroy,
+                    convention(Convention::Destroy),
                 )
                 .map_err(|_| ())?,
                 tick: GenericDetour::new(
@@ -204,11 +221,8 @@ fn install() -> Result<(), ()> {
                     tick_hook as Tick,
                 )
                 .map_err(|_| ())?,
-                show: GenericDetour::new(
-                    std::mem::transmute::<usize, Show>(shape.show),
-                    show_hook as Show,
-                )
-                .map_err(|_| ())?,
+                show: Method::new(shape.show, show_hook as Show, convention(Convention::Show))
+                    .map_err(|_| ())?,
                 history_tick: shape
                     .history
                     .map(|(_, tick)| {
@@ -300,8 +314,18 @@ fn plain(bytes: &[u8]) -> bool {
             .any(|b| matches!(*b, 0..=8 | 11..=31 | 127 | b'\\' | b'[' | b']'))
 }
 fn decide(host: Host, source: &[u8], generation: &mut u64) -> Vec<u8> {
-    let Some((text, marker)) = crate::text::decode(source) else {
-        return source.to_vec();
+    let h = HOOKS.get().unwrap();
+    let (prefix, text, marker) = if h.shape.profile == Profile::Classic {
+        let (prefix, body, marker) = crate::text::classic_parts(source);
+        let Some(text) = encoding::decode(body, h.code_page) else {
+            return source.to_vec();
+        };
+        (prefix, text, marker)
+    } else {
+        let Some((text, marker)) = crate::text::decode(source) else {
+            return source.to_vec();
+        };
+        (&[][..], text.to_owned(), marker)
     };
     let input: Vec<_> = text.encode_utf16().collect();
     let mut output = vec![0u16; LIMIT];
@@ -328,24 +352,39 @@ fn decide(host: Host, source: &[u8], generation: &mut u64) -> Vec<u8> {
     }
     String::from_utf16(&output[..result.text_len as usize])
         .ok()
-        .map(String::into_bytes)
-        .filter(|b| plain(b))
-        .and_then(|mut bytes| {
+        .filter(|text| plain(text.as_bytes()))
+        .and_then(|text| {
+            if h.shape.profile == Profile::Classic {
+                encoding::encode(&text, h.code_page)
+            } else {
+                Some(text.into_bytes())
+            }
+        })
+        .and_then(|body| {
+            let mut bytes = prefix.to_vec();
+            bytes.extend_from_slice(&body);
             bytes.extend_from_slice(marker);
             (bytes.len() <= LIMIT).then_some(bytes)
         })
         .unwrap_or_else(|| source.to_vec())
 }
+fn completed(h: &Hooks, bytes: &[u8]) -> bool {
+    bytes.ends_with(if h.shape.profile == Profile::Classic {
+        &[255]
+    } else {
+        crate::text::MARKER
+    })
+}
 unsafe fn set(h: &Hooks, object: usize, bytes: &[u8], presented: bool) {
     let mut terminated = bytes.to_vec();
     terminated.push(0);
-    h.setter.call(object as _, terminated.as_ptr());
+    (h.setter.original.call)(object as _, terminated.as_ptr());
     // A completed dialogue is an engine string plus its terminal marker. The
     // setter invalidates glyphs but does not submit display/finish instructions.
     // Use the engine's own methods on the owner thread; never advance the script.
-    if presented || bytes.ends_with(crate::text::MARKER) {
-        let finish = std::mem::transmute::<usize, Destroy>(h.shape.finish);
-        h.show.call(object as _, -1);
+    if presented || completed(h, bytes) {
+        let finish = h.finish.call;
+        (h.show.original.call)(object as _, -1);
         finish(object as _);
     }
 }
@@ -415,7 +454,7 @@ fn tick(object: usize, presented: bool) {
         if next != owner.last
             || (owner.epoch != epoch
                 && next != owner.source
-                && (owner.presented || next.ends_with(crate::text::MARKER)))
+                && (owner.presented || completed(h, &next)))
         {
             unsafe {
                 set(h, object, &next, owner.presented);
@@ -437,13 +476,13 @@ unsafe extern "thiscall" fn tick_hook(object: *mut c_void, arg: usize) -> usize 
     SetLastError(error);
     HOOKS.get().unwrap().tick.call(object, arg)
 }
-unsafe extern "thiscall" fn show_hook(object: *mut c_void, limit: i32) {
+unsafe extern "thiscall" fn show_hook(object: *mut c_void, limit: i32) -> usize {
     let error = GetLastError();
     // History rows submit display directly without running the string's tick.
     // Admit at this actual display boundary; do not guess visibility from UTF-8.
     let _ = std::panic::catch_unwind(|| tick(object as usize, true));
     SetLastError(error);
-    HOOKS.get().unwrap().show.call(object, limit);
+    (HOOKS.get().unwrap().show.original.call)(object, limit)
 }
 fn history_tick(object: usize) {
     let h = HOOKS.get().unwrap();
@@ -493,7 +532,7 @@ unsafe extern "thiscall" fn history_tick_hook(object: *mut c_void, arg: usize) -
         .unwrap()
         .call(object, arg)
 }
-unsafe extern "thiscall" fn set_hook(object: *mut c_void, text: *const u8) {
+unsafe extern "thiscall" fn set_hook(object: *mut c_void, text: *const u8) -> usize {
     let error = GetLastError();
     if let Some(_guard) = Guard::enter() {
         if let Ok(mut state) = SESSION.lock() {
@@ -501,9 +540,9 @@ unsafe extern "thiscall" fn set_hook(object: *mut c_void, text: *const u8) {
         }
     }
     SetLastError(error);
-    HOOKS.get().unwrap().setter.call(object, text);
+    (HOOKS.get().unwrap().setter.original.call)(object, text)
 }
-unsafe extern "thiscall" fn append_hook(object: *mut c_void, text: *const u8) {
+unsafe extern "thiscall" fn append_hook(object: *mut c_void, text: *const u8) -> usize {
     let error = GetLastError();
     let h = HOOKS.get().unwrap();
     let guard = Guard::enter();
@@ -530,10 +569,9 @@ unsafe extern "thiscall" fn append_hook(object: *mut c_void, text: *const u8) {
         }
     }
     SetLastError(error);
-    h.append
-        .call(object, copied.as_ref().map_or(text, |s| s.as_ptr()));
+    (h.append.original.call)(object, copied.as_ref().map_or(text, |s| s.as_ptr()))
 }
-unsafe extern "thiscall" fn destroy_hook(object: *mut c_void) {
+unsafe extern "thiscall" fn destroy_hook(object: *mut c_void) -> usize {
     let error = GetLastError();
     if let Some(_guard) = Guard::enter() {
         if let Ok(mut state) = SESSION.lock() {
@@ -545,5 +583,5 @@ unsafe extern "thiscall" fn destroy_hook(object: *mut c_void) {
         }
     }
     SetLastError(error);
-    HOOKS.get().unwrap().destroy.call(object);
+    (HOOKS.get().unwrap().destroy.original.call)(object)
 }
