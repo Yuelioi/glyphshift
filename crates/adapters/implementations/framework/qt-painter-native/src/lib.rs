@@ -8,6 +8,7 @@ use glyphshift_adapter_native_abi::{
     FEATURE_TEXT_OBSERVE, FEATURE_TEXT_REPLACE, PLATFORM_WINDOWS, STATUS_ACTIVATION_FAILED,
     STATUS_INVALID_HOST, STATUS_OK, STATUS_UNAUTHORIZED_FEATURE, STATUS_UNSUPPORTED_FEATURE,
 };
+use glyphshift_adapter_native_abi::{NativeTextEventV1, NativeTextHostBinding, NativeTextHostV1};
 use glyphshift_adapter_qt_painter::ADAPTER_ID;
 use retour::GenericDetour;
 use std::cell::Cell;
@@ -54,6 +55,7 @@ type FnQArrayDataDeallocate = unsafe extern "C" fn(*mut c_void, isize, isize);
 struct HostBridge {
     context: usize,
     decide_utf16: DecideUtf16V1,
+    text_host: Option<NativeTextHostBinding>,
 }
 
 #[derive(Clone, Copy)]
@@ -326,6 +328,11 @@ extern "C" fn activate(
     let bridge = HostBridge {
         context: host.context as usize,
         decide_utf16: host.decide_utf16,
+        text_host: TEXT_HOST
+            .lock()
+            .ok()
+            .and_then(|binding| *binding)
+            .filter(|binding| binding.matches(&host)),
     };
     let host_ready = if let Some(current) = HOST.get() {
         current.write().map(|mut current| *current = bridge).is_ok()
@@ -349,15 +356,24 @@ fn decide(source: &str) -> Option<DecisionBuffers> {
     let source = source.encode_utf16().collect::<Vec<_>>();
     let mut text = vec![0_u16; MAX_TEXT_UNITS];
     let mut font = [];
-    let decision = (host.decide_utf16)(
-        host.context as *mut c_void,
-        source.as_ptr(),
-        source.len() as u32,
-        text.as_mut_ptr(),
-        text.len() as u32,
-        font.as_mut_ptr(),
-        0,
-    );
+    let decision = if let Some(extended) = host.text_host {
+        extended.decide(
+            &NativeTextEventV1::complete_draw(&source),
+            &mut text,
+            &mut font,
+        )
+    } else {
+        (host.decide_utf16)(
+            host.context as *mut c_void,
+            source.as_ptr(),
+            source.len() as u32,
+            text.as_mut_ptr(),
+            text.len() as u32,
+            font.as_mut_ptr(),
+            0,
+        )
+    };
+
     if decision.status != STATUS_OK || decision.text_len as usize > text.len() {
         return None;
     }
@@ -407,6 +423,7 @@ unsafe fn draw_rect_with(
     let Some(source) = hooks.strings.read(text) else {
         return original();
     };
+    let _scope = text_scope();
     let Some(replacement) = replacement_for(&source) else {
         return original();
     };
@@ -795,4 +812,34 @@ pub extern "C" fn glyphshift_adapter_entry_v1() -> NativeAdapterApiV1 {
         deactivate,
         request_refresh,
     }
+}
+
+static TEXT_HOST: std::sync::Mutex<Option<NativeTextHostBinding>> = std::sync::Mutex::new(None);
+/// Optional source-evidence binding; the V1 host and legacy rendering path stay valid.
+///
+/// # Safety
+/// A non-null host must point to a readable V1 extension whose context and callbacks
+/// remain valid until every Adapter callback has finished.
+#[no_mangle]
+pub unsafe extern "C" fn glyphshift_adapter_bind_text_host_v1(host: *const NativeTextHostV1) -> i32 {
+    let value = if host.is_null() {
+        None
+    } else {
+        let Some(value) = NativeTextHostBinding::new(unsafe { *host }) else {
+            return STATUS_INVALID_HOST;
+        };
+        Some(value)
+    };
+    match TEXT_HOST.lock() {
+        Ok(mut binding) => {
+            *binding = value;
+            STATUS_OK
+        }
+        Err(_) => STATUS_INVALID_HOST,
+    }
+}
+
+fn text_scope() -> Option<glyphshift_adapter_native_abi::NativeTextScope> {
+    let binding = HOST.get()?.read().ok()?.text_host?;
+    binding.enter_scope()
 }

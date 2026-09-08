@@ -86,14 +86,27 @@ fn qt5_msvc_members_replace_update_and_restore_in_both_architectures() {
             decide_utf16: decide,
             source_characters_utf16: characters,
         }));
+        let extended = Box::leak(Box::new(glyphshift_adapter_native_abi::NativeTextHostV1 {
+            struct_size: size_of::<glyphshift_adapter_native_abi::NativeTextHostV1>() as u32,
+            version: glyphshift_adapter_native_abi::TEXT_HOST_VERSION_V1,
+            context: host.context,
+            decide_text: structured_decide,
+            enter_scope: None,
+            leave_scope: None,
+        }));
         for kind in 0..4 {
             assert_eq!(render(kind), "Open");
         }
-        for generation in 1..=2 {
+        for generation in 1..=3 {
             GENERATION.store(generation, Ordering::Release);
             package
-                .activate(
+                .activate_with_text_host(
                     host,
+                    if generation == 2 {
+                        Some(extended)
+                    } else {
+                        None
+                    },
                     [Feature::TextObserve, Feature::TextReplace],
                     [Feature::TextObserve, Feature::TextReplace],
                 )
@@ -110,10 +123,41 @@ fn qt5_msvc_members_replace_update_and_restore_in_both_architectures() {
                     );
                 }
             }
+            assert_eq!(
+                EXTENDED_CALLS.load(Ordering::Acquire),
+                if generation == 1 { 0 } else { 400 }
+            );
             package.deactivate().unwrap();
             for kind in 0..4 {
                 assert_eq!(render(kind), "Open");
             }
         }
     }
+}
+
+static EXTENDED_CALLS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+extern "C" fn structured_decide(
+    context: *mut core::ffi::c_void,
+    event: *const glyphshift_adapter_native_abi::NativeTextEventV1,
+    text: *mut u16,
+    text_capacity: u32,
+    font: *mut u16,
+    font_capacity: u32,
+) -> NativeDecisionV1 {
+    let event = unsafe { &*event };
+    assert_eq!(event.kind, glyphshift_adapter_native_abi::TEXT_EVENT_DRAW);
+    assert_eq!(
+        event.struct_size,
+        size_of::<glyphshift_adapter_native_abi::NativeTextEventV1>() as u32
+    );
+    EXTENDED_CALLS.fetch_add(1, Ordering::AcqRel);
+    decide(
+        context,
+        event.source,
+        event.source_len,
+        text,
+        text_capacity,
+        font,
+        font_capacity,
+    )
 }

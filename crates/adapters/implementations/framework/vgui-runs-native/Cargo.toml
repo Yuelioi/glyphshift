@@ -1,0 +1,19 @@
+[package]
+name = "glyphshift-adapter-vgui-runs-native"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+glyphshift-adapter-native-abi = { path = "../../../platform/native-abi" }
+glyphshift-domain = { path = "../../../../core/domain" }
+retour = { version = "0.3", features = ["thiscall-abi"] }
+iced-x86 = { version = "1.21", default-features = false, features = ["std","decoder","instr_info"] }
+windows-sys = { version = "0.61", features = ["Win32_Foundation","Win32_System_LibraryLoader","Win32_System_Memory","Win32_System_ProcessStatus","Win32_System_Threading","Win32_System_Diagnostics_Debug"] }
+
+[lints.rust]
+unsafe_code = "allow"

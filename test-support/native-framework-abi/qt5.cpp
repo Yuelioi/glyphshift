@@ -2,6 +2,8 @@
 // not Qt rendering or application compatibility. Compile without inlining.
 #include <string>
 #include <cstdint>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #define API __declspec(dllexport)
 class QChar { public: unsigned short value; };
 class API QString {
@@ -22,7 +24,17 @@ class QRectF { public: double x=0, y=0, width=0, height=0; };
 class QTextOption {};
 static std::u16string drawn;
 static int calls=0;
-static void record(const QString& text) { drawn.assign(reinterpret_cast<const char16_t*>(text.utf16()), text.size()); ++calls; }
+static bool raster=false;
+static void glyphs(const unsigned short* text,int length) {
+    auto dc=CreateCompatibleDC(nullptr);
+    if(!dc) return;
+    for(int i=0;i<length;++i) ExtTextOutW(dc,0,0,0,nullptr,reinterpret_cast<const wchar_t*>(text+i),1,nullptr);
+    DeleteDC(dc);
+}
+static void record(const QString& text) {
+    drawn.assign(reinterpret_cast<const char16_t*>(text.utf16()), text.size()); ++calls;
+    if(raster) glyphs(text.utf16(),text.size());
+}
 class API QPainter {
 public:
     void drawText(const QPointF&, const QString&, int, int);
@@ -48,3 +60,5 @@ extern "C" API const unsigned short* __cdecl fixture_draw(int kind, const unsign
     return reinterpret_cast<const unsigned short*>(drawn.c_str());
 }
 extern "C" API int __cdecl fixture_calls() { return calls; }
+extern "C" API void __cdecl fixture_set_raster(int enabled) { raster=enabled!=0; }
+extern "C" API void __cdecl fixture_raster_only() { glyphs(reinterpret_cast<const unsigned short*>(L"Open"),4); }

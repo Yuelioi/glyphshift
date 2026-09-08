@@ -36,7 +36,8 @@ macro_rules! members {
             let Some(source) = drawn_point_text(&full_text, from, length) else {
                 return hooks.point.call(painter, point, text, from, length);
             };
-            let Some(replacement) = replacement_for(&source) else {
+            let _scope = text_scope();
+    let Some(replacement) = replacement_for(&source) else {
                 return hooks.point.call(painter, point, text, from, length);
             };
             if hooks

@@ -11,7 +11,7 @@ $vcvars = Join-Path $vs "VC/Auxiliary/Build/$(if ($Architecture -eq 'x86') { 'vc
 foreach ($fixture in @(@('qt5.cpp','Qt5Gui.dll'), @('gtk3.cpp','gtk3-fixture.dll'), @('raylib.cpp','raylib.dll'), @('mono.cpp','mono-2.0-bdwgc.dll'))) {
 $source = Join-Path $PSScriptRoot $fixture[0]
 $build = Join-Path $output 'compile.cmd'
-@('@echo off', "call `"$vcvars`" >nul", "cl /nologo /std:c++17 /EHsc /W4 /WX /Od /Ob0 /LD `"$source`" /link /OUT:$($fixture[1])") | Set-Content $build
+@('@echo off', "call `"$vcvars`" >nul", "cl /nologo /std:c++17 /EHsc /W4 /WX /Od /Ob0 /LD `"$source`" /link gdi32.lib /OUT:$($fixture[1])") | Set-Content $build
 Push-Location $output
 try {
     & $build
