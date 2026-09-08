@@ -2,7 +2,8 @@
 
 ## Open Work
 
-- **Focus** [适配器边界与 x86 规划](work/adapter-coverage-and-x86/index.md)
+- **Focus** [探针与字典流程统一](work/probe-dictionary-flow/index.md)
+- [适配器边界与 x86 规划](work/adapter-coverage-and-x86/index.md)
 - [Alias / Qt Quick 适配器](work/alias-text-support/index.md)
 - [游戏文字适配器](work/game-text-adapters/index.md)
 - [AE 临时界面观测丢失](work/ae-transient-observation-loss/index.md)
