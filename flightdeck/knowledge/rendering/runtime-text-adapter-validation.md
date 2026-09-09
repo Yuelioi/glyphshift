@@ -46,7 +46,8 @@
 | Raylib | `DrawTextEx` 使用 fallback atlas，按帧回收旧资源并在关闭前清理 | 仅动态 raylib 5.5；静态链接、复制实现和业务纹理缓存不覆盖 |
 | Unity Mono | 同时通过 backend、标准 UI profile、live object 与主线程 gate，再管理 setter/snapshot/恢复 | NGUI、自绘 mesh、UI Toolkit、IL2CPP 与无主线程 dispatch 的目标拒绝 |
 | Unity IL2CPP | 导出、metadata 与 live standard text object 三重 gate | 当前是 observe-only 原型；存在 TMP/uGUI 类型不等于有活动标准 UI |
-| UIA / Console | 独立 Worker 或目标 Runtime 采集公开文字 | 仅 `TextObserve`，不得冒充原位 `TextReplace` |
+
+归档 UIA/OCR 不属于当前产品能力、验证入口或替换方案；不得以旧观测原型补齐当前适配器覆盖。
 
 ## 结果解释
 

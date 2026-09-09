@@ -2,6 +2,8 @@
 param([ValidateSet('x86','x64')][string]$Architecture = 'x86')
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+. (Join-Path $PSScriptRoot 'cargo-target.ps1')
+$null = Get-GlyphshiftCargoTargetDirectory -RepoRoot $repoRoot
 $targetArgs = if ($Architecture -eq 'x86') { @('--target','i686-pc-windows-msvc') } else { @() }
 $packages = @('glyphshift-adapter-gdi-native','glyphshift-adapter-gdiplus-native','glyphshift-adapter-directwrite-native',
     'glyphshift-adapter-qt-painter-native','glyphshift-adapter-gtk3-pango-native',

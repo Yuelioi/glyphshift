@@ -4,24 +4,25 @@ Status: Finished
 
 ## Goal
 
-从 `local-test/` 的本机实验中提炼可复用、脱敏且可验证的技术知识；删除结论简单或已由正式实现覆盖的
-实验，复杂实验只保留最小源码与必要说明；最后删除整个可再生成的 `target/`。
+从本机实验提炼脱敏、可复用的已验证知识，清理可重建缓存，并按全局根变量加软件名隔离后续构建，整理本机目录与配置入口。
 
 ## Current
 
-本机实验已经完成脱敏审读和逐族判定，脱敏研究稿与跨任务 Knowledge 均已落盘。`local-test/` 已从
-构建、Runtime、第三方源码、授权输入和原始证据混合区收敛为最小手写源码集；浏览器 profile 与其他
-敏感运行状态已删除。整个 `target/` 已删除，后续 IL2CPP negative harness 也已改写为使用仓库统一的
-本机证据根，不会再次创建旧的本机测试根。
+本轮按用户要求再次整理知识、缓存及本机测试目录。此前完成记录不能代表后续实验没有重新积累；本轮重新盘点后清理仓库旧 target、旧桌面及实验构建缓存，并仅按本项目 package 清理共享 Cargo 根，未删除其他项目缓存。正在被进程引用的审阅目录保留。
 
-保留集、生成目录、PowerShell 语法、Unity 静态合同、Markdown 链接、Git ignore、staged/tracked 路径和
-隐私模式扫描均通过；没有运行全仓测试，也没有重建桌面 App。
+Cargo 入口统一为全局根目录下的 `glyphshift/`，显式 override 保持精确；构建、测试、子进程与本机配置入口使用同一解析结果。`local-test/` 根只保留导航、机器入口和 tools/config/software/cache/evidence 分区，历史根脚本归档并更新显式引用，活动实验按软件存放。配置不再保存长期 PID。
+
+已提炼 [缓存文字刷新与恢复](../../knowledge/rendering/retained-text-refresh.md) 和 [本机产物存放](../../knowledge/workflow/local-artifacts.md)。Houdini 未解问题仍在下一项 Work，不提升为已验证知识。本机操作清单、原始证据和历史配置只留在忽略目录。
+
+本轮核对：清理约 66.4 GiB 逻辑文件大小，local-test 约 3.34 GiB；保留一个仍被进程引用的旧审阅目录。Cargo 路径合同、33 个 PowerShell 文件语法、9 个迁移 Python 脚本语法及 12 个 Playwright 配置加载通过。未重建全部缓存或重新启动目标。
+
+第二轮将 94 个证据根散落文件按验证日志、整理记录和软件调查分组，清空 11 项已经失效的软件路径设置并保留本机历史值；Houdini 采样输出改用专属目录。原始证据内容、视频工程与已保留的审阅目录未删除。
 
 ## Next
 
-None.
+None. 后续软件覆盖在独立 Work 继续。
 
-## Progress
+## 历史整理记录
 
 - 冻结清理原则：简单实验在结论落盘后删除；复杂实验只保留最小源码和必要说明；原始证据不进入
   tracked 文档；`target/` 最终完整删除。

@@ -2,6 +2,8 @@
 param()
 $ErrorActionPreference='Stop'
 $repoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+. (Join-Path $PSScriptRoot 'cargo-target.ps1')
+$null = Get-GlyphshiftCargoTargetDirectory -RepoRoot $repoRoot
 & (Join-Path $repoRoot 'test-support/native-framework-abi/build-vgui.ps1')
 & cargo build --manifest-path (Join-Path $repoRoot 'Cargo.toml') --target i686-pc-windows-msvc -p glyphshift-adapter-vgui-runs-native -p glyphshift-adapter-gdi-native
 if($LASTEXITCODE -ne 0){throw 'VGUI/GDI native build failed.'}

@@ -13,8 +13,10 @@
 - 用户已授权当前发布前改动创建 Git commit；最终截图仍是后续独立补充。
 - tag 发布属于当前仓库：`vMAJOR.MINOR.PATCH` 必须与三处桌面版本一致，使用仓库 `GITHUB_TOKEN`
   创建 Release，不硬编码账户或依赖个人 PAT。
-- Glyphshift 自有代码使用 MIT License；根 `LICENSE`、Rust workspace、桌面 npm package 与中英文
+- Glyphshift 自有代码按用户最新要求使用 GPL-3.0-only；根 `LICENSE`、Rust workspace、桌面 npm package 与中英文
   README 必须保持一致。首个公开仓库由当前用户的个人账号拥有，首个 tag `v0.2.0` 已发布并保留
   安装包、候选清单和 SHA-256 校验文件。
 - 首个公开 tag 不携带 `npm audit` high/critical 告警；允许在既有 semver 范围内更新传递依赖锁版本以
   消除发布阻塞的安全告警，并记录剩余低风险。
+
+- 用户文档以 docs/ 为稳定发布源，ZIP 附件名固定 docs.zip；内部维护说明放 scripts/docs-publishing.md，不进入公开文档包。版本随 Release 标签的 checkout，打包不需要文档站令牌；目标文档集由文档站绑定或显式发布参数决定。

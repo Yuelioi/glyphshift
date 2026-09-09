@@ -9,6 +9,14 @@ Status: Finished
 
 ## Current
 
+服务地址旁增加问号入口，按已识别的预设地址打开对应官方文档，桌面 opener 白名单同步更新。高级设置允许编辑翻译提示词并恢复系统默认；提示词随普通配置持久化，HTTP 与 Codex 均应用，固定格式与条目顺序规则继续附加。旧配置缺少字段时使用默认，空值恢复默认，不改变运行中任务已解析的配置。前后端默认提示词共用同一资源。
+
+本轮 AI Rust 回归 38 项通过；定向 Playwright 4 项、前端生产构建及界面检测通过。未发送真实云端翻译请求。
+
+
+新增配置提供 DeepSeek、通义千问（北京）与硅基流动预设，自动填入地址、模型和协议，保留手动修改。预设切换清空草稿 Key；已有配置不自动套用预设。默认模型与地址来自官方文档，真实联网调用仍需用户自己的 Key。4 项定向 Playwright、Vue 类型检查和界面检测通过，表单截图已核对。
+
+
 AI Profile 独立保存供应商协议、连接参数、单批条目上限、超时、并发、重试与过滤策略；输入 Token
 只在执行前本机估算。Dictionary 与 Probe 会保留已完成结果，并允许重试剩余空白项。完成、部分完成
 或主动停止后的通知现在始终提供关闭动作；关闭通知会同时收起终态批次详情，不丢弃任何结果。
@@ -63,3 +71,11 @@ None
 - [阶段计划](plan.md)
 - [设计简报](references/design-brief.md)
 - [Provider 协议调研](references/provider-protocols.md)
+
+### 服务预设资料
+
+- [DeepSeek API](https://api-docs.deepseek.com/)：默认使用 `deepseek-v4-flash`，通过已有 Chat Completions 路径关闭思考。
+- [百炼 API 配置](https://help.aliyun.com/zh/model-studio/get-api-key/)：北京地域端点与 `qwen-plus`。
+- [硅基流动调用示例](https://docs.siliconflow.cn/docs/userguide/capabilities/stream-mode)：端点与 `Qwen/Qwen2.5-72B-Instruct`。
+
+千问与硅基流动预设保留服务默认思考行为，不向这些端点发送 OpenAI 专用的关闭档位。预设只生成普通配置草稿，编辑现有配置不会重新套用默认值。未以真实凭据验收网络调用。

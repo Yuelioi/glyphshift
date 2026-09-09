@@ -2,6 +2,8 @@
 param()
 $ErrorActionPreference = 'Stop'
 $repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+. (Join-Path $PSScriptRoot 'cargo-target.ps1')
+$null = Get-GlyphshiftCargoTargetDirectory -RepoRoot $repoRoot
 $outputRoot = Join-Path $repoRoot 'local-test/evidence/native-vgui-localize'
 $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
 $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
