@@ -10,6 +10,12 @@ Status: Open
 
 ## Current
 
+用户已授权提交、tag push 和 Release，当前发布版本 v0.3.0，标签尚未发布。README 与 docs 教程已按当前工作流同步，docs.zip 本机打包成功（7 个文件）。前端构建、功能 Playwright 24 项及 MV 合成策略 12 项通过；发布内容合同旧断言已同步。活动 Rust 包完整执行，只有隔离进程测试 2 项在 100 毫秒启动限时下失败；该测试目标串行复查 8 项全部通过，其余活动包通过。发布仍需检查 GitHub Action 和下载资产校验，不把本机旧候选当作新版本。
+
+中英文 README 已按当前单软件工作流重写，用户正在审阅。内容包含开始/停止与自然退出、持久化收集开关、有序字典及原文排除、多文件 JSON/CSV/SRT 导入、工作流字体覆盖、全局跳过规则、自动补全队列和退出策略；旧的兼容方式、独立探针操作与工作流整体导入导出说法已移除。首屏提供下载、在线文档和 Releases 入口，结尾明确 Release Action 打包 docs.zip 与文档站绑定是两步。
+
+README / Release Action 两项既有内容合同通过，两份 README 共 10 个本地链接均有效，隐私及 diff 空白检查通过。只重写 README 并调整其既有内容校验，未发布、提交或推送；`docs/` 的详细教程仍需要在下一次文档发版前按当前工作流逐页对齐，不能认为 README 更新会自动进入 docs.zip。
+
 当前推进用户文档与 Release 文档包。docs 已有入口、快速开始、工作流、字典、AI 翻译和常见问题共 6 页，以及单语言 docs.json；采用日常说法，不包含机器截图。两份 README 已加入口。发布脚本从内置 yueli-docs-publish 技能复制入 scripts，CI 不依赖本机技能路径。
 
 现有 tag Release job 在同一 checkout 中打包 docs.zip，随安装包和候选清单一起发布，SHA256SUMS 增加文档包校验值，资产数量改为 4。维护与月离文档绑定步骤见 [文档发布说明](../../../scripts/docs-publishing.md)。尚未上传、绑定文档站、提交或推送。

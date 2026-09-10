@@ -14,7 +14,7 @@ test('CatSystem2 catalog entry can be selected for text replacement without adve
   await page.goto('/')
   await page.getByRole('button', { name: '编辑 默认创作工作流' }).click()
   const editor = workflowEditor(page)
-  await editor.getByRole('tab', { name: '软件与兼容方式' }).click()
+  await editor.getByRole('tab', { name: '软件与适配器' }).click()
   const row = editor.getByTestId('workflow-adapter-table').locator('tbody > tr').filter({ hasText: presentation.name })
   await expect(row).toBeVisible()
   await expect(row).toContainText('CatSystem2')

@@ -8,21 +8,24 @@ Status: Open
 
 ## Current
 
-最新目标为 PotPlayer 外挂 SRT。用户已验证：保持工作流运行，重新打开同一字幕后译文可见；先启动工作流再打开字幕也可翻译。因此缓存生成时机是当前优先方向，不以两个 GDI 入口共同命中判定冲突。尚未验证运行中新增译文无需重载即可更新，实时翻译目标未完成。未改适配器代码；原始采样只在本地忽略目录。
+用户决定保留 TouchDesigner 首轮研究，暂不继续。软件调查结果统一放在 `references/software/`，一款软件一份 Markdown；每份保存当前决定、已验证事实、未解决问题和恢复时的第一步。历史跨软件初查保留原文，通过链接追溯，避免把旧初查当作最新验收结果。
 
-用户同时要求简化清空字典：改用现有确认弹窗，移除输入字典名称，保留取消、运行任务时的编辑保护，以及清空后保存才写文件的行为。已同步中英文案、使用文档和既有页面测试。
-
-较早的目标交接如下，下一次优先处理当前 PotPlayer 请求。
-
-Houdini 的工具栏短标签和悬停提示正文仍有漏采集。目标加载了 Qt Painter / Qt Quick 组件，Qt 库提供 drawText、QTextLayout、QTextItem、QStaticText 等入口，但尚未证明遗漏文字经过哪条路径。两次静态采样无绘制调用，截图返回无效绘制区域；Windows 自动化插件初始化报错。已请求用户恢复正在测试的窗口并显示提示，尚未取得可复现红例，不能将入口猜测当作结论。
-
-此前四目标初查确认：Vovious 使用静态 JUCE，Blender 使用自绘界面及 Python/BLF，Fluffy Mod Manager 的完整字符串入口尚未定位。CatSystem2 经典分支已在上一项 Work 实现且用户确认可用，保留实验标识；经典历史页及更多作品未验收。
+TouchDesigner 的 Slug 集成已找到二进制标记，但按公开符号定位的字符串入口未通过，尚无可见替换。PotPlayer 的重载字幕使用办法已由用户确认，实时缓存适配已取消。其他软件调查分别保留，不自动继续测试。
 
 ## Next
 
-用户已取消 PotPlayer 缓存刷新任务，不继续修改或测试其字幕实时热更新。当前产品工作转至工作流 Work 的 SRT 提前导入及可扩展字典导入导出。若之后重新授权该目标，再使用原先的两代译文与停止恢复验收。
+等待用户选定后续目标，再从对应软件记录恢复工作；仅重新授权 TouchDesigner 时才继续其静态库入口和 ABI 调查。所有适配仍需完整正文、两代译文、字体和停止恢复验收，遵守 [文字适配器验收原则](../../knowledge/rendering/runtime-text-adapter-validation.md)。
 
-Houdini、Vovious、Blender 与 Mod Manager 的未完成覆盖继续保留，完成当前 PotPlayer 对照后再恢复。
+## 软件记录
+
+- [MTool](references/software/mtool.md)（引擎适配参考，后续任务转游戏 Work）
+
+- [TouchDesigner](references/software/touchdesigner.md)
+- [PotPlayer](references/software/potplayer.md)
+- [Houdini](references/software/houdini.md)
+- [Vovious](references/software/vovious.md)
+- [Blender](references/software/blender.md)
+- [Fluffy Mod Manager](references/software/fluffy-mod-manager.md)
 
 ## References
 
