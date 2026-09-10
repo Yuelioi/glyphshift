@@ -10,7 +10,9 @@ Status: Open
 
 ## Current
 
-用户已授权提交、tag push 和 Release，当前发布版本 v0.3.0，标签尚未发布。README 与 docs 教程已按当前工作流同步，docs.zip 本机打包成功（7 个文件）。前端构建、功能 Playwright 24 项及 MV 合成策略 12 项通过；发布内容合同旧断言已同步。活动 Rust 包完整执行，只有隔离进程测试 2 项在 100 毫秒启动限时下失败；该测试目标串行复查 8 项全部通过，其余活动包通过。发布仍需检查 GitHub Action 和下载资产校验，不把本机旧候选当作新版本。
+v0.3.0 已按用户授权提交、创建 annotated tag 并与 main 原子推送，发布提交为 `99525c3`。GitHub Release Action 成功，发布为 Latest，安装包、candidate-manifest.json、docs.zip、SHA256SUMS.txt 四个资产完整；下载后安装包与文档包 SHA-256 校验一致。参见 [Release](https://github.com/Yuelioi/glyphshift/releases/tag/v0.3.0) 与 [构建记录](https://github.com/Yuelioi/glyphshift/actions/runs/34478621581)。
+
+README 与 docs 教程已按当前工作流同步，文档包包含 7 个文件。前端构建、功能 Playwright 24 项、发布内容合同 4 项及 MV 合成策略 12 项通过。活动 Rust 包完整执行，只有隔离进程测试 2 项在 100 毫秒启动限时下失败；该测试目标串行复查 8 项全部通过，其余活动包通过。保留该时间敏感测试风险，不把复查描述为首轮全绿。以下为历史过程记录。
 
 中英文 README 已按当前单软件工作流重写，用户正在审阅。内容包含开始/停止与自然退出、持久化收集开关、有序字典及原文排除、多文件 JSON/CSV/SRT 导入、工作流字体覆盖、全局跳过规则、自动补全队列和退出策略；旧的兼容方式、独立探针操作与工作流整体导入导出说法已移除。首屏提供下载、在线文档和 Releases 入口，结尾明确 Release Action 打包 docs.zip 与文档站绑定是两步。
 
@@ -52,7 +54,7 @@ tag `v0.2.0` 已推送；GitHub Actions 完成版本校验、Windows NSIS 构建
 
 ## Next
 
-继续维护 [用户文档](../../../docs/index.md)。用户下一次授权发版时，核对 docs.zip 与安装包来自同一标签并完整上传；发布后按 [文档发布说明](../../../scripts/docs-publishing.md) 绑定月离文档目标文档集。不要自动发布或创建标签，已发布标签不移动。截图仍待用户提供并通过隐私检查。
+v0.3.0 发布工作已完成。后续按 [文档发布说明](../../../scripts/docs-publishing.md) 检查月离文档目标文档集是否已绑定 Release 文档包，本次未操作文档站绑定。下一次发版继续核对安装包和文档包来自同一标签；已发布标签不移动。截图仍待用户提供并通过隐私检查。
 
 ## Progress
 
