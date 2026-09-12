@@ -2,13 +2,15 @@
 
 ## Open Work
 
+- **Focus** [DirectWrite 修复与 0.4.1 发布](work/ae2025-text-capture/index.md)
+
 - [单软件工作流统一](work/workflow-unification/index.md)
 
 - [探针与字典流程统一](work/probe-dictionary-flow/index.md)
 - [Houdini 与其他软件文字覆盖](work/software-text-coverage/index.md)
 - [适配器边界与 x86 规划](work/adapter-coverage-and-x86/index.md)
 - [Alias / Qt Quick 适配器](work/alias-text-support/index.md)
-- **Focus** [游戏文字适配器](work/game-text-adapters/index.md)
+- [游戏文字适配器](work/game-text-adapters/index.md)
 - [AE 临时界面观测丢失](work/ae-transient-observation-loss/index.md)
 - [发布根文档对齐](work/release-root-docs/index.md)
 

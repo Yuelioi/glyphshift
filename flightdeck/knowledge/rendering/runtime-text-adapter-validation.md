@@ -19,6 +19,7 @@
 - **完整原文优先**：选择仍持有完整字符串的最窄入口，不从逐字形、顶点或纹理缓存反推文本。
 - **不修改目标所有权**：优先复制 layout、字符串对象或字体状态并瞬时绘制译文；保留目标对象与原文，
   使停用恢复不依赖逆向修改。
+- **关联跟随成功创建更新**：目标对象地址可以被复用；成功创建但内容为空或无法观察时也要移除旧原文关联，防止历史译文画进新对象。DirectWrite 合同应包含非空布局释放后被空布局复用的像素验证。
 - **复杂格式 fail-open**：无法证明局部字体、locale、装饰、inline object、Pango attribute 或方向脚本
   可等价迁移时，调用原始路径。
 - **代次显式切换**：首代、下一代与移除替换都通过 publication generation 驱动；相同代次去重，旧
@@ -51,6 +52,7 @@
 
 ## 结果解释
 
+- DirectWrite 的观察资格与替换资格分别判断。已关联原文持续进入采集；全文统一 Typography 可以复制，局部样式及不支持的对象保持原样。格式和尺寸以绘制时的布局为准，复制范围按译文 UTF-16 长度重建；译文未采用时在原始绘制前释放作用域。见[复杂格式原生合同](../../../crates/adapters/platform/native-host/tests/native_directwrite_capture_formatting_contract.rs)与[真实显示验证](../../work/ae2025-text-capture/references/typography-translation.md)。
 - `Matched + Replaced` 只证明生成了替换决策；Qt/GTK 等无返回值绘制入口不能据此证明最终像素。
 - 真实测试必须区分“进程正常退出”“入口非零命中”“第一代可见”“第二代可见”“停用恢复”五类结果。
 - 空 capture 且 drop 为零时，先检查授权进程族、实际 UI 宿主和后代路由，再判断 Adapter 能力。
