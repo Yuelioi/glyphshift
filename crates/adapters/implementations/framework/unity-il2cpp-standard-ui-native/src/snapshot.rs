@@ -1,5 +1,6 @@
 use crate::diagnostics::trace;
 use crate::metadata::{MetadataError, TextTarget};
+use crate::objects::ObjectRegistry;
 use crate::runtime_gate::{Il2CppExports, StartGcWorld};
 use glyphshift_adapter_unity_standard_ui::{
     ManagedObjectId, ManagedText, StandardUiKind, MAX_TEXT_UNITS,
@@ -11,16 +12,24 @@ const MAX_SNAPSHOT_UTF16_UNITS: usize = 1024 * 1024;
 #[cfg(not(windows))]
 const MAX_LIVENESS_ALLOCATIONS: usize = 8;
 
+pub(super) struct CapturedSnapshot {
+    pub(super) texts: Vec<ManagedText>,
+    pub(super) collected: Vec<ManagedObjectId>,
+}
+
 pub(super) unsafe fn capture_snapshot(
     exports: Il2CppExports,
     targets: &[TextTarget],
-) -> Result<Vec<ManagedText>, MetadataError> {
+    objects: Option<&mut ObjectRegistry>,
+) -> Result<CapturedSnapshot, MetadataError> {
     let domain = (exports.domain_get)();
     if domain.is_null() {
         return Err(MetadataError::RuntimeMissing);
     }
     let _thread = AttachedThread::enter(exports, domain)?;
     let mut workspace = SnapshotWorkspace::new()?;
+    let writeback = exports.writeback;
+    let mut snapshot_error = None;
     trace("snapshot.world.begin");
     {
         let _world = GcWorld::stop(exports);
@@ -30,21 +39,40 @@ pub(super) unsafe fn capture_snapshot(
             utf16,
         } = &mut workspace;
         for target in targets {
-            let objects = liveness_objects(exports, target.class, liveness)?;
+            let objects = match liveness_objects(exports, target.class, liveness) {
+                Ok(objects) => objects,
+                Err(error) => {
+                    snapshot_error = Some(error);
+                    break;
+                }
+            };
             for &object in objects {
                 if raw_texts.len() == MAX_SNAPSHOT_OBJECTS {
                     break;
                 }
-                read_text_field_into(exports, object, *target, raw_texts, utf16);
+                read_text_field_into(exports, writeback, object, *target, raw_texts, utf16);
             }
         }
     }
     trace("snapshot.world.end");
-    Ok(workspace.finish())
+    if let Some(error) = snapshot_error {
+        unsafe { workspace.release_pending_handles(writeback) };
+        return Err(error);
+    }
+    let mut objects = objects;
+    let collected = match (objects.as_deref_mut(), writeback) {
+        (Some(objects), Some(writeback)) => unsafe { objects.refresh(writeback) },
+        _ => Vec::new(),
+    };
+    Ok(CapturedSnapshot {
+        texts: unsafe { workspace.finish(writeback, objects) },
+        collected,
+    })
 }
 
 unsafe fn read_text_field_into(
     exports: Il2CppExports,
+    writeback: Option<crate::runtime_gate::Il2CppWritebackExports>,
     object: usize,
     target: TextTarget,
     raw_texts: &mut Vec<RawText>,
@@ -76,8 +104,19 @@ unsafe fn read_text_field_into(
     if length != 0 {
         utf16.extend_from_slice(std::slice::from_raw_parts(chars, length));
     }
+    let handle = if let Some(writeback) = writeback {
+        let handle = (writeback.gchandle_new_weakref)(object as *mut c_void, false);
+        if handle == 0 {
+            utf16.truncate(start);
+            return;
+        }
+        handle
+    } else {
+        0
+    };
     raw_texts.push(RawText {
         object: object as u64,
+        handle,
         kind: target.kind,
         start,
         length,
@@ -99,26 +138,52 @@ impl SnapshotWorkspace {
         })
     }
 
-    fn finish(self) -> Vec<ManagedText> {
+    unsafe fn finish(
+        self,
+        writeback: Option<crate::runtime_gate::Il2CppWritebackExports>,
+        mut objects: Option<&mut ObjectRegistry>,
+    ) -> Vec<ManagedText> {
         let Self {
             raw_texts, utf16, ..
         } = self;
         raw_texts
             .into_iter()
-            .map(|raw| {
-                ManagedText::utf16(
-                    ManagedObjectId::new(raw.object),
+            .filter_map(|raw| {
+                let object_id = match (objects.as_deref_mut(), writeback) {
+                    (Some(objects), Some(writeback)) => {
+                        unsafe { objects.adopt_snapshot_handle(writeback, raw.handle) }?
+                    }
+                    _ => ManagedObjectId::new(raw.object),
+                };
+                Some(ManagedText::utf16(
+                    object_id,
                     raw.kind,
                     utf16[raw.start..raw.start + raw.length].to_vec(),
-                )
+                ))
             })
             .collect()
+    }
+
+    unsafe fn release_pending_handles(
+        &mut self,
+        writeback: Option<crate::runtime_gate::Il2CppWritebackExports>,
+    ) {
+        let Some(writeback) = writeback else {
+            return;
+        };
+        for raw in &mut self.raw_texts {
+            if raw.handle != 0 {
+                (writeback.gchandle_free)(raw.handle);
+                raw.handle = 0;
+            }
+        }
     }
 }
 
 #[derive(Clone, Copy)]
 struct RawText {
     object: u64,
+    handle: usize,
     kind: StandardUiKind,
     start: usize,
     length: usize,
@@ -431,5 +496,23 @@ mod tests {
         assert_eq!(workspace.liveness.objects.capacity(), MAX_SNAPSHOT_OBJECTS);
         assert_eq!(workspace.raw_texts.capacity(), MAX_SNAPSHOT_OBJECTS);
         assert_eq!(workspace.utf16.capacity(), MAX_SNAPSHOT_UTF16_UNITS);
+    }
+
+    #[test]
+    fn observe_only_snapshot_keeps_the_legacy_raw_object_identity() {
+        let mut workspace = SnapshotWorkspace::new().expect("snapshot workspace");
+        workspace.utf16.extend("Open".encode_utf16());
+        workspace.raw_texts.push(RawText {
+            object: 0x1234,
+            handle: 0,
+            kind: StandardUiKind::TextMeshPro,
+            start: 0,
+            length: 4,
+        });
+
+        let texts = unsafe { workspace.finish(None, None) };
+
+        assert_eq!(texts.len(), 1);
+        assert_eq!(texts[0].object_id(), ManagedObjectId::new(0x1234));
     }
 }

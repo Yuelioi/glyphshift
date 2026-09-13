@@ -1,10 +1,12 @@
 //! Host-independent observation contracts shared by Unity managed backends.
 
 mod observer_driver;
+mod writeback;
 
 pub use observer_driver::{
     ObserverDriver, ObserverDriverError, StandardUiObservationRuntime, StandardUiProfile,
 };
+pub use writeback::{SetterOutcome, TextDecision, TextWrite, UnityStandardUiWriteback};
 
 use std::collections::BTreeMap;
 
@@ -44,6 +46,21 @@ pub struct ManagedText {
 }
 
 impl ManagedText {
+    #[must_use]
+    pub const fn object_id(&self) -> ManagedObjectId {
+        self.object_id
+    }
+
+    #[must_use]
+    pub const fn kind(&self) -> StandardUiKind {
+        self.kind
+    }
+
+    #[must_use]
+    pub fn units(&self) -> &[u16] {
+        &self.units
+    }
+
     #[must_use]
     pub fn utf16(
         object_id: ManagedObjectId,

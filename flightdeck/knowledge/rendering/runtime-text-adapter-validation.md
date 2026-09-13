@@ -46,7 +46,7 @@
 | SDL3_ttf | 复制 `TTF_Text` 的 engine/font 及公开布局属性后绘制译文对象 | 当前只有技术 smoke，没有代表性真实目标与产品 Adapter |
 | Raylib | `DrawTextEx` 使用 fallback atlas，按帧回收旧资源并在关闭前清理 | 仅动态 raylib 5.5；静态链接、复制实现和业务纹理缓存不覆盖 |
 | Unity Mono | 同时通过 backend、标准 UI profile、live object 与主线程 gate，再管理 setter/snapshot/恢复 | NGUI、自绘 mesh、UI Toolkit、IL2CPP 与无主线程 dispatch 的目标拒绝 |
-| Unity IL2CPP | 导出、metadata 与 live standard text object 三重 gate | 当前是 observe-only 原型；存在 TMP/uGUI 类型不等于有活动标准 UI |
+| Unity IL2CPP | 导出、metadata、live standard text object 与可证明主线程四重 gate；写回只调用标准 `set_text` | 当前为未发布 TextReplace 原型；存在 TMP/uGUI 类型不等于有活动标准 UI，外部同后端自绘负例与真实写回复跑完成前不进入生产 |
 
 归档 UIA/OCR 不属于当前产品能力、验证入口或替换方案；不得以旧观测原型补齐当前适配器覆盖。
 

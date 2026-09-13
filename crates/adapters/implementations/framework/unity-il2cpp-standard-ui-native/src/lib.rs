@@ -4,11 +4,14 @@
 //! Bundle. It uses public IL2CPP exports and never writes managed text.
 
 mod diagnostics;
+mod main_thread;
 mod metadata;
 mod native_adapter;
+mod objects;
 mod observer_loop;
 mod runtime_gate;
 mod snapshot;
+mod writeback;
 
 pub use runtime_gate::{Il2CppRuntimeGate, RuntimeGateError};
 

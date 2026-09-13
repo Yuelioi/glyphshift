@@ -1,6 +1,6 @@
 # 通用实时翻译覆盖
 
-Status: Stopped
+Status: Open
 
 ## Goal
 
@@ -10,9 +10,18 @@ Status: Stopped
 
 ## Current
 
-本 Work 已于产品路线收敛后停止。Glyphshift 的“任意软件实时翻译覆盖”目标被新的 Adobe 专用产品
-YomiFrame 取代；现有实现和实证只作为选择性迁移来源保留，不再继续 Unity、游戏引擎或其他通用
-Adapter 覆盖工作。
+用户已恢复通用引擎文字覆盖主线，当前优先级为 Unity IL2CPP、Godot 4、UE5。当前执行
+[Unity IL2CPP Standard UI TextReplace 原型](slices/unity-il2cpp-standard-ui-writeback-prototype.md)：在已完成
+observe-only seam 与两个跨代正例基础上，只使用公开 IL2CPP metadata/runtime invoke、标准 TMP/uGUI
+`set_text` 语义和通用 Windows 主线程调度；不使用私有 `MethodInfo` 布局、逐游戏 RVA、符号或机器码扫描。
+原型继续保持未发布，外部 Shipping-like 自绘负例仍阻止生产 Catalog/Runtime Bundle 接入。
+
+该 TextReplace 代码原型与确定性合同现已完成：共享 retained-text 状态机覆盖动态业务原文、Dictionary
+generation 与停用恢复；IL2CPP 写回只经公开 setter invoke，live object/replacement string 分别使用弱/强
+GC handle。全局 Session 锁已从 Host callback、snapshot、managed setter 与恢复/清理调用栈移开；Host
+decision 与 setter 调用期间保持事务所有权，重入 refresh 只排队，重入 deactivate 返回失败且保持 Active，
+只有独占停用恢复成功后才真正发布 inactive。当前只缺两个已授权 IL2CPP
+正例的真实可见复跑；本机路径仍缺失时保持 Slice `In Progress`。
 
 现有 GDI、USER32 DrawText、GDI+、Qt、GTK 3/Pango 与 DirectWrite TextLayout Adapter 已进入正式
 Runtime Bundle。Console 与 UI Automation 目前只有采集价值，不能作为实时翻译成功。Direct2D
@@ -266,9 +275,17 @@ NGUI-only 同后端负例继续拒绝。
 
 ## Next
 
-None.
+- 完成 [Unity IL2CPP Standard UI TextReplace 原型](slices/unity-il2cpp-standard-ui-writeback-prototype.md)：代码与
+  确定性合同已证明公共 setter invoke、对象寿命、generation 2、动态业务原文和停用恢复；下一步只恢复
+  两个已授权跨代正例做可见验收，本机真实目标路径缺失时不得伪造实机结论。
+- IL2CPP 原型收口后按既定优先级进入 Godot 4 observe-only Go/No-Go；UE5 保持最后，不接受逐游戏地址路线。
 
 ## Progress
+
+- Unity IL2CPP TextReplace 未发布原型已完成代码侧收口：native 27/27、共享状态机 15/15、IL2CPP facade
+  1/1、Mono facade 1/1、Mono native 11/11、shipping-like 6/6 通过；IL2CPP native Clippy 通过。全局
+  Session mutex 不再包住 Host/IL2CPP 外部调用，停用 gate 保证失败停用仍保持 Host/Adapter 生命周期一致；
+  真实正例路径仍缺。
 
 - 产品路线最终放弃通用软件覆盖并转向独立的 Adobe 专用产品；本 Work 因被取代而停止，未完成的
   IL2CPP 生产准入项不再属于后续议程。

@@ -1,12 +1,12 @@
-//! Unity Mono Standard UI descriptor and retained-text writeback state.
-
-mod writeback;
+//! Unity Mono Standard UI descriptor over the shared retained-text state.
 
 pub use glyphshift_adapter_unity_standard_ui::{
-    ManagedObjectId, ManagedText, ObservedText, ObserverEvent, StandardUiKind,
-    UnityStandardUiObserver, MAX_TEXT_UNITS, MAX_TRACKED_OBJECTS,
+    ManagedObjectId, ManagedText, ObservedText, ObserverEvent, SetterOutcome, StandardUiKind,
+    TextDecision, TextWrite, UnityStandardUiObserver, UnityStandardUiWriteback, MAX_TEXT_UNITS,
+    MAX_TRACKED_OBJECTS,
 };
-pub use writeback::{SetterOutcome, TextDecision, TextWrite, UnityMonoWriteback};
+
+pub type UnityMonoWriteback = UnityStandardUiWriteback;
 
 use glyphshift_adapter_sdk::{AdapterDescriptor, AdapterVersion};
 use glyphshift_domain::{AdapterId, ApplyModel, Feature, Placement};

@@ -4,7 +4,9 @@
 
 - [DirectWrite 修复与 0.4.1 发布](work/ae2025-text-capture/index.md)
 
-- **Focus** [Rust 模块结构整理](work/rust-module-refactor/index.md)
+- [Rust 模块结构整理](work/rust-module-refactor/index.md)
+
+- **Focus** [通用实时翻译覆盖](work/real-time-translation-coverage/index.md)
 
 - [单软件工作流统一](work/workflow-unification/index.md)
 

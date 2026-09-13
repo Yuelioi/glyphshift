@@ -158,6 +158,10 @@
     直接复用两个已固定的跨代正例，证明初始/增量 live-object snapshot、停用与退出；不扩大到 UI
     Toolkit、NGUI、两次 snapshot 间的瞬时文字、写回或生产 Catalog/Bundle。Unity 2021 LTS 动态分数
     正例取得 14 条 Observation，Unity 6 搜索更新正例取得 72 条；均正常停用退出。
+  - [ ] 完成 [Unity IL2CPP Standard UI TextReplace 原型](slices/unity-il2cpp-standard-ui-writeback-prototype.md)：
+    只通过公开 `il2cpp_class_get_method_from_name`、`il2cpp_runtime_invoke`、UTF-16 string/GC handle 与通用
+    Windows 主线程调度调用标准属性 setter，证明初始写回、动态原文、第二代更新和停用恢复；不直接写
+    `m_text`/`m_Text` 字段，不读取私有 `MethodInfo` 或逐游戏地址。
   - [ ] 后续恢复 [Unity IL2CPP Standard UI 同后端负例宿主](slices/unity-il2cpp-standard-ui-negative-harness.md)：
     source-only fixture 与静态合同已完成；真实构建/smoke 不再阻塞 observe-only Hook，也不为此安装 Unity。
   - [ ] 新增生产 crate、Catalog 或 Runtime Bundle 项前，另行取得一份外部、可重复的 Windows x64 IL2CPP

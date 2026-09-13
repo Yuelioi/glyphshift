@@ -32,10 +32,16 @@ impl ObserverLoop {
     }
 
     pub(crate) fn stop(mut self) {
-        self.stop.store(true, Ordering::Release);
+        self.request_stop();
         if let Some(worker) = self.worker.take() {
-            let _ = worker.join();
+            if worker.thread().id() != thread::current().id() {
+                let _ = worker.join();
+            }
         }
+    }
+
+    pub(crate) fn request_stop(&self) {
+        self.stop.store(true, Ordering::Release);
     }
 }
 

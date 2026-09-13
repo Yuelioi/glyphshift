@@ -9,7 +9,7 @@ struct RequiredExport {
     nul_terminated: &'static [u8],
 }
 
-const REQUIRED_EXPORTS: [RequiredExport; 17] = [
+const OBSERVE_EXPORTS: [RequiredExport; 17] = [
     required_export("il2cpp_domain_get", b"il2cpp_domain_get\0"),
     required_export(
         "il2cpp_domain_get_assemblies",
@@ -47,6 +47,26 @@ const REQUIRED_EXPORTS: [RequiredExport; 17] = [
     required_export("il2cpp_thread_detach", b"il2cpp_thread_detach\0"),
 ];
 
+const WRITEBACK_EXPORTS: [RequiredExport; 8] = [
+    required_export(
+        "il2cpp_class_get_method_from_name",
+        b"il2cpp_class_get_method_from_name\0",
+    ),
+    required_export("il2cpp_runtime_invoke", b"il2cpp_runtime_invoke\0"),
+    required_export("il2cpp_string_new_utf16", b"il2cpp_string_new_utf16\0"),
+    required_export("il2cpp_gchandle_new", b"il2cpp_gchandle_new\0"),
+    required_export(
+        "il2cpp_gchandle_new_weakref",
+        b"il2cpp_gchandle_new_weakref\0",
+    ),
+    required_export(
+        "il2cpp_gchandle_get_target",
+        b"il2cpp_gchandle_get_target\0",
+    ),
+    required_export("il2cpp_gchandle_free", b"il2cpp_gchandle_free\0"),
+    required_export("il2cpp_format_exception", b"il2cpp_format_exception\0"),
+];
+
 const fn required_export(name: &'static str, nul_terminated: &'static [u8]) -> RequiredExport {
     RequiredExport {
         name,
@@ -78,26 +98,39 @@ trait RuntimeSource {
 /// Resolved public IL2CPP export contract for the current process.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Il2CppRuntimeGate {
-    export_addresses: [usize; REQUIRED_EXPORTS.len()],
+    observe_export_addresses: [usize; OBSERVE_EXPORTS.len()],
+    writeback_export_addresses: Option<[usize; WRITEBACK_EXPORTS.len()]>,
 }
 
 impl Il2CppRuntimeGate {
     /// Inspects only modules that are already loaded in the current process.
-    pub fn inspect_current_process() -> Result<Self, RuntimeGateError> {
-        inspect_with(&CurrentProcessRuntime)
+    pub fn inspect_current_process(require_writeback: bool) -> Result<Self, RuntimeGateError> {
+        inspect_with(&CurrentProcessRuntime, require_writeback)
     }
 
     #[must_use]
     pub const fn resolved_export_count(&self) -> usize {
-        self.export_addresses.len()
+        OBSERVE_EXPORTS.len()
+            + if self.writeback_export_addresses.is_some() {
+                WRITEBACK_EXPORTS.len()
+            } else {
+                0
+            }
     }
 
     fn address(&self, name: &str) -> usize {
-        let index = REQUIRED_EXPORTS
+        if let Some(index) = OBSERVE_EXPORTS
+            .iter()
+            .position(|required| required.name == name)
+        {
+            return self.observe_export_addresses[index];
+        }
+        let index = WRITEBACK_EXPORTS
             .iter()
             .position(|required| required.name == name)
             .expect("IL2CPP export is part of the validated gate");
-        self.export_addresses[index]
+        self.writeback_export_addresses
+            .expect("writeback exports were validated before use")[index]
     }
 
     pub(crate) fn exports(self) -> Il2CppExports {
@@ -107,6 +140,24 @@ impl Il2CppRuntimeGate {
             };
         }
         unsafe {
+            let writeback = self
+                .writeback_export_addresses
+                .map(|_| Il2CppWritebackExports {
+                    class_get_method_from_name: resolve!(
+                        "il2cpp_class_get_method_from_name",
+                        ClassGetMethodFromName
+                    ),
+                    runtime_invoke: resolve!("il2cpp_runtime_invoke", RuntimeInvoke),
+                    string_new_utf16: resolve!("il2cpp_string_new_utf16", StringNewUtf16),
+                    gchandle_new: resolve!("il2cpp_gchandle_new", GcHandleNew),
+                    gchandle_new_weakref: resolve!(
+                        "il2cpp_gchandle_new_weakref",
+                        GcHandleNewWeakRef
+                    ),
+                    gchandle_get_target: resolve!("il2cpp_gchandle_get_target", GcHandleGetTarget),
+                    gchandle_free: resolve!("il2cpp_gchandle_free", GcHandleFree),
+                    format_exception: resolve!("il2cpp_format_exception", FormatException),
+                });
             Il2CppExports {
                 domain_get: resolve!("il2cpp_domain_get", DomainGet),
                 domain_get_assemblies: resolve!(
@@ -137,6 +188,7 @@ impl Il2CppRuntimeGate {
                 thread_current: resolve!("il2cpp_thread_current", ThreadCurrent),
                 thread_attach: resolve!("il2cpp_thread_attach", ThreadAttach),
                 thread_detach: resolve!("il2cpp_thread_detach", ThreadDetach),
+                writeback,
             }
         }
     }
@@ -151,7 +203,10 @@ pub enum RuntimeGateError {
     MissingExport(&'static str),
 }
 
-fn inspect_with(source: &impl RuntimeSource) -> Result<Il2CppRuntimeGate, RuntimeGateError> {
+fn inspect_with(
+    source: &impl RuntimeSource,
+    require_writeback: bool,
+) -> Result<Il2CppRuntimeGate, RuntimeGateError> {
     match source.platform() {
         HostPlatform::WindowsX64 => {}
         #[cfg(any(test, all(windows, not(target_arch = "x86_64"))))]
@@ -166,13 +221,27 @@ fn inspect_with(source: &impl RuntimeSource) -> Result<Il2CppRuntimeGate, Runtim
         .loaded_module(IL2CPP_MODULE)
         .ok_or(RuntimeGateError::Il2CppRuntimeUnavailable)?;
 
-    let mut export_addresses = [0; REQUIRED_EXPORTS.len()];
-    for (index, required) in REQUIRED_EXPORTS.iter().enumerate() {
-        export_addresses[index] = source
+    let mut observe_export_addresses = [0; OBSERVE_EXPORTS.len()];
+    for (index, required) in OBSERVE_EXPORTS.iter().enumerate() {
+        observe_export_addresses[index] = source
             .export_address(module, required.nul_terminated)
             .ok_or(RuntimeGateError::MissingExport(required.name))?;
     }
-    Ok(Il2CppRuntimeGate { export_addresses })
+    let writeback_export_addresses = if require_writeback {
+        let mut addresses = [0; WRITEBACK_EXPORTS.len()];
+        for (index, required) in WRITEBACK_EXPORTS.iter().enumerate() {
+            addresses[index] = source
+                .export_address(module, required.nul_terminated)
+                .ok_or(RuntimeGateError::MissingExport(required.name))?;
+        }
+        Some(addresses)
+    } else {
+        None
+    };
+    Ok(Il2CppRuntimeGate {
+        observe_export_addresses,
+        writeback_export_addresses,
+    })
 }
 
 struct CurrentProcessRuntime;
@@ -255,7 +324,15 @@ pub(crate) type ClassFromName =
     unsafe extern "C" fn(*const c_void, *const c_char, *const c_char) -> *mut c_void;
 pub(crate) type ClassGetFieldFromName =
     unsafe extern "C" fn(*mut c_void, *const c_char) -> *mut c_void;
+pub(crate) type ClassGetMethodFromName =
+    unsafe extern "C" fn(*mut c_void, *const c_char, i32) -> *const c_void;
 pub(crate) type FieldGetValue = unsafe extern "C" fn(*mut c_void, *mut c_void, *mut c_void);
+pub(crate) type RuntimeInvoke = unsafe extern "C" fn(
+    *const c_void,
+    *mut c_void,
+    *mut *mut c_void,
+    *mut *mut c_void,
+) -> *mut c_void;
 pub(crate) type RegisterObjects = unsafe extern "C" fn(*mut *mut c_void, i32, *mut c_void);
 pub(crate) type Reallocate = unsafe extern "C" fn(*mut c_void, usize, *mut c_void) -> *mut c_void;
 pub(crate) type LivenessAllocate = unsafe extern "C" fn(
@@ -272,6 +349,17 @@ pub(crate) type StopGcWorld = unsafe extern "C" fn();
 pub(crate) type StartGcWorld = unsafe extern "C" fn();
 pub(crate) type StringChars = unsafe extern "C" fn(*mut c_void) -> *const u16;
 pub(crate) type StringLength = unsafe extern "C" fn(*mut c_void) -> i32;
+pub(crate) type StringNewUtf16 = unsafe extern "C" fn(*const u16, i32) -> *mut c_void;
+// `Il2CppGCHandle` changed from an integer handle in older Unity releases to a
+// pointer-sized handle in newer IL2CPP. This adapter is Windows x64-only, where
+// `usize` is ABI-compatible with both forms: a 32-bit return is zero-extended
+// in RAX and an older callee consuming the handle reads the low 32 bits.
+pub(crate) type GcHandle = usize;
+pub(crate) type GcHandleNew = unsafe extern "C" fn(*mut c_void, bool) -> GcHandle;
+pub(crate) type GcHandleNewWeakRef = unsafe extern "C" fn(*mut c_void, bool) -> GcHandle;
+pub(crate) type GcHandleGetTarget = unsafe extern "C" fn(GcHandle) -> *mut c_void;
+pub(crate) type GcHandleFree = unsafe extern "C" fn(GcHandle);
+pub(crate) type FormatException = unsafe extern "C" fn(*const c_void, *mut c_char, i32);
 pub(crate) type ThreadCurrent = unsafe extern "C" fn() -> *mut c_void;
 pub(crate) type ThreadAttach = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 pub(crate) type ThreadDetach = unsafe extern "C" fn(*mut c_void);
@@ -295,6 +383,19 @@ pub(crate) struct Il2CppExports {
     pub thread_current: ThreadCurrent,
     pub thread_attach: ThreadAttach,
     pub thread_detach: ThreadDetach,
+    pub writeback: Option<Il2CppWritebackExports>,
+}
+
+#[derive(Clone, Copy)]
+pub(crate) struct Il2CppWritebackExports {
+    pub class_get_method_from_name: ClassGetMethodFromName,
+    pub runtime_invoke: RuntimeInvoke,
+    pub string_new_utf16: StringNewUtf16,
+    pub gchandle_new: GcHandleNew,
+    pub gchandle_new_weakref: GcHandleNewWeakRef,
+    pub gchandle_get_target: GcHandleGetTarget,
+    pub gchandle_free: GcHandleFree,
+    pub format_exception: FormatException,
 }
 
 #[cfg(test)]
@@ -318,8 +419,9 @@ mod tests {
                 platform: HostPlatform::WindowsX64,
                 mono: false,
                 il2cpp: true,
-                exports: REQUIRED_EXPORTS
+                exports: OBSERVE_EXPORTS
                     .iter()
+                    .chain(WRITEBACK_EXPORTS.iter())
                     .map(|required| required.nul_terminated)
                     .collect(),
             }
@@ -348,8 +450,32 @@ mod tests {
 
     #[test]
     fn accepts_complete_loaded_il2cpp_runtime() {
-        let gate = inspect_with(&FakeRuntime::compatible()).expect("complete gate");
-        assert_eq!(gate.resolved_export_count(), REQUIRED_EXPORTS.len());
+        let runtime = FakeRuntime::compatible();
+        let observe = inspect_with(&runtime, false).expect("observe gate");
+        assert_eq!(observe.resolved_export_count(), OBSERVE_EXPORTS.len());
+        let writeback = inspect_with(&runtime, true).expect("writeback gate");
+        assert_eq!(
+            writeback.resolved_export_count(),
+            OBSERVE_EXPORTS.len() + WRITEBACK_EXPORTS.len()
+        );
+    }
+
+    #[test]
+    fn observe_only_does_not_require_writeback_exports() {
+        let mut runtime = FakeRuntime::compatible();
+        for required in WRITEBACK_EXPORTS {
+            runtime.exports.remove(required.nul_terminated);
+        }
+        assert_eq!(
+            inspect_with(&runtime, false)
+                .expect("observe-only gate")
+                .resolved_export_count(),
+            OBSERVE_EXPORTS.len()
+        );
+        assert_eq!(
+            inspect_with(&runtime, true),
+            Err(RuntimeGateError::MissingExport(WRITEBACK_EXPORTS[0].name))
+        );
     }
 
     #[test]
@@ -358,7 +484,10 @@ mod tests {
             mono: true,
             ..FakeRuntime::compatible()
         };
-        assert_eq!(inspect_with(&runtime), Err(RuntimeGateError::MonoBackend));
+        assert_eq!(
+            inspect_with(&runtime, false),
+            Err(RuntimeGateError::MonoBackend)
+        );
     }
 
     #[test]
@@ -368,18 +497,26 @@ mod tests {
             ..FakeRuntime::compatible()
         };
         assert_eq!(
-            inspect_with(&runtime),
+            inspect_with(&runtime, false),
             Err(RuntimeGateError::Il2CppRuntimeUnavailable)
         );
 
-        let mut runtime = FakeRuntime::compatible();
-        runtime
-            .exports
-            .remove(b"il2cpp_field_get_value\0".as_slice());
-        assert_eq!(
-            inspect_with(&runtime),
-            Err(RuntimeGateError::MissingExport("il2cpp_field_get_value"))
-        );
+        for required in OBSERVE_EXPORTS {
+            let mut runtime = FakeRuntime::compatible();
+            runtime.exports.remove(required.nul_terminated);
+            assert_eq!(
+                inspect_with(&runtime, false),
+                Err(RuntimeGateError::MissingExport(required.name))
+            );
+        }
+        for required in WRITEBACK_EXPORTS {
+            let mut runtime = FakeRuntime::compatible();
+            runtime.exports.remove(required.nul_terminated);
+            assert_eq!(
+                inspect_with(&runtime, true),
+                Err(RuntimeGateError::MissingExport(required.name))
+            );
+        }
     }
 
     #[test]
@@ -389,7 +526,7 @@ mod tests {
             ..FakeRuntime::compatible()
         };
         assert_eq!(
-            inspect_with(&runtime),
+            inspect_with(&runtime, false),
             Err(RuntimeGateError::UnsupportedArchitecture)
         );
 
@@ -398,7 +535,7 @@ mod tests {
             ..FakeRuntime::compatible()
         };
         assert_eq!(
-            inspect_with(&runtime),
+            inspect_with(&runtime, false),
             Err(RuntimeGateError::UnsupportedPlatform)
         );
     }
