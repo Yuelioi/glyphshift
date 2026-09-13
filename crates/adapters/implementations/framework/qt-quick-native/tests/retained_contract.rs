@@ -72,7 +72,7 @@ impl Storage {
 }
 
 #[test]
-#[ignore = "requires GLYPHSHIFT_QT_BIN, GLYPHSHIFT_QT_PLUGIN_PATH and GLYPHSHIFT_QML_IMPORT_PATH for a Qt 6.8.3 installation"]
+#[ignore = "requires GLYPHSHIFT_QT_BIN, GLYPHSHIFT_QT_PLUGIN_PATH and GLYPHSHIFT_QML_IMPORT_PATH for a verified Qt installation"]
 fn retained_labels_survive_control_thread_exit_updates_and_object_destruction() {
     unsafe {
         let root =

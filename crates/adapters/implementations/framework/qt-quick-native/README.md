@@ -1,8 +1,8 @@
 # Qt Quick 标准文字
 
-`windows.qt.quick-text` 是独立的 RetainedObject Adapter，用于现有 Qt Painter 绘制入口无法覆盖的 QML 文字对象。当前只接受动态 Qt **6.8.3 / Windows x64 / MSVC ABI**，版本和必需导出不匹配时拒绝激活。
+`windows.qt.quick-text` 是独立的 RetainedObject Adapter，用于现有 Qt Painter 绘制入口无法覆盖的 QML 文字对象。当前只接受动态 Qt **6.8.3 或 6.11.1 / Windows x64 / MSVC ABI**，版本和必需导出不匹配时拒绝激活。
 
-支持 QQuickText 派生标签、使用这些标签的菜单和提示。首版只处理 PlainText 和保守判断的 AutoText；TextInput、TextEdit、富文本、静态链接 Qt、自绘纹理及其他 Qt 版本不在范围内。
+支持 QQuickText 派生标签、使用这些标签的菜单和提示。只处理 PlainText 和保守判断的 AutoText；TextInput、TextEdit、富文本、静态链接 Qt、自绘纹理及其他 Qt 版本不在范围内。
 
 ## 生命周期
 

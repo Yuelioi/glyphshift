@@ -1,4 +1,4 @@
-//! The deliberately narrow, dynamically resolved Qt 6.8.3 MSVC x64 ABI.
+//! The deliberately narrow, dynamically resolved Qt 6.8.3 / 6.11.1 MSVC x64 ABI.
 use glyphshift_adapter_qt_quick::{eligible_text, MAX_TEXT_UNITS};
 use std::{
     collections::HashSet,
@@ -14,6 +14,12 @@ type Getter = unsafe extern "system" fn(Object, Object) -> Object;
 type List = unsafe extern "system" fn(Object) -> Object;
 type Pointer = unsafe extern "system" fn(Object) -> Object;
 type Predicate = unsafe extern "system" fn(Object) -> bool;
+
+const SUPPORTED_QT_VERSIONS: &[&[u8]] = &[b"6.8.3", b"6.11.1"];
+
+fn supported_qt_version(version: &[u8]) -> bool {
+    SUPPORTED_QT_VERSIONS.contains(&version)
+}
 
 pub struct Qt {
     all_windows: List,
@@ -61,7 +67,7 @@ impl Qt {
             };
         }
         let version = symbol!(core, "qVersion", unsafe extern "system" fn() -> *const i8);
-        if std::ffi::CStr::from_ptr(version()).to_bytes() != b"6.8.3" {
+        if !supported_qt_version(std::ffi::CStr::from_ptr(version()).to_bytes()) {
             return Err(());
         }
         Ok(Self {
@@ -215,5 +221,20 @@ impl Qt {
             pending.extend(self.list(children).into_iter().map(|child| (child, alpha)));
         }
         result
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::supported_qt_version;
+
+    #[test]
+    fn only_verified_qt_versions_are_accepted() {
+        assert!(supported_qt_version(b"6.8.3"));
+        assert!(supported_qt_version(b"6.11.1"));
+        assert!(!supported_qt_version(b"6.8.2"));
+        assert!(!supported_qt_version(b"6.9.0"));
+        assert!(!supported_qt_version(b"6.11.0"));
+        assert!(!supported_qt_version(b"6.12.0"));
     }
 }

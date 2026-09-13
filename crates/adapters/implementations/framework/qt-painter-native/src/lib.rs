@@ -23,11 +23,14 @@ use windows::Win32::System::LibraryLoader::{GetModuleHandleW, GetProcAddress};
 const SUPPORTED_FEATURES: u64 = FEATURE_TEXT_OBSERVE | FEATURE_TEXT_REPLACE;
 const MAX_TEXT_UNITS: usize = 16 * 1024;
 
+const DRAW_POINT_SIMPLE_SYMBOL: &[u8] = b"?drawText@QPainter@@QEAAXAEBVQPointF@@AEBVQString@@@Z\0";
 const DRAW_POINT_SYMBOL: &[u8] = b"?drawText@QPainter@@QEAAXAEBVQPointF@@AEBVQString@@HH@Z\0";
 const DRAW_RECT_SYMBOL: &[u8] = b"?drawText@QPainter@@QEAAXAEBVQRect@@HAEBVQString@@PEAV2@@Z\0";
 const DRAW_RECT_OPTION_SYMBOL: &[u8] =
     b"?drawText@QPainter@@QEAAXAEBVQRectF@@AEBVQString@@AEBVQTextOption@@@Z\0";
 const DRAW_RECT_F_SYMBOL: &[u8] = b"?drawText@QPainter@@QEAAXAEBVQRectF@@HAEBVQString@@PEAV2@@Z\0";
+const DRAW_RECT_COORDS_SYMBOL: &[u8] =
+    b"?drawText@QPainter@@QEAAXHHHHHAEBVQString@@PEAVQRect@@@Z\0";
 const QSTRING_UTF16_SYMBOL: &[u8] = b"?utf16@QString@@QEBAPEBGXZ\0";
 const QSTRING_DTOR_SYMBOL: &[u8] = b"??1QString@@QEAA@XZ\0";
 const QSTRING5_CTOR_SYMBOL: &[u8] = b"??0QString@@QEAA@PEBVQChar@@H@Z\0";
@@ -245,10 +248,12 @@ fn release_ref(ref_count: &AtomicI32) -> bool {
 
 struct QtHooks {
     strings: QStringApi,
+    point_simple: Option<GenericDetour<FnDrawPointSimple>>,
     point: GenericDetour<FnDrawPoint>,
     rect: GenericDetour<FnDrawRect>,
     rect_option: GenericDetour<FnDrawRectOption>,
     rect_f: GenericDetour<FnDrawRect>,
+    rect_coords: Option<GenericDetour<FnDrawRectCoords>>,
     widget_refresh: Option<WidgetRefreshHooks>,
 }
 
@@ -390,6 +395,10 @@ fn replacement_for(source: &str) -> Option<Vec<u16>> {
     .then_some(decision.text)
 }
 
+fn eligible_source(source: &str) -> bool {
+    !source.trim().is_empty()
+}
+
 fn drawn_point_text(text: &str, from: i32, length: i32) -> Option<String> {
     let from = usize::try_from(from).ok()?;
     let units = text.encode_utf16().collect::<Vec<_>>();
@@ -423,6 +432,9 @@ unsafe fn draw_rect_with(
     let Some(source) = hooks.strings.read(text) else {
         return original();
     };
+    if !eligible_source(&source) {
+        return original();
+    }
     let _scope = text_scope();
     let Some(replacement) = replacement_for(&source) else {
         return original();
@@ -759,19 +771,31 @@ unsafe fn build_hooks() -> Result<QtHooks, ()> {
     };
     let point_target =
         std::mem::transmute::<RawProc, FnDrawPoint>(resolve(gui, DRAW_POINT_SYMBOL)?);
+    let point_simple_target = resolve(gui, DRAW_POINT_SIMPLE_SYMBOL)
+        .ok()
+        .map(|target| std::mem::transmute::<RawProc, FnDrawPointSimple>(target));
     let rect_target = std::mem::transmute::<RawProc, FnDrawRect>(resolve(gui, DRAW_RECT_SYMBOL)?);
     let rect_option_target =
         std::mem::transmute::<RawProc, FnDrawRectOption>(resolve(gui, DRAW_RECT_OPTION_SYMBOL)?);
     let rect_f_target =
         std::mem::transmute::<RawProc, FnDrawRect>(resolve(gui, DRAW_RECT_F_SYMBOL)?);
+    let rect_coords_target = resolve(gui, DRAW_RECT_COORDS_SYMBOL)
+        .ok()
+        .map(|target| std::mem::transmute::<RawProc, FnDrawRectCoords>(target));
     let widget_refresh = build_widget_refresh_hooks(major, core, namespace)?;
     Ok(QtHooks {
         strings,
+        point_simple: point_simple_target
+            .map(|target| GenericDetour::new(target, draw_point_simple_detour).map_err(|_| ()))
+            .transpose()?,
         point: GenericDetour::new(point_target, draw_point_detour).map_err(|_| ())?,
         rect: GenericDetour::new(rect_target, draw_rect_detour).map_err(|_| ())?,
         rect_option: GenericDetour::new(rect_option_target, draw_rect_option_detour)
             .map_err(|_| ())?,
         rect_f: GenericDetour::new(rect_f_target, draw_rect_f_detour).map_err(|_| ())?,
+        rect_coords: rect_coords_target
+            .map(|target| GenericDetour::new(target, draw_rect_coords_detour).map_err(|_| ()))
+            .transpose()?,
         widget_refresh,
     })
 }
@@ -781,6 +805,11 @@ unsafe fn install_hooks() -> Result<(), ()> {
         HOOKS.set(build_hooks()?).map_err(|_| ())?;
     }
     let hooks = HOOKS.get().ok_or(())?;
+    if let Some(point_simple) = hooks.point_simple.as_ref() {
+        if !point_simple.is_enabled() {
+            point_simple.enable().map_err(|_| ())?;
+        }
+    }
     if !hooks.point.is_enabled() {
         hooks.point.enable().map_err(|_| ())?;
     }
@@ -792,6 +821,11 @@ unsafe fn install_hooks() -> Result<(), ()> {
     }
     if !hooks.rect_f.is_enabled() {
         hooks.rect_f.enable().map_err(|_| ())?;
+    }
+    if let Some(rect_coords) = hooks.rect_coords.as_ref() {
+        if !rect_coords.is_enabled() {
+            rect_coords.enable().map_err(|_| ())?;
+        }
     }
     Ok(())
 }
@@ -821,7 +855,9 @@ static TEXT_HOST: std::sync::Mutex<Option<NativeTextHostBinding>> = std::sync::M
 /// A non-null host must point to a readable V1 extension whose context and callbacks
 /// remain valid until every Adapter callback has finished.
 #[no_mangle]
-pub unsafe extern "C" fn glyphshift_adapter_bind_text_host_v1(host: *const NativeTextHostV1) -> i32 {
+pub unsafe extern "C" fn glyphshift_adapter_bind_text_host_v1(
+    host: *const NativeTextHostV1,
+) -> i32 {
     let value = if host.is_null() {
         None
     } else {
@@ -842,4 +878,17 @@ pub unsafe extern "C" fn glyphshift_adapter_bind_text_host_v1(host: *const Nativ
 fn text_scope() -> Option<glyphshift_adapter_native_abi::NativeTextScope> {
     let binding = HOST.get()?.read().ok()?.text_host?;
     binding.enter_scope()
+}
+
+#[cfg(test)]
+mod source_tests {
+    use super::eligible_source;
+
+    #[test]
+    fn whitespace_only_painter_text_never_reaches_the_host() {
+        assert!(!eligible_source(""));
+        assert!(!eligible_source(" \t\r\n"));
+        assert!(eligible_source("File"));
+        assert!(eligible_source(" File "));
+    }
 }
