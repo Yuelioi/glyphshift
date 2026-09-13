@@ -2,7 +2,9 @@
 
 ## Open Work
 
-- **Focus** [DirectWrite 修复与 0.4.1 发布](work/ae2025-text-capture/index.md)
+- [DirectWrite 修复与 0.4.1 发布](work/ae2025-text-capture/index.md)
+
+- **Focus** [Rust 模块结构整理](work/rust-module-refactor/index.md)
 
 - [单软件工作流统一](work/workflow-unification/index.md)
 
