@@ -1,4 +1,4 @@
-//! Descriptor for the unpublished Unity IL2CPP Standard UI retained-text prototype.
+//! Descriptor for the Unity IL2CPP Standard UI retained-text adapter.
 
 use glyphshift_adapter_sdk::{AdapterDescriptor, AdapterVersion};
 use glyphshift_domain::{AdapterId, ApplyModel, Feature, Placement};
@@ -12,7 +12,11 @@ pub fn descriptor() -> AdapterDescriptor {
         AdapterVersion::new(0, 1, 0),
         ApplyModel::RetainedObject,
         Placement::TargetProcess,
-        [Feature::TextObserve, Feature::TextReplace],
+        [
+            Feature::TextObserve,
+            Feature::TextReplace,
+            Feature::FontSubstitute,
+        ],
     )
     .with_platforms(["windows"])
     .with_architectures(["x86_64"])
@@ -23,7 +27,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn descriptor_is_unpublished_retained_standard_ui_windows_x64() {
+    fn descriptor_is_retained_standard_ui_windows_x64() {
         let descriptor = descriptor();
 
         assert_eq!(descriptor.adapter_id().as_str(), ADAPTER_ID);
@@ -31,7 +35,11 @@ mod tests {
         assert_eq!(descriptor.placement(), Placement::TargetProcess);
         assert_eq!(
             descriptor.features().collect::<Vec<_>>(),
-            [Feature::TextObserve, Feature::TextReplace]
+            [
+                Feature::TextObserve,
+                Feature::TextReplace,
+                Feature::FontSubstitute,
+            ]
         );
         assert_eq!(descriptor.platforms().collect::<Vec<_>>(), ["windows"]);
         assert_eq!(descriptor.architectures().collect::<Vec<_>>(), ["x86_64"]);

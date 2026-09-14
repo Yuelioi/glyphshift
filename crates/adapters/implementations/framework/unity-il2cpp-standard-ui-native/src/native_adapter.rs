@@ -1,13 +1,15 @@
 use crate::diagnostics::trace;
+use crate::font_substitution::FontWrite;
 use crate::main_thread;
 use crate::metadata::Il2CppStandardUiRuntime;
 use crate::observer_loop::ObserverLoop;
 use crate::runtime_gate::Il2CppRuntimeGate;
 use glyphshift_adapter_native_abi::{
     DecideUtf16V1, NativeAdapterApiV1, NativeAdapterDescriptorV1, NativeNegotiationV1,
-    NativeRuntimeHostV1, ARCH_X86_64, DECISION_TEXT_REPLACE, FEATURE_TEXT_OBSERVE,
-    FEATURE_TEXT_REPLACE, PLATFORM_WINDOWS, STATUS_ACTIVATION_FAILED, STATUS_INVALID_HOST,
-    STATUS_OK, STATUS_UNAUTHORIZED_FEATURE, STATUS_UNSUPPORTED_FEATURE,
+    NativeRuntimeHostV1, ARCH_X86_64, DECISION_FONT_SUBSTITUTE, DECISION_TEXT_REPLACE,
+    FEATURE_FONT_SUBSTITUTE, FEATURE_TEXT_OBSERVE, FEATURE_TEXT_REPLACE, PLATFORM_WINDOWS,
+    STATUS_ACTIVATION_FAILED, STATUS_INVALID_HOST, STATUS_OK, STATUS_UNAUTHORIZED_FEATURE,
+    STATUS_UNSUPPORTED_FEATURE,
 };
 use glyphshift_adapter_unity_il2cpp_standard_ui::ADAPTER_ID;
 use glyphshift_adapter_unity_standard_ui::{
@@ -25,7 +27,14 @@ const SNAPSHOT_FAILED: u8 = 2;
 const INITIAL_SNAPSHOT_TIMEOUT: Duration = Duration::from_secs(3);
 const MAIN_THREAD_DISPATCH_TIMEOUT: Duration = Duration::from_millis(750);
 const RESTORE_TIMEOUT: Duration = Duration::from_secs(3);
-const SUPPORTED_FEATURES: u64 = FEATURE_TEXT_OBSERVE | FEATURE_TEXT_REPLACE;
+const MUTATING_FEATURES: u64 = FEATURE_TEXT_REPLACE | FEATURE_FONT_SUBSTITUTE;
+const SUPPORTED_FEATURES: u64 = FEATURE_TEXT_OBSERVE | MUTATING_FEATURES;
+
+struct HostDecision {
+    text: TextDecision,
+    replacement: Option<Vec<u16>>,
+    font: Option<Box<str>>,
+}
 
 #[derive(Clone, Copy)]
 struct HostBridge {
@@ -34,13 +43,13 @@ struct HostBridge {
 }
 
 impl HostBridge {
-    fn decide(self, source: &str) -> Option<TextDecision> {
+    fn decide(self, source: &str) -> Option<HostDecision> {
         let source = source.encode_utf16().collect::<Vec<_>>();
         if source.is_empty() || source.len() > MAX_TEXT_UNITS {
             return None;
         }
         let mut replacement = vec![0_u16; MAX_TEXT_UNITS];
-        let mut font = vec![0_u16; 63];
+        let mut font = vec![0_u16; 256];
         let decision = (self.decide_utf16)(
             self.context as *mut c_void,
             source.as_ptr(),
@@ -53,18 +62,37 @@ impl HostBridge {
         if decision.status != STATUS_OK {
             return None;
         }
-        if decision.decision_bits & DECISION_TEXT_REPLACE == 0 {
-            return Some(TextDecision::keep(decision.generation));
-        }
-        let length = usize::try_from(decision.text_len).ok()?;
-        if length > replacement.len() {
-            return None;
-        }
-        replacement.truncate(length);
-        Some(TextDecision::replace_utf16(
-            decision.generation,
+        let replacement = if decision.decision_bits & DECISION_TEXT_REPLACE != 0 {
+            let length = usize::try_from(decision.text_len).ok()?;
+            if length > replacement.len() {
+                return None;
+            }
+            replacement.truncate(length);
+            Some(replacement)
+        } else {
+            None
+        };
+        let font = if decision.decision_bits & DECISION_FONT_SUBSTITUTE != 0 {
+            let length = usize::try_from(decision.font_len).ok()?;
+            if length == 0 || length > font.len() {
+                return None;
+            }
+            font.truncate(length);
+            let family = String::from_utf16(&font).ok()?;
+            let family = family.trim();
+            (!family.is_empty()).then(|| Box::<str>::from(family))
+        } else {
+            None
+        };
+        let text = replacement.as_ref().map_or_else(
+            || TextDecision::keep(decision.generation),
+            |replacement| TextDecision::replace_utf16(decision.generation, replacement.clone()),
+        );
+        Some(HostDecision {
+            text,
             replacement,
-        ))
+            font,
+        })
     }
 }
 
@@ -209,7 +237,7 @@ extern "C" fn activate(
         return negotiation_error(STATUS_ACTIVATION_FAILED);
     }
 
-    let require_writeback = negotiated.active_feature_bits & FEATURE_TEXT_REPLACE != 0;
+    let require_writeback = negotiated.active_feature_bits & MUTATING_FEATURES != 0;
     let gate = match Il2CppRuntimeGate::inspect_current_process(require_writeback) {
         Ok(gate) => gate,
         Err(error) => {
@@ -218,7 +246,10 @@ extern "C" fn activate(
         }
     };
     trace("gate.ok");
-    let runtime = match Il2CppStandardUiRuntime::resolve(gate) {
+    let runtime = match Il2CppStandardUiRuntime::resolve(
+        gate,
+        negotiated.active_feature_bits & FEATURE_FONT_SUBSTITUTE != 0,
+    ) {
         Ok(runtime) => runtime,
         Err(error) => {
             trace(&format!("metadata.error.{error:?}"));
@@ -249,7 +280,7 @@ extern "C" fn activate(
         return negotiation_error(STATUS_ACTIVATION_FAILED);
     }
 
-    if negotiated.active_feature_bits & FEATURE_TEXT_REPLACE != 0
+    if negotiated.active_feature_bits & MUTATING_FEATURES != 0
         && !main_thread::dispatch(probe_main_thread, MAIN_THREAD_DISPATCH_TIMEOUT)
     {
         trace("writeback.main-thread.unavailable");
@@ -309,8 +340,10 @@ extern "C" fn deactivate() -> i32 {
         .ok()
         .and_then(|slot| {
             slot.session.as_ref().map(|session| {
-                session.active_feature_bits & FEATURE_TEXT_REPLACE != 0
-                    && (session.force_restore_all || session.writeback.has_applied_replacements())
+                session.active_feature_bits & MUTATING_FEATURES != 0
+                    && (session.force_restore_all
+                        || session.writeback.has_applied_replacements()
+                        || session.runtime.has_font_substitutions())
             })
         })
         .unwrap_or(false);
@@ -377,7 +410,14 @@ fn restore_on_main_thread() -> bool {
     } else {
         restored_state.deactivate()
     };
-    let restored = match unsafe { session.runtime.apply_writes_on_current_thread(&writes) } {
+    let fonts_restored = unsafe { session.runtime.restore_fonts_on_current_thread() };
+    let restored = match fonts_restored
+        .map_err(|error| trace(&format!("font.restore.error.{error:?}")))
+        .and_then(|_| {
+            unsafe { session.runtime.apply_writes_on_current_thread(&writes) }
+                .map_err(|error| trace(&format!("writeback.restore.error.{error:?}")))
+        })
+    {
         Ok(()) => {
             session.writeback = restored_state;
             session.writeback_started = false;
@@ -386,8 +426,7 @@ fn restore_on_main_thread() -> bool {
             trace("writeback.restore.ok");
             true
         }
-        Err(error) => {
-            trace(&format!("writeback.restore.error.{error:?}"));
+        Err(()) => {
             false
         }
     };
@@ -421,13 +460,18 @@ fn collect_on_observer_thread() {
                 return None;
             }
         };
-        if session.active_feature_bits & FEATURE_TEXT_REPLACE != 0 {
+        let observer_snapshot = if session.active_feature_bits & FEATURE_TEXT_REPLACE != 0 {
+            session.writeback.business_snapshot(&snapshot.texts)
+        } else {
+            snapshot.texts.clone()
+        };
+        if session.active_feature_bits & MUTATING_FEATURES != 0 {
             session.pending_writeback_snapshot = Some(snapshot.texts.clone());
         }
         let new_observations = match process_snapshot(
             &mut session.observer,
             &mut session.initial_snapshot,
-            snapshot.texts,
+            observer_snapshot,
         ) {
             Ok(observations) => observations,
             Err(()) => {
@@ -440,6 +484,7 @@ fn collect_on_observer_thread() {
         for object_id in snapshot.collected {
             let _ = session.observer.apply(ObserverEvent::Collected(object_id));
             session.writeback.collected(object_id);
+            session.runtime.mark_collected_font_object(object_id);
         }
         let mut observations = std::mem::take(&mut session.pending_observations);
         observations.extend(new_observations);
@@ -468,7 +513,7 @@ fn collect_on_observer_thread() {
                 trace("writeback.transaction.cancelled-by-stop");
                 return;
             }
-            let writeback_ok = active_feature_bits & FEATURE_TEXT_REPLACE == 0
+            let writeback_ok = active_feature_bits & MUTATING_FEATURES == 0
                 || main_thread::dispatch(
                     pump_writeback_on_main_thread,
                     MAIN_THREAD_DISPATCH_TIMEOUT,
@@ -499,7 +544,7 @@ fn pump_writeback_on_main_thread() -> bool {
     let Some(mut session) = begin_session_transaction() else {
         return false;
     };
-    if session.active_feature_bits & FEATURE_TEXT_REPLACE == 0 {
+    if session.active_feature_bits & MUTATING_FEATURES == 0 {
         finish_session_transaction(Some(session));
         return true;
     }
@@ -507,8 +552,13 @@ fn pump_writeback_on_main_thread() -> bool {
     if session.force_restore_all {
         let mut recovered = session.writeback.clone();
         let restores = recovered.deactivate_all();
-        let recovered_ok =
-            match unsafe { session.runtime.apply_writes_on_current_thread(&restores) } {
+        let recovered_ok = match unsafe { session.runtime.restore_fonts_on_current_thread() }
+            .map_err(|error| trace(&format!("font.recovery.error.{error:?}")))
+            .and_then(|_| {
+                unsafe { session.runtime.apply_writes_on_current_thread(&restores) }
+                    .map_err(|error| trace(&format!("writeback.recovery.error.{error:?}")))
+            })
+        {
                 Ok(()) => {
                     session.writeback = recovered;
                     session.writeback_started = false;
@@ -517,8 +567,7 @@ fn pump_writeback_on_main_thread() -> bool {
                     trace("writeback.recovery.ok");
                     true
                 }
-                Err(error) => {
-                    trace(&format!("writeback.recovery.error.{error:?}"));
+                Err(()) => {
                     false
                 }
             };
@@ -528,11 +577,20 @@ fn pump_writeback_on_main_thread() -> bool {
     }
 
     let snapshot = session.pending_writeback_snapshot.take();
+    let text_replace_active = session.active_feature_bits & FEATURE_TEXT_REPLACE != 0;
     let Some((next, writes)) = prepare_writeback_transaction(
         &session.writeback,
         session.writeback_started,
         snapshot,
-        |source| session.host.decide(source),
+        |source| {
+            session.host.decide(source).map(|decision| {
+                if text_replace_active {
+                    decision.text
+                } else {
+                    TextDecision::keep(decision.text.generation())
+                }
+            })
+        },
     ) else {
         finish_session_transaction(Some(session));
         return false;
@@ -547,21 +605,36 @@ fn pump_writeback_on_main_thread() -> bool {
         return false;
     }
 
-    let applied = unsafe { session.runtime.apply_writes_on_current_thread(&writes) };
+    let font_writes = prepare_font_writes(
+        &next,
+        session.host,
+        session.active_feature_bits,
+    );
+    let fonts_applied = if session.active_feature_bits & FEATURE_FONT_SUBSTITUTE != 0 {
+        unsafe { session.runtime.apply_fonts_on_current_thread(&font_writes) }
+            .map_err(|error| trace(&format!("font.apply.error.{error:?}")))
+            .is_ok()
+    } else {
+        true
+    };
+    let text_applied = fonts_applied
+        && (!text_replace_active
+            || unsafe { session.runtime.apply_writes_on_current_thread(&writes) }
+                .map_err(|error| trace(&format!("writeback.apply.error.{error:?}")))
+                .is_ok());
 
-    let result = match applied {
-        Ok(()) => {
+    let result = if text_applied {
             session.writeback = next;
             session.writeback_started = true;
             session.force_restore_all = false;
             true
-        }
-        Err(error) => {
-            trace(&format!("writeback.apply.error.{error:?}"));
+        } else {
             let failed_state = next.clone();
             let mut reset_state = next;
             let restores = reset_state.deactivate_all();
-            if unsafe { session.runtime.apply_writes_on_current_thread(&restores) }.is_ok() {
+            let fonts_restored = unsafe { session.runtime.restore_fonts_on_current_thread() }.is_ok();
+            let texts_restored = unsafe { session.runtime.apply_writes_on_current_thread(&restores) }.is_ok();
+            if fonts_restored && texts_restored {
                 session.writeback = reset_state;
                 session.writeback_started = false;
                 session.force_restore_all = false;
@@ -573,7 +646,6 @@ fn pump_writeback_on_main_thread() -> bool {
                 session.force_restore_all = true;
             }
             false
-        }
     };
     finish_session_transaction(Some(session));
     result
@@ -616,6 +688,34 @@ fn prepare_writeback_transaction(
         }
     }
     Some((next, writes))
+}
+
+fn prepare_font_writes(
+    state: &UnityStandardUiWriteback,
+    host: HostBridge,
+    active_feature_bits: u64,
+) -> Vec<FontWrite> {
+    if active_feature_bits & FEATURE_FONT_SUBSTITUTE == 0 {
+        return Vec::new();
+    }
+    let text_replace_active = active_feature_bits & FEATURE_TEXT_REPLACE != 0;
+    state
+        .business_texts()
+        .into_iter()
+        .filter_map(|text| {
+            let (object_id, kind, source) = text.into_decoded_parts()?;
+            let decision = host.decide(&source)?;
+            let family = decision.font?;
+            let units = if text_replace_active {
+                decision
+                    .replacement
+                    .unwrap_or_else(|| source.encode_utf16().collect())
+            } else {
+                source.encode_utf16().collect()
+            };
+            Some(FontWrite::new(object_id, kind, family, units))
+        })
+        .collect()
 }
 
 fn process_snapshot(
@@ -872,6 +972,42 @@ mod tests {
         let restores = restored.deactivate();
         assert_eq!(restores.len(), 1);
         assert_eq!(rendered(&restores[0]), "Score: 248");
+    }
+
+    #[test]
+    fn observer_must_not_publish_the_adapters_own_retained_replacement() {
+        let mut observer = UnityStandardUiObserver::default();
+        let mut initial = false;
+        let source_snapshot = vec![managed(1, "Shooter")];
+
+        let observed = process_snapshot(&mut observer, &mut initial, source_snapshot.clone())
+            .expect("initial observation");
+        assert_eq!(observed.len(), 1);
+        assert_eq!(observed[0].source(), "Shooter");
+
+        let (writeback, writes) = prepare_writeback_transaction(
+            &UnityStandardUiWriteback::default(),
+            false,
+            Some(source_snapshot),
+            |_| Some(TextDecision::replace_text(1, "射击")),
+        )
+        .expect("initial writeback");
+        assert_eq!(rendered(&writes[0]), "射击");
+
+        let echoed_snapshot = writeback.business_snapshot(&[managed(1, "射击")]);
+        let echoed = process_snapshot(&mut observer, &mut initial, echoed_snapshot)
+            .expect("retained replacement snapshot");
+        assert!(
+            echoed.is_empty(),
+            "adapter output must not be emitted as a new source: writeback={:?}",
+            writeback.known_generation()
+        );
+
+        let dynamic_snapshot = writeback.business_snapshot(&[managed(1, "Burst")]);
+        let dynamic = process_snapshot(&mut observer, &mut initial, dynamic_snapshot)
+            .expect("dynamic business snapshot");
+        assert_eq!(dynamic.len(), 1);
+        assert_eq!(dynamic[0].source(), "Burst");
     }
 
     #[test]

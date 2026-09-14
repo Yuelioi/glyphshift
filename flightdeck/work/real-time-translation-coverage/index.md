@@ -14,14 +14,19 @@ Status: Open
 [Unity IL2CPP Standard UI TextReplace 原型](slices/unity-il2cpp-standard-ui-writeback-prototype.md)：在已完成
 observe-only seam 与两个跨代正例基础上，只使用公开 IL2CPP metadata/runtime invoke、标准 TMP/uGUI
 `set_text` 语义和通用 Windows 主线程调度；不使用私有 `MethodInfo` 布局、逐游戏 RVA、符号或机器码扫描。
-原型继续保持未发布，外部 Shipping-like 自绘负例仍阻止生产 Catalog/Runtime Bundle 接入。
+用户已明确授权在外部 Shipping-like 自绘负例仍缺时先把该通用 Adapter 接入生产 Catalog/Runtime Bundle；
+因此当前产品状态是“已进入正式分发的候选实时翻译能力”。跨 Unity 2021 旧 TMP 与 Unity 6 新 TMP 的真实
+TextReplace 首代、第二代、停用恢复、防译文回流和兜底字体可见复跑已经完成；仍不能把缺失的真实动态
+业务 source 写回或同后端自绘负例冒充为已完成证据。
 
 该 TextReplace 代码原型与确定性合同现已完成：共享 retained-text 状态机覆盖动态业务原文、Dictionary
 generation 与停用恢复；IL2CPP 写回只经公开 setter invoke，live object/replacement string 分别使用弱/强
 GC handle。全局 Session 锁已从 Host callback、snapshot、managed setter 与恢复/清理调用栈移开；Host
 decision 与 setter 调用期间保持事务所有权，重入 refresh 只排队，重入 deactivate 返回失败且保持 Active，
-只有独占停用恢复成功后才真正发布 inactive。当前只缺两个已授权 IL2CPP
-正例的真实可见复跑；本机路径仍缺失时保持 Slice `In Progress`。
+只有独占停用恢复成功后才真正发布 inactive。生产 Bundle/Catalog 接入已经完成并限制为 Windows x64；
+语言兜底字体也已接通 Runtime publication，并按 `DictionaryMatches` 只作用于实际译文字典命中。两个跨代
+IL2CPP 正例的真实可见复跑已完成，Slice 仅因动态业务 source 可见写回与外部同后端负例仍缺而保持
+`In Progress`。
 
 现有 GDI、USER32 DrawText、GDI+、Qt、GTK 3/Pango 与 DirectWrite TextLayout Adapter 已进入正式
 Runtime Bundle。Console 与 UI Automation 目前只有采集价值，不能作为实时翻译成功。Direct2D
@@ -222,8 +227,8 @@ Windows x64 IL2CPP 与 guest bitmap atlas/mesh 自绘 seam 闭环在同一项目
 而 system-font 分支会实例化 TMP，显示面也使用 Canvas/RawImage，因而仍只是混合栈对照。本轮未下载、
 启动、注入或本地重建候选。
 
-连续四轮 No-Go 后，外部 Shipping-like 自绘负例仍缺；这继续阻止可靠拒绝结论与生产 crate、Catalog、
-Runtime Bundle 接入，但不再阻止两个已授权 Standard UI 正例上的未发布 observe-only Hook。此前把仓库
+连续四轮 No-Go 后，外部 Shipping-like 自绘负例仍缺；这在当时继续阻止可靠拒绝结论与生产 crate、Catalog、
+Runtime Bundle 接入，但不再阻止两个已授权 Standard UI 正例上的 observe-only Hook。此前把仓库
 自建负例误设成只读 attach 前置条件，导致主线被本机缺少 Unity Editor 阻塞；该顺序现已纠正，不安装
 Unity。确定性宿主源码与静态合同保留为后续合成合同，不计入真实软件证据，也不占用当前执行。
 
@@ -275,20 +280,24 @@ NGUI-only 同后端负例继续拒绝。
 
 ## Next
 
-- 完成 [Unity IL2CPP Standard UI TextReplace 原型](slices/unity-il2cpp-standard-ui-writeback-prototype.md)：代码与
-  确定性合同已证明公共 setter invoke、对象寿命、generation 2、动态业务原文和停用恢复；下一步只恢复
-  两个已授权跨代正例做可见验收，本机真实目标路径缺失时不得伪造实机结论。
+- 继续收口 [Unity IL2CPP Standard UI TextReplace 原型](slices/unity-il2cpp-standard-ui-writeback-prototype.md)：
+  两个已授权跨代正例的首代、generation 2、兜底字体、防回流、停用恢复和正常退出已经可见验收；下一步只补
+  一个真实动态业务 source 的可见写回，以及后续外部 Shipping-like 自绘负例。
 - IL2CPP 原型收口后按既定优先级进入 Godot 4 observe-only Go/No-Go；UE5 保持最后，不接受逐游戏地址路线。
 
 ## Progress
 
-- Unity IL2CPP TextReplace 未发布原型已完成代码侧收口：native 27/27、共享状态机 15/15、IL2CPP facade
-  1/1、Mono facade 1/1、Mono native 11/11、shipping-like 6/6 通过；IL2CPP native Clippy 通过。全局
-  Session mutex 不再包住 Host/IL2CPP 外部调用，停用 gate 保证失败停用仍保持 Host/Adapter 生命周期一致；
-  真实正例路径仍缺。
+- Unity IL2CPP TextReplace 已完成代码侧收口并按用户明确决定接入生产 Catalog/Runtime Bundle：native 27/27、
+  IL2CPP facade 1/1 及相关 Clippy 通过；Release Bundle 验证为 14 个 Adapter，IL2CPP 仅出现在 x64 主清单，
+  x86 附加包没有该项。桌面目录已加入中英文说明与 Unity 官方 IL2CPP 文档入口。真实正例写回复跑与外部
+  同后端自绘负例仍是证据缺口，因此当前只按“候选实时翻译能力”解释，不升级为已验证支持。
+- Random Heroes / GMTK2022 已用当前生产 Review Bundle 的 IL2CPP Adapter 直接走 Controller/Target Runtime
+  实机 attach：`TextReplace` 激活成功，采集到 `High Score:`、`Quit`、`RANDOM`、`Shooter`、`Start` 与分数
+  共 6 条唯一文字，停用与目标正常退出均成功。桌面端先前显示 0 条的直接原因是既有工作流创建于 IL2CPP
+  Adapter 加入前，持久 adapter plan 未包含 `windows.unity.il2cpp.standard-ui`；本机测试工作流已补入该项。
 
-- 产品路线最终放弃通用软件覆盖并转向独立的 Adobe 专用产品；本 Work 因被取代而停止，未完成的
-  IL2CPP 生产准入项不再属于后续议程。
+- 曾有一轮产品路线准备放弃通用软件覆盖并转向独立 Adobe 产品；用户随后重新恢复本 Work，当前仍以
+  通用实时翻译覆盖为主线，该历史决策不再约束现阶段 IL2CPP/Godot/UE 议程。
 
 - 已重新确认产品主线是“探针发现原文 → Dictionary 提供译文 → Adapter 实时写回”，而不是通用观察
   数据平台。
@@ -395,8 +404,8 @@ NGUI-only 同后端负例继续拒绝。
 - runtime-only smoke 已确认第一份样本的初始菜单、关卡选择与动态分数；第二份用公开参数进入无头显
   Viewer 和完整 Monoscopic 工作区。两者都正常退出且未注入；Localization 可见切换仍未完成。
 - Unity IL2CPP 两个跨代发布正例已完成静态、runtime-only 与 observe-only attach 门禁；Unity 2021 LTS
-  动态分数取得 14 条 Observation，Unity 6 搜索更新取得 72 条，均正常停用退出。当前只缺同后端自绘
-  Mesh/Sprite/texture 文字负例，原型保持未发布。
+  动态分数取得 14 条 Observation，Unity 6 搜索更新取得 72 条，均正常停用退出。此前外部同后端自绘
+  Mesh/Sprite/texture 文字负例缺失曾阻止生产接入；用户后续明确允许先发布候选 Adapter，该证据缺口仍保留。
 - 完成第二次 IL2CPP 自绘负例有界公开复核：3 条方向、5 个官方仓库全部拒绝；同时固定“混合栈自绘
   marker 漏抓不等于进程级可靠拒绝”的门槛。没有下载、运行或注入任何候选。
 - 完成第三次 IL2CPP 自绘负例有界公开复核：3 条方向、8 个不重复候选全部拒绝；最接近的
@@ -404,8 +413,9 @@ NGUI-only 同后端负例继续拒绝。
 - 完成第四次 IL2CPP 自绘负例有界公开复核：3 条方向、7 个不重复候选全部拒绝；nofun 证明了
   Windows x64 IL2CPP + guest bitmap atlas/mesh 的局部 seam，但因无固定 guest 触发且存在 TMP/Canvas 混合栈而不是
   进程级负例。未下载、运行、注入或本地重建。
-- 已纠正 IL2CPP 执行顺序：两个已授权正例可以先进入未发布 observe-only Hook；负例缺失继续阻止可靠
-  拒绝与生产接入，但不再要求先安装 Unity。合成宿主不计入真实软件覆盖。
+- 已纠正 IL2CPP 执行顺序：两个已授权正例先进入 observe-only Hook；外部负例缺失继续限制“可靠拒绝”与
+  已验证支持结论，但在用户明确授权后不再阻止该通用 Adapter 进入生产 Catalog/Runtime Bundle。合成宿主
+  仍不计入真实软件覆盖。
 - 建立 Unity IL2CPP 自绘负例的 source-only fixture 与定向构建包装器；保留 TMP/uGUI 精确类型身份但以
   组件 allowlist 和运行时守卫确保 live text 为零。静态合同、PowerShell AST、隐私/空白扫描及两轮独立
   审核通过。因当前没有匹配 Editor/module，真实构建与 runtime smoke 仍开放。

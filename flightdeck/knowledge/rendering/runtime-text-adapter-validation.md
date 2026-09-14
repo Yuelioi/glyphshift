@@ -11,8 +11,9 @@
 3. **授权真实目标**：在代表性动态链接目标中同时取得非零命中、可见像素变化、第二代变化与停用后的
    原文恢复；过程必须由机器可判定断言收口。
 
-产品 Catalog 只接受完成第三层的窄能力。只完成前两层的实现应标为技术 smoke、原型或 No-Go 研究，
-不能按框架名称推导软件覆盖率。
+产品 Catalog 默认只接受完成第三层的窄能力。若用户明确决定先分发证据尚未闭环的通用候选，Catalog 必须
+保留准确技术边界与证据债务，产品状态仍按“候选实时翻译”解释；不能因为已进入正式 Bundle 就把它升级成
+“已验证实时翻译”，也不能按框架名称推导软件覆盖率。
 
 ## 通用实现约束
 
@@ -46,7 +47,7 @@
 | SDL3_ttf | 复制 `TTF_Text` 的 engine/font 及公开布局属性后绘制译文对象 | 当前只有技术 smoke，没有代表性真实目标与产品 Adapter |
 | Raylib | `DrawTextEx` 使用 fallback atlas，按帧回收旧资源并在关闭前清理 | 仅动态 raylib 5.5；静态链接、复制实现和业务纹理缓存不覆盖 |
 | Unity Mono | 同时通过 backend、标准 UI profile、live object 与主线程 gate，再管理 setter/snapshot/恢复 | NGUI、自绘 mesh、UI Toolkit、IL2CPP 与无主线程 dispatch 的目标拒绝 |
-| Unity IL2CPP | 导出、metadata、live standard text object 与可证明主线程四重 gate；写回只调用标准 `set_text` | 当前为未发布 TextReplace 原型；存在 TMP/uGUI 类型不等于有活动标准 UI，外部同后端自绘负例与真实写回复跑完成前不进入生产 |
+| Unity IL2CPP | 导出、metadata、live standard text object 与可证明主线程四重 gate；写回只调用标准 `set_text` | 已按明确产品决定作为 Windows x64 候选进入生产 Bundle；存在 TMP/uGUI 类型不等于有活动标准 UI，真实写回复跑与外部同后端自绘负例补齐前不得宣称“已验证实时翻译” |
 
 归档 UIA/OCR 不属于当前产品能力、验证入口或替换方案；不得以旧观测原型补齐当前适配器覆盖。
 

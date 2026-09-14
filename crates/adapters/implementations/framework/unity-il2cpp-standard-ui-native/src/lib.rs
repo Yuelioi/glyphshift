@@ -4,6 +4,7 @@
 //! Bundle. It uses public IL2CPP exports and never writes managed text.
 
 mod diagnostics;
+mod font_substitution;
 mod main_thread;
 mod metadata;
 mod native_adapter;

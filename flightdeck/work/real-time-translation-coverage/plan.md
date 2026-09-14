@@ -164,5 +164,8 @@
     `m_text`/`m_Text` 字段，不读取私有 `MethodInfo` 或逐游戏地址。
   - [ ] 后续恢复 [Unity IL2CPP Standard UI 同后端负例宿主](slices/unity-il2cpp-standard-ui-negative-harness.md)：
     source-only fixture 与静态合同已完成；真实构建/smoke 不再阻塞 observe-only Hook，也不为此安装 Unity。
-  - [ ] 新增生产 crate、Catalog 或 Runtime Bundle 项前，另行取得一份外部、可重复的 Windows x64 IL2CPP
-    Shipping-like 自绘负例；四次有界公开筛选均为 No-Go，不用 Mono/混合栈样本或合成宿主冒充该证据。
+  - [x] 用户明确授权在外部负例仍缺时先接入生产 Catalog/Runtime Bundle；该决定只改变发布时机，不改变
+    证据等级。跨 Unity 2021/Unity 6 的真实 TextReplace 首代、第二代、停用恢复、防回流和兜底字体复跑已完成；
+    动态业务 source 的可见写回与同后端负例仍未补齐。
+  - [ ] 另行取得一份外部、可重复的 Windows x64 IL2CPP Shipping-like 自绘负例；四次有界公开筛选均为
+    No-Go，不用 Mono/混合栈样本或合成宿主冒充该证据。

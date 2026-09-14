@@ -143,6 +143,45 @@ impl UnityStandardUiWriteback {
             .any(|tracked| tracked.applied.is_some())
     }
 
+    /// Returns the retained snapshot as business text for observation.
+    ///
+    /// Unity's retained `text` field may contain the replacement written by
+    /// this adapter. When that happens, feed the observer the saved business
+    /// source instead so adapter output cannot become a new dictionary source.
+    /// Values that differ from the last applied replacement are preserved as
+    /// genuine business updates.
+    #[must_use]
+    pub fn business_snapshot(&self, snapshot: &[ManagedText]) -> Vec<ManagedText> {
+        snapshot
+            .iter()
+            .map(|text| {
+                let Some(tracked) = self.tracked.get(&text.object_id()) else {
+                    return text.clone();
+                };
+                if tracked.kind == text.kind()
+                    && tracked
+                        .applied
+                        .as_deref()
+                        .is_some_and(|applied| applied == text.units())
+                {
+                    ManagedText::utf16(text.object_id(), text.kind(), tracked.source.clone())
+                } else {
+                    text.clone()
+                }
+            })
+            .collect()
+    }
+
+    #[must_use]
+    pub fn business_texts(&self) -> Vec<ManagedText> {
+        self.tracked
+            .iter()
+            .map(|(object_id, tracked)| {
+                ManagedText::utf16(*object_id, tracked.kind, tracked.source.clone())
+            })
+            .collect()
+    }
+
     #[must_use]
     pub fn needs_generation_refresh(&self, generation: u64) -> bool {
         self.tracked
@@ -526,6 +565,20 @@ mod tests {
 
         let restores = engine.deactivate();
         assert_eq!(rendered(&restores[0]), "Hello");
+    }
+
+    #[test]
+    fn observer_business_snapshot_rewrites_only_adapter_output() {
+        let mut engine = UnityStandardUiWriteback::default();
+        let _ = engine.activate(vec![text(1, "Shooter")], |_| {
+            TextDecision::replace_text(1, "射击")
+        });
+
+        let echoed = engine.business_snapshot(&[text(1, "射击")]);
+        assert_eq!(echoed, vec![text(1, "Shooter")]);
+
+        let dynamic = engine.business_snapshot(&[text(1, "Burst")]);
+        assert_eq!(dynamic, vec![text(1, "Burst")]);
     }
 
     #[test]

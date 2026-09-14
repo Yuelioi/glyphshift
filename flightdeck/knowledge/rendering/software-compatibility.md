@@ -18,6 +18,7 @@
 | [ZBrush 2026](../../work/software-text-coverage/references/software/zbrush.md) | **尚不支持** | **继续寻找可抽象的通用文字入口** | 界面文字已确认绕过现有 13 个通用文字适配器；常规重绘复用 glyph / 纹理缓存。当前规则禁止软件专属适配器，只有找到可复用的完整字符串上游 seam 后才进入通用适配器实现。 |
 | [Blender](../../work/software-text-coverage/references/software/blender.md) | **尚未适配** | 优先官方 Python 翻译接口 | 自绘界面。官方翻译注册、注销和区域重绘接口比底层像素 Hook 更适合作为入口，但尚未完成完整覆盖验证。 |
 | [TouchDesigner](../../work/software-text-coverage/references/software/touchdesigner.md) | **尚不支持** | 推荐 Slug / 内部文字布局适配器 | 新版主界面大量文字使用 Slug / Text COMP 路线，现有 Windows / Qt 适配器没有覆盖。公开导出入口未找到，需继续定位稳定的完整字符串入口。 |
+| SlugD3D11 Demo | **尚不支持** | 继续研究可复用的 Slug GPU 文字入口 | Slug 7.5 D3D11 Demo 的文字由 Slug 自有 shader / glyph mesh 管线绘制，二进制内直接携带 Slug 文本与 shader 资源；现有 GDI、DirectWrite、Qt 与 Unity 适配器均不经过该文字路径。后续只有找到可复用的完整字符串上游 seam 才进入通用适配器实现。 |
 | [Vovious](../../work/software-text-coverage/references/software/vovious.md) | **尚未适配** | 推荐 JUCE 通用适配器 | 静态 JUCE，自带 TextEditor / Typeface 类型，但没有可用文字函数导出。需要找到接收完整 JUCE String 的绘制或布局入口。 |
 | [Fluffy Mod Manager](../../work/software-text-coverage/references/software/fluffy-mod-manager.md) | **尚不支持** | 暂后置；寻找完整字符串入口 | OpenGL 自绘，当前没有找到可复用的文字函数入口。只拿到字形贴图或顶点不足以做可靠翻译。 |
 | [PotPlayer](../../work/software-text-coverage/references/software/potplayer.md) | **可用但有使用限制** | 继续使用现有 GDI 路线 | 外挂 SRT 完整正文可命中 TextOutW / ExtTextOutW；预先准备字典并重新加载字幕可显示译文。实时缓存刷新未适配。 |

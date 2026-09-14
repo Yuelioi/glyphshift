@@ -47,12 +47,27 @@ const OBSERVE_EXPORTS: [RequiredExport; 17] = [
     required_export("il2cpp_thread_detach", b"il2cpp_thread_detach\0"),
 ];
 
-const WRITEBACK_EXPORTS: [RequiredExport; 8] = [
+const WRITEBACK_EXPORTS: [RequiredExport; 17] = [
     required_export(
         "il2cpp_class_get_method_from_name",
         b"il2cpp_class_get_method_from_name\0",
     ),
+    required_export("il2cpp_class_get_methods", b"il2cpp_class_get_methods\0"),
+    required_export("il2cpp_method_get_name", b"il2cpp_method_get_name\0"),
+    required_export(
+        "il2cpp_method_get_param_count",
+        b"il2cpp_method_get_param_count\0",
+    ),
+    required_export("il2cpp_method_get_param", b"il2cpp_method_get_param\0"),
+    required_export(
+        "il2cpp_class_from_il2cpp_type",
+        b"il2cpp_class_from_il2cpp_type\0",
+    ),
+    required_export("il2cpp_type_is_byref", b"il2cpp_type_is_byref\0"),
+    required_export("il2cpp_object_new", b"il2cpp_object_new\0"),
+    required_export("il2cpp_object_unbox", b"il2cpp_object_unbox\0"),
     required_export("il2cpp_runtime_invoke", b"il2cpp_runtime_invoke\0"),
+    required_export("il2cpp_resolve_icall", b"il2cpp_resolve_icall\0"),
     required_export("il2cpp_string_new_utf16", b"il2cpp_string_new_utf16\0"),
     required_export("il2cpp_gchandle_new", b"il2cpp_gchandle_new\0"),
     required_export(
@@ -147,8 +162,24 @@ impl Il2CppRuntimeGate {
                         "il2cpp_class_get_method_from_name",
                         ClassGetMethodFromName
                     ),
+                    class_get_methods: resolve!("il2cpp_class_get_methods", ClassGetMethods),
+                    method_get_name: resolve!("il2cpp_method_get_name", MethodGetName),
+                    method_get_param_count: resolve!(
+                        "il2cpp_method_get_param_count",
+                        MethodGetParamCount
+                    ),
+                    method_get_param: resolve!("il2cpp_method_get_param", MethodGetParam),
+                    class_from_il2cpp_type: resolve!(
+                        "il2cpp_class_from_il2cpp_type",
+                        ClassFromIl2CppType
+                    ),
+                    type_is_byref: resolve!("il2cpp_type_is_byref", TypeIsByref),
+                    object_new: resolve!("il2cpp_object_new", ObjectNew),
+                    object_unbox: resolve!("il2cpp_object_unbox", ObjectUnbox),
                     runtime_invoke: resolve!("il2cpp_runtime_invoke", RuntimeInvoke),
+                    resolve_icall: resolve!("il2cpp_resolve_icall", ResolveIcall),
                     string_new_utf16: resolve!("il2cpp_string_new_utf16", StringNewUtf16),
+                    string_length: resolve!("il2cpp_string_length", StringLength),
                     gchandle_new: resolve!("il2cpp_gchandle_new", GcHandleNew),
                     gchandle_new_weakref: resolve!(
                         "il2cpp_gchandle_new_weakref",
@@ -326,6 +357,15 @@ pub(crate) type ClassGetFieldFromName =
     unsafe extern "C" fn(*mut c_void, *const c_char) -> *mut c_void;
 pub(crate) type ClassGetMethodFromName =
     unsafe extern "C" fn(*mut c_void, *const c_char, i32) -> *const c_void;
+pub(crate) type ClassGetMethods =
+    unsafe extern "C" fn(*mut c_void, *mut *mut c_void) -> *const c_void;
+pub(crate) type MethodGetName = unsafe extern "C" fn(*const c_void) -> *const c_char;
+pub(crate) type MethodGetParamCount = unsafe extern "C" fn(*const c_void) -> u32;
+pub(crate) type MethodGetParam = unsafe extern "C" fn(*const c_void, u32) -> *const c_void;
+pub(crate) type ClassFromIl2CppType = unsafe extern "C" fn(*const c_void) -> *mut c_void;
+pub(crate) type TypeIsByref = unsafe extern "C" fn(*const c_void) -> bool;
+pub(crate) type ObjectNew = unsafe extern "C" fn(*const c_void) -> *mut c_void;
+pub(crate) type ObjectUnbox = unsafe extern "C" fn(*mut c_void) -> *mut c_void;
 pub(crate) type FieldGetValue = unsafe extern "C" fn(*mut c_void, *mut c_void, *mut c_void);
 pub(crate) type RuntimeInvoke = unsafe extern "C" fn(
     *const c_void,
@@ -333,6 +373,7 @@ pub(crate) type RuntimeInvoke = unsafe extern "C" fn(
     *mut *mut c_void,
     *mut *mut c_void,
 ) -> *mut c_void;
+pub(crate) type ResolveIcall = unsafe extern "C" fn(*const c_char) -> *const c_void;
 pub(crate) type RegisterObjects = unsafe extern "C" fn(*mut *mut c_void, i32, *mut c_void);
 pub(crate) type Reallocate = unsafe extern "C" fn(*mut c_void, usize, *mut c_void) -> *mut c_void;
 pub(crate) type LivenessAllocate = unsafe extern "C" fn(
@@ -389,8 +430,18 @@ pub(crate) struct Il2CppExports {
 #[derive(Clone, Copy)]
 pub(crate) struct Il2CppWritebackExports {
     pub class_get_method_from_name: ClassGetMethodFromName,
+    pub class_get_methods: ClassGetMethods,
+    pub method_get_name: MethodGetName,
+    pub method_get_param_count: MethodGetParamCount,
+    pub method_get_param: MethodGetParam,
+    pub class_from_il2cpp_type: ClassFromIl2CppType,
+    pub type_is_byref: TypeIsByref,
+    pub object_new: ObjectNew,
+    pub object_unbox: ObjectUnbox,
     pub runtime_invoke: RuntimeInvoke,
+    pub resolve_icall: ResolveIcall,
     pub string_new_utf16: StringNewUtf16,
+    pub string_length: StringLength,
     pub gchandle_new: GcHandleNew,
     pub gchandle_new_weakref: GcHandleNewWeakRef,
     pub gchandle_get_target: GcHandleGetTarget,
