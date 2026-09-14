@@ -18,6 +18,7 @@
 ## 通用实现约束
 
 - **完整原文优先**：选择仍持有完整字符串的最窄入口，不从逐字形、顶点或纹理缓存反推文本。
+- **Capture key 与实时决策一致**：目录聚合若按 `SourceTextPolicy` 生成 key，目标进程的实时 lookup 也必须使用同一 policy。精确原文仍应优先；只有精确查找失败时才回退到规范 key。若规范化只去除布局用首尾空白，采用回退译文时要把原调用的首尾空白补回，避免“目录能翻译、像素查不到”或破坏布局。
 - **不修改目标所有权**：优先复制 layout、字符串对象或字体状态并瞬时绘制译文；保留目标对象与原文，
   使停用恢复不依赖逆向修改。
 - **关联跟随成功创建更新**：目标对象地址可以被复用；成功创建但内容为空或无法观察时也要移除旧原文关联，防止历史译文画进新对象。DirectWrite 合同应包含非空布局释放后被空布局复用的像素验证。
@@ -46,6 +47,7 @@
 | GTK 3 / Pango | 复制 `PangoLayout`，仅对无属性或全文统一属性替换文本 | 局部 byte-range 样式透传；GTK 4 不沿用该 seam |
 | SDL3_ttf | 复制 `TTF_Text` 的 engine/font 及公开布局属性后绘制译文对象 | 当前只有技术 smoke，没有代表性真实目标与产品 Adapter |
 | Raylib | `DrawTextEx` 使用 fallback atlas，按帧回收旧资源并在关闭前清理 | 仅动态 raylib 5.5；静态链接、复制实现和业务纹理缓存不覆盖 |
+| SideFX CV PaintBuffer | 在动态 `libCV.dll` 的 `CV_PaintBuffer::textWrappedInBox` 完整 UTF-8 字符串入口瞬时替换参数 | 当前只验证 Windows x64 与精确 MSVC 导出；已缓存绘图区是否重画仍由目标自身决定，缺模块或导出必须 fail-closed |
 | Unity Mono | 同时通过 backend、标准 UI profile、live object 与主线程 gate，再管理 setter/snapshot/恢复 | NGUI、自绘 mesh、UI Toolkit、IL2CPP 与无主线程 dispatch 的目标拒绝 |
 | Unity IL2CPP | 导出、metadata、live standard text object 与可证明主线程四重 gate；写回只调用标准 `set_text` | 已按明确产品决定作为 Windows x64 候选进入生产 Bundle；存在 TMP/uGUI 类型不等于有活动标准 UI，真实写回复跑与外部同后端自绘负例补齐前不得宣称“已验证实时翻译” |
 
@@ -67,6 +69,7 @@
 - [Qt 原生实现](../../../crates/adapters/implementations/framework/qt-painter-native/src/lib.rs)
 - [GTK 3 / Pango 原生实现](../../../crates/adapters/implementations/framework/gtk3-pango-native/src/lib.rs)
 - [Raylib 原生实现](../../../crates/adapters/implementations/framework/raylib-native/src/lib.rs)
+- [SideFX CV PaintBuffer 原生实现](../../../crates/adapters/implementations/framework/sidefx-cv-paint-buffer-native/src/lib.rs)
 - [Unity Mono writeback](../../../crates/adapters/implementations/framework/unity-mono-standard-ui/src/writeback.rs)
   与[真实运行时合同](../../../crates/adapters/implementations/framework/unity-mono-standard-ui-native/tests/shipping_like_runtime.rs)
 - [Unity IL2CPP runtime gate](../../../crates/adapters/implementations/framework/unity-il2cpp-standard-ui-native/src/runtime_gate.rs)

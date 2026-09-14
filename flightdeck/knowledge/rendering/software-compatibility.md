@@ -7,7 +7,7 @@
 | --- | --- | --- | --- |
 | Cavalry | **已验证可用（实机截图）** | 继续使用现有 Qt Widgets 路线 | 实机展示中主界面已有多处中文，Glyphshift 能持续采集并替换 Qt Widgets 文字。当前证据证明展示区域可用，不等于每个面板都已完整验收。 |
 | Fiddler Classic | **已验证可用（实机截图）** | 继续使用现有 Windows 文字适配器 | 实机展示中菜单和界面文字已有中文，且能持续采集大量词条。当前结论以展示区域为边界。 |
-| [Houdini](../../work/software-text-coverage/references/software/houdini.md) | **部分支持，存在漏采（实机截图）** | 扩展 Qt 文字分支 | 实机展示证明主界面已有大量区域可翻译；工具栏短标签和悬停提示仍有已确认漏采，需要继续验证 QTextLayout、静态文字等入口。 |
+| [Houdini 22.0.429](../../work/software-text-coverage/references/software/houdini.md) | **部分支持，建议在首次生成 UI / help 前启用 Workflow** | **Qt Painter + Qt Text Document + SideFX CV PaintBuffer** | shelf 与 Network Editor 菜单走 Qt Painter；`Add / Edit / Go / View / Tools / Layout / Help` 的首尾布局空白已由通用 Runtime source-policy key 回退解决，真实决策与中文像素均通过。hover / help 完整正文进入 `QTextDocument::setHtml`，Qt 6.8.3 x64 的纯文本与单可见文本节点 HTML 首代可见替换通过。Network Editor 的 `Non-Commercial Edition`、`Objects` 与 `Empty Network\nPress Tab to Add Nodes` 已确认进入动态 `libCV.dll!CV_PaintBuffer::textWrappedInBox`，动态实验中文像素和合成 ABI 生命周期合同通过；production Adapter 已进入 16-Adapter Bundle，重启目标后的当前界面已获用户手动确认完全汉化；第二代更新 / 停用恢复仍缺独立实机验收，保留缓存生命周期边界。 |
 | IDA | **已验证可用（实机截图）** | 继续使用现有通用适配器并按版本观察 | 实机展示中菜单和主要界面已有中文。当前只记录已展示版本与区域可用，不扩大为所有 IDA 版本完整支持。 |
 | NEKOPARA | **已验证可用（实机截图）** | 继续使用已验证的游戏文字适配器 | 实机展示中游戏正文已出现中文，可作为游戏正文路线的成功样本。不同作品、引擎版本和历史页仍按各自适配器边界判断。 |
 | Notepad++ | **已验证可用（实机截图）** | 继续使用现有 Windows 文字适配器 | 实机展示中菜单和编辑器外围界面已有中文，适合作为传统桌面软件通用路线的成功样本。 |

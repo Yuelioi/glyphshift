@@ -8,6 +8,34 @@ Status: Open
 
 ## Current
 
+Houdini 22.0.429 当前组合两条通用 Qt 能力。`Quick Shapes`、`Helix`、`Spiral` 继续经过 Qt Painter 已覆盖的
+QPointF `drawText`；新增 `windows.qt.text-document` 则覆盖真实 hover 提示经 `QTextDocument::setHtml` 建模的
+纯文本与单可见文本节点 HTML。production real-host 已把 `The currently active Desktop` 从 Qt Painter 的 0 hit
+红例变成 Text Document 首代 2 hit / 第二代 1 hit，并完成中文像素与停用后原文验证；Tube 与 Spiral 的富 help
+正文也分别完成首次生成时的可见中文验证。Tube 第二代 publication 有 replacement hit，但像素仍停留在首代，
+停用后再次 hover 也继续显示译文；生命周期探针证明 help 卡片首次 setHtml 后不再 clone / destroy / setHtml，普通
+Windows redraw 也不能失效其下游缓存。新 Adapter 精确限制为 Qt 6.8.3 MSVC x64 全局 namespace，复杂 / 多段 HTML
+fail-open，没有 Houdini 专属 Hook。当前因此继续标记部分支持，并推荐在启动目标、首次生成 shelf / help 前启用
+Workflow。详细证据见
+[Houdini](references/software/houdini.md)。
+
+Houdini Network Editor 右下角的 `Add / Edit / Go / View / Tools / Layout / Help` 也已闭环：真实绘制继续使用
+现有 `QPainter::drawText(QRectF, int, QString const&, QRectF*)`，只是源字符串带首尾布局空格。Capture 目录使用
+`SourceTextPolicy::key()` 去边缘空白，而实时 Runtime 此前没有应用同一 key，造成“表里已有译文、像素仍英文”。
+现在通用 target Runtime 保留精确键优先，失败后按 source-policy key 回退并保留原调用首尾空白；定向回归、
+production diagnostics 的 matched/replaced 与真实中文像素均通过，0 丢弃。该修复不依赖 Houdini 或 Qt 特判。
+同一区域剩余文字已经找到新的通用 seam：`Non-Commercial Edition`、`Objects` 与组合正文
+`Empty Network\nPress Tab to Add Nodes` 都真实进入动态 `libCV.dll` 的 `CV_PaintBuffer::textWrappedInBox`。
+一次性动态替换已经证明该入口能直接产生中文像素，并保留目标自己的字体与布局。现已新增 x64-only 的
+`windows.sidefx.cv-paint-buffer-text`，精确 gate 动态模块与已验证 MSVC 导出，缺能力 fail-closed；合成 ABI
+合同覆盖首代、第二代与停用恢复，缺模块激活合同也通过。最新同步 Runtime Bundle 验证为 16 个 Adapter，
+活动包全仓测试通过。更新恢复后已通过 `scripts/review-app.ps1` 重新同步构建并验证 16-Adapter Bundle，
+重启目标后 revision 6 Workflow 激活成功，已无 `runtime.target_restart_required`。production SideFX CV
+已采集三个目标字符串，采集丢弃为 0；`Non-Commercial Edition` 与 `Objects` 首代中文像素通过。
+组合中心提示原先没有译文，已补入中文。用户随后对最新同步 review App 手动验收，确认当前界面已完全汉化，
+并授权提交、打 tag 与推送。本轮界面覆盖按用户验收通过记录；第二代更新与停用恢复未单独完成自动验收，
+不据此消除已有 retained cache 边界。
+
 Autograph 2026 已完成：Qt Quick 适配器精确加入 Qt 6.11.1 MSVC x64，retained-object 合同通过，最新生产 Runtime 在实机捕获 47 条唯一文字且 0 丢弃，并完成 `File` 两代热更新与停止恢复。Autograph 继续复用通用 Qt Quick 适配器，不新增专属适配器。详细证据见 [Autograph](references/software/autograph.md)。
 
 Silhouette 2026.0 主界面标准区域已通过：Qt 6.5.4 Widgets 使用 `isl0` C++ 命名空间，Qt Painter 已加入精确 Qt 6/x64 ABI，干净 Runtime 曾捕获 56 条唯一文字且 `droppedObservations=0`，并完成热更新与停止恢复。但用户随后确认节点图仍漏 `Unproject`、`Right`、`Left`、`Time Shift` 和节点 `Output`。静态导入检查发现 Silhouette 主程序使用 QGraphicsScene，并直接导入两个 Qt Painter 尚未覆盖的标准重载；现已把这两个重载作为**通用 Qt Painter 可选能力**补入，包级回归 5/5 通过，最新 review build 已生成，等待目标进程重启后的实机验收。详细证据见 [Silhouette](references/software/silhouette.md)。软件调查结果统一放在 `references/software/`，一款软件一份 Markdown；每份保存当前决定、已验证事实、未解决问题和恢复时的第一步。
@@ -16,7 +44,14 @@ TouchDesigner 的 Slug 集成已找到二进制标记，但按公开符号定位
 
 ## Next
 
-Silhouette 2026.0 当前 Next 是重启真实目标，让最新 Qt Painter DLL 生效，并针对节点图的 `Unproject / Right / Left / Time Shift / Output` 做捕获与可见替换验收；如果新增 QPainter 重载仍未覆盖，再沿 QGraphicsScene / QTextLayout 的通用完整字符串入口继续。Autograph 2026 当前没有未完成的适配任务。后续 Qt 版本或不同命名空间仍按单版本、单 ABI 重新验收，不扩大白名单。当前阶段禁止软件专属适配器；ZBrush 只继续研究能抽象为通用适配器的完整字符串入口。所有适配仍需完整正文、两代译文、字体和停止恢复验收，遵守 [文字适配器验收原则](../../knowledge/rendering/runtime-text-adapter-validation.md)。
+用户已确认当前界面完全汉化，本轮通用适配器与 Runtime 修复随 `v0.5.0` 提交、打 tag、推送。
+保持停止自动实机测试；生命周期补验仅在后续任务明确要求时开展。
+若后续改善富 help 热更新 / 停止恢复，只研究可跨 Qt 软件复用的
+QTextDocument 下游 cache 失效 seam；标准 Windows redraw 已证实不足，不继续枚举 Houdini 私有 Help / Pluto /
+OPUI 入口。
+Silhouette 的节点图复验保留在其软件记录中，不与本轮混做。所有适配仍按
+[文字适配器验收原则](../../knowledge/rendering/runtime-text-adapter-validation.md) 区分“文字命中”“代次更新”
+“像素刷新”和“停止恢复”。
 
 ## 软件记录
 

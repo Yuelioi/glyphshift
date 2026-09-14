@@ -6,12 +6,12 @@
 
 - [Rust 模块结构整理](work/rust-module-refactor/index.md)
 
-- **Focus** [通用实时翻译覆盖](work/real-time-translation-coverage/index.md)
+- [通用实时翻译覆盖](work/real-time-translation-coverage/index.md)
 
 - [单软件工作流统一](work/workflow-unification/index.md)
 
 - [探针与字典流程统一](work/probe-dictionary-flow/index.md)
-- [Houdini 与其他软件文字覆盖](work/software-text-coverage/index.md)
+- **Focus** [Houdini 与其他软件文字覆盖](work/software-text-coverage/index.md)
 - [适配器边界与 x86 规划](work/adapter-coverage-and-x86/index.md)
 - [Alias / Qt Quick 适配器](work/alias-text-support/index.md)
 - [游戏文字适配器](work/game-text-adapters/index.md)

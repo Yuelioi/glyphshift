@@ -14,4 +14,12 @@
 
 CatSystem2 UTF-8 正文与历史行使用不同显示入口；经典 ANSI 分支又有不同的对象布局、寄存器参数和结束标记。某条路径通过不能推广为所有版本或历史页通过。经典分支的颜色前缀和代码页处理属于该 profile，不是所有引擎通用的文本清洗规则。
 
+框架级 draw Hook 也可能只在 retained cache **生成时**看到完整字符串，而不是每次窗口 repaint 都重新收到文字。此时需要把“何时激活”纳入验证：记录目标启动、框架加载和首次文字生成的相对顺序，分别测试稳定运行后的刷新与启动前/启动早期激活。`repaint()`、主题/字体通知、ChangeEvent 或 geometry 更新只有在真实目标证明会失效文字缓存时才能作为刷新合同；不能因为函数调用成功就视为像素已经更新。
+
+如果完整字符串入口是通用框架 API，但失效缓存只能依赖某个软件自己的私有控件函数，保持通用 Adapter 不变并把该目标记录为“可用但刷新受限 / 部分支持”。可以推荐在目标首次生成缓存前激活、重新打开界面或重启目标；不要为了通过热更新与停止恢复而把软件私有刷新符号塞进通用 Adapter。Houdini 22.0.429 的 Qt Painter shelf 是这一类边界：首代提前激活可见替换成立，但热更新与停止后的像素恢复被其自有 UI 缓存阻断。
+
+另一类 retained text 会在通用框架自己的模型对象上保留完整文字。此时可以把“模型 setter + 对象生命周期 + GUI 线程回写”作为跨软件 seam，但不能只 Hook setter 后永久改写目标对象。Adapter 至少需要记录原文与最后一次自身写入、监听对象销毁、在 publication 更新与停用时回到对象所属 GUI 线程，并且只在当前内容仍等于自身最后写入时恢复。应用自己后续改写的内容必须获胜；GUI 回写超时时还应撤销临时线程 hook，不能把过期回调留在目标中。
+
+模型对象可更新仍不代表最终显示缓存会跟着更新。Houdini 22.0.429 提供了两种 `QTextDocument::setHtml` 实例：纯文本 hover 已完成首代、第二代和停用后的可见恢复；shelf 富 help 则以 CSS + 单个可见正文节点进入同一标准 seam，Tube / Spiral 首代可见替换成立，但 Tube 第二代只有 replacement 决策命中，卡片像素仍停留在首代，停用后亦保持译文。首次 help 生成后，重复 hover 不再 clone / destroy / setHtml，通用 Windows redraw 也不能让卡片重读文档。这类目标应继续标记为“下游显示缓存限制”，不能把模型写入成功或诊断 hit 记成像素刷新通过，也不能为了通过验收去 Hook 软件私有 help / UI 缓存函数。
+
 依据：[原生实现](../../../crates/adapters/implementations/framework/catsystem2-native/README.md)、[显示缓存合成宿主](../../../test-support/catsystem2-native/fixture.cpp)、[经典分支验证](../../work/adapter-coverage-and-x86/slices/catsystem2-classic.md)。
