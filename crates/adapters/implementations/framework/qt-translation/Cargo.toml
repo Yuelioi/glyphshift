@@ -1,0 +1,10 @@
+[package]
+name = "glyphshift-adapter-qt-translation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+glyphshift-adapter-sdk = { path = "../../../platform/sdk" }
+glyphshift-domain = { path = "../../../../core/domain" }

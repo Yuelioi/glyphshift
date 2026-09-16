@@ -194,3 +194,88 @@ macro_rules! members {
 members!("thiscall");
 #[cfg(not(target_arch = "x86"))]
 members!("system");
+
+macro_rules! statics {
+    ($abi:literal) => {
+        pub(super) type FnQToolTipShow3 =
+            unsafe extern $abi fn(*const c_void, *const c_void, *mut c_void);
+        pub(super) type FnQToolTipShow4 = unsafe extern $abi fn(
+            *const c_void,
+            *const c_void,
+            *mut c_void,
+            *const c_void,
+        );
+        pub(super) type FnQToolTipShow5 = unsafe extern $abi fn(
+            *const c_void,
+            *const c_void,
+            *mut c_void,
+            *const c_void,
+            i32,
+        );
+
+        pub(super) unsafe extern $abi fn tooltip3_detour(
+            pos: *const c_void,
+            text: *const c_void,
+            widget: *mut c_void,
+        ) {
+            let Some(hooks) = HOOKS.get() else {
+                return;
+            };
+            let Some(tooltip) = hooks.tooltip3.as_ref() else {
+                return;
+            };
+            tooltip_with(
+                hooks,
+                text,
+                || tooltip.call(pos, text, widget),
+                |replacement| tooltip.call(pos, replacement, widget),
+            );
+        }
+
+        pub(super) unsafe extern $abi fn tooltip4_detour(
+            pos: *const c_void,
+            text: *const c_void,
+            widget: *mut c_void,
+            rect: *const c_void,
+        ) {
+            let Some(hooks) = HOOKS.get() else {
+                return;
+            };
+            let Some(tooltip) = hooks.tooltip4.as_ref() else {
+                return;
+            };
+            tooltip_with(
+                hooks,
+                text,
+                || tooltip.call(pos, text, widget, rect),
+                |replacement| tooltip.call(pos, replacement, widget, rect),
+            );
+        }
+
+        pub(super) unsafe extern $abi fn tooltip5_detour(
+            pos: *const c_void,
+            text: *const c_void,
+            widget: *mut c_void,
+            rect: *const c_void,
+            display_time_ms: i32,
+        ) {
+            let Some(hooks) = HOOKS.get() else {
+                return;
+            };
+            let Some(tooltip) = hooks.tooltip5.as_ref() else {
+                return;
+            };
+            tooltip_with(
+                hooks,
+                text,
+                || tooltip.call(pos, text, widget, rect, display_time_ms),
+                |replacement| tooltip.call(pos, replacement, widget, rect, display_time_ms),
+            );
+        }
+    };
+}
+
+#[cfg(target_arch = "x86")]
+statics!("C");
+#[cfg(not(target_arch = "x86"))]
+statics!("system");

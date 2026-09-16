@@ -11,6 +11,16 @@
 3. **授权真实目标**：在代表性动态链接目标中同时取得非零命中、可见像素变化、第二代变化与停用后的
    原文恢复；过程必须由机器可判定断言收口。
 
+## 新 Adapter 立项门槛
+
+新增通用 Adapter 在进入生产实现前，还必须先满足“代表目标价值”门槛：
+
+- 至少有一个相对知名、公开可获得、当前仍有现实用户价值的真实软件作为主验证目标；
+- 一手源码 / 官方资料与实机证据必须证明该软件确实走候选技术路径，不能只按框架标记、DLL 加载或品牌关系推断；
+- 必须先证明目标存在现有 Adapter 无法覆盖的完整文字区域；如果最终仍落到已经支持的 GDI、DirectWrite、Qt、GTK 等入口，则判定为重复覆盖 No-Go；
+- 小众软件可以作为第二样本、ABI 证据或技术 smoke，但不能单独承担“新增生产 Adapter”的收益证明；框架 Demo、合成宿主也不能替代真实代表目标；
+- 代表目标只决定“值不值得做”，不能进入 Adapter 身份。Adapter ID、locator、运行时 gate 与实现分支仍必须按通用技术 seam 定义。
+
 产品 Catalog 默认只接受完成第三层的窄能力。若用户明确决定先分发证据尚未闭环的通用候选，Catalog 必须
 保留准确技术边界与证据债务，产品状态仍按“候选实时翻译”解释；不能因为已进入正式 Bundle 就把它升级成
 “已验证实时翻译”，也不能按框架名称推导软件覆盖率。
@@ -18,6 +28,9 @@
 ## 通用实现约束
 
 - **完整原文优先**：选择仍持有完整字符串的最窄入口，不从逐字形、顶点或纹理缓存反推文本。
+- **静态链接 profile 要证明 callable 身份**：常量、循环和数据布局与框架源码相似，只能证明语义相关；若
+  目标把 canonical 函数内联进调用者，或所需入口被链接器消除，就不能把某个相似 caller 当作通用 Hook。
+  只有能用版本 / ABI / 类型和调用结构唯一证明的 callable seam 才激活，缺失或歧义时 fail-closed。
 - **Capture key 与实时决策一致**：目录聚合若按 `SourceTextPolicy` 生成 key，目标进程的实时 lookup 也必须使用同一 policy。精确原文仍应优先；只有精确查找失败时才回退到规范 key。若规范化只去除布局用首尾空白，采用回退译文时要把原调用的首尾空白补回，避免“目录能翻译、像素查不到”或破坏布局。
 - **不修改目标所有权**：优先复制 layout、字符串对象或字体状态并瞬时绘制译文；保留目标对象与原文，
   使停用恢复不依赖逆向修改。
@@ -44,6 +57,7 @@
 | DirectWrite | 在 `CreateTextLayout` 保存原文与 layout 关系，实际 `DrawTextLayout` 时复制并替换 | 复杂分段格式、inline object 与无法关联的 layout 透传 |
 | GDI / GDI+ / Direct2D | 在公开绘制入口取得文本，精确保留编码、字体与原调用语义 | 模块存在不代表入口命中；glyph-index 必须显式解码 |
 | Qt Widgets | 解析动态 Qt 5/6 `QString` ABI，拦截 `QPainter::drawText` 并请求 UI 线程重绘 | 静态 Qt、QML、scene graph 与 backing-store 缓存不自动覆盖 |
+| Qt Translation Service | 在精确动态 Qt 6.10.3 MSVC x64 `QCoreApplication::translate` 保留完整 source/context/disambiguation/n，并用 `LanguageChange` 请求重译 | Dictionary 仍只按 source 唯一；context/disambiguation 只作观测证据与 AI 语义提示，不进入词典 key。同 source 的非复数调用共享一条译文；plural 当前只观察不替换；placeholder 多重集合必须保持。Qt 5.15.18 仅研究 feature、future-call-only，不进入默认生产 Bundle |
 | GTK 3 / Pango | 复制 `PangoLayout`，仅对无属性或全文统一属性替换文本 | 局部 byte-range 样式透传；GTK 4 不沿用该 seam |
 | SDL3_ttf | 复制 `TTF_Text` 的 engine/font 及公开布局属性后绘制译文对象 | 当前只有技术 smoke，没有代表性真实目标与产品 Adapter |
 | Raylib | `DrawTextEx` 使用 fallback atlas，按帧回收旧资源并在关闭前清理 | 仅动态 raylib 5.5；静态链接、复制实现和业务纹理缓存不覆盖 |
@@ -67,6 +81,7 @@
 - [DirectWrite 原生实现](../../../crates/adapters/implementations/native/directwrite-native/src/lib.rs)
   与[激活合同](../../../crates/adapters/platform/native-host/tests/native_directwrite_activation_contract.rs)
 - [Qt 原生实现](../../../crates/adapters/implementations/framework/qt-painter-native/src/lib.rs)
+- [Qt Translation Service 原生实现](../../../crates/adapters/implementations/framework/qt-translation-native/src/lib.rs)
 - [GTK 3 / Pango 原生实现](../../../crates/adapters/implementations/framework/gtk3-pango-native/src/lib.rs)
 - [Raylib 原生实现](../../../crates/adapters/implementations/framework/raylib-native/src/lib.rs)
 - [SideFX CV PaintBuffer 原生实现](../../../crates/adapters/implementations/framework/sidefx-cv-paint-buffer-native/src/lib.rs)

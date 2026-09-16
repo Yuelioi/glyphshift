@@ -37,6 +37,12 @@ const QSTRING5_CTOR_SYMBOL: &[u8] = b"??0QString@@QEAA@PEBVQChar@@H@Z\0";
 const QSTRING5_SIZE_SYMBOL: &[u8] = b"?size@QString@@QEBAHXZ\0";
 const QSTRING6_CTOR_SYMBOL: &[u8] = b"??0QString@@QEAA@PEBVQChar@@_J@Z\0";
 const QSTRING6_SIZE_SYMBOL: &[u8] = b"?size@QString@@QEBA_JXZ\0";
+const QTOOLTIP_SHOW3_SYMBOL: &[u8] =
+    b"?showText@QToolTip@@SAXAEBVQPoint@@AEBVQString@@PEAVQWidget@@@Z\0";
+const QTOOLTIP_SHOW4_SYMBOL: &[u8] =
+    b"?showText@QToolTip@@SAXAEBVQPoint@@AEBVQString@@PEAVQWidget@@AEBVQRect@@@Z\0";
+const QTOOLTIP_SHOW5_SYMBOL: &[u8] =
+    b"?showText@QToolTip@@SAXAEBVQPoint@@AEBVQString@@PEAVQWidget@@AEBVQRect@@H@Z\0";
 const QAPPLICATION_ALL_WIDGETS_SYMBOL: &[u8] =
     b"?allWidgets@QApplication@@SA?AV?$QList@PEAVQWidget@@@@XZ\0";
 const QWIDGET_FIND_SYMBOL: &[u8] = b"?find@QWidget@@SAPEAV1@_K@Z\0";
@@ -254,6 +260,9 @@ struct QtHooks {
     rect_option: GenericDetour<FnDrawRectOption>,
     rect_f: GenericDetour<FnDrawRect>,
     rect_coords: Option<GenericDetour<FnDrawRectCoords>>,
+    tooltip3: Option<GenericDetour<FnQToolTipShow3>>,
+    tooltip4: Option<GenericDetour<FnQToolTipShow4>>,
+    tooltip5: Option<GenericDetour<FnQToolTipShow5>>,
     widget_refresh: Option<WidgetRefreshHooks>,
 }
 
@@ -395,6 +404,120 @@ fn replacement_for(source: &str) -> Option<Vec<u16>> {
     .then_some(decision.text)
 }
 
+fn tooltip_replacement(source: &str) -> Option<Vec<u16>> {
+    if let Some(replacement) = replacement_for(source) {
+        return Some(replacement);
+    }
+    let leaf = single_rich_text_leaf(source)?;
+    let replacement = replacement_for(&leaf.visible_text)?;
+    let replacement = String::from_utf16(&replacement).ok()?;
+    let escaped = escape_html_text(&replacement);
+    Some(
+        format!("{}{}{}", leaf.open_tag, escaped, leaf.close_tag)
+            .encode_utf16()
+            .collect(),
+    )
+}
+
+struct RichTextLeaf<'a> {
+    open_tag: &'a str,
+    visible_text: String,
+    close_tag: &'a str,
+}
+
+fn single_rich_text_leaf(source: &str) -> Option<RichTextLeaf<'_>> {
+    if !source.starts_with('<') || source.starts_with("</") {
+        return None;
+    }
+    let open_end = source.find('>')?;
+    let open_tag = &source[..=open_end];
+    if open_tag[..open_tag.len() - 1].trim_end().ends_with('/') {
+        return None;
+    }
+    let name_end = source[1..open_end]
+        .find(|character: char| character.is_ascii_whitespace() || character == '/')
+        .map_or(open_end, |offset| offset + 1);
+    let name = &source[1..name_end];
+    if name.is_empty()
+        || !name
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b':'))
+    {
+        return None;
+    }
+    let close_start = source.rfind("</")?;
+    if close_start <= open_end {
+        return None;
+    }
+    let close_tag = &source[close_start..];
+    if !close_tag.ends_with('>') || !close_tag[2..close_tag.len() - 1].eq_ignore_ascii_case(name) {
+        return None;
+    }
+    let body = &source[open_end + 1..close_start];
+    if body.contains('<') || body.contains('>') {
+        return None;
+    }
+    Some(RichTextLeaf {
+        open_tag,
+        visible_text: decode_html_text(body),
+        close_tag,
+    })
+}
+
+fn decode_html_text(text: &str) -> String {
+    let mut decoded = String::with_capacity(text.len());
+    let mut rest = text;
+    while let Some(start) = rest.find('&') {
+        decoded.push_str(&rest[..start]);
+        rest = &rest[start..];
+        let Some(end) = rest.find(';') else {
+            decoded.push_str(rest);
+            return decoded;
+        };
+        let entity = &rest[1..end];
+        let value = match entity {
+            "amp" => Some('&'),
+            "lt" => Some('<'),
+            "gt" => Some('>'),
+            "quot" => Some('"'),
+            "apos" | "#39" => Some('\''),
+            _ => entity
+                .strip_prefix("#x")
+                .or_else(|| entity.strip_prefix("#X"))
+                .and_then(|value| u32::from_str_radix(value, 16).ok())
+                .or_else(|| {
+                    entity
+                        .strip_prefix('#')
+                        .and_then(|value| value.parse::<u32>().ok())
+                })
+                .and_then(char::from_u32),
+        };
+        if let Some(value) = value {
+            decoded.push(value);
+        } else {
+            decoded.push_str(&rest[..=end]);
+        }
+        rest = &rest[end + 1..];
+    }
+    decoded.push_str(rest);
+    decoded
+}
+
+fn escape_html_text(text: &str) -> String {
+    let mut escaped = String::with_capacity(text.len());
+    for character in text.chars() {
+        match character {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&#39;"),
+            _ => escaped.push(character),
+        }
+    }
+    escaped
+}
+
 fn eligible_source(source: &str) -> bool {
     !source.trim().is_empty()
 }
@@ -437,6 +560,37 @@ unsafe fn draw_rect_with(
     }
     let _scope = text_scope();
     let Some(replacement) = replacement_for(&source) else {
+        return original();
+    };
+    if hooks
+        .strings
+        .with_temporary(&replacement, replacement_call)
+        .is_none()
+    {
+        original();
+    }
+}
+
+unsafe fn tooltip_with(
+    hooks: &QtHooks,
+    text: *const c_void,
+    original: impl FnOnce(),
+    replacement_call: impl FnOnce(*const c_void),
+) {
+    if ACTIVE_FEATURES.load(Ordering::Acquire) == 0 {
+        return original();
+    }
+    let Some(_guard) = CallbackGuard::enter() else {
+        return original();
+    };
+    let Some(source) = hooks.strings.read(text) else {
+        return original();
+    };
+    if !eligible_source(&source) {
+        return original();
+    }
+    let _scope = text_scope();
+    let Some(replacement) = tooltip_replacement(&source) else {
         return original();
     };
     if hooks
@@ -782,6 +936,20 @@ unsafe fn build_hooks() -> Result<QtHooks, ()> {
     let rect_coords_target = resolve(gui, DRAW_RECT_COORDS_SYMBOL)
         .ok()
         .map(|target| std::mem::transmute::<RawProc, FnDrawRectCoords>(target));
+    let widgets = match major {
+        5 => GetModuleHandleW(w!("Qt5Widgets.dll")).ok(),
+        6 => GetModuleHandleW(w!("Qt6Widgets.dll")).ok(),
+        _ => None,
+    };
+    let tooltip3_target = widgets
+        .and_then(|widgets| resolve(widgets, QTOOLTIP_SHOW3_SYMBOL).ok())
+        .map(|target| std::mem::transmute::<RawProc, FnQToolTipShow3>(target));
+    let tooltip4_target = widgets
+        .and_then(|widgets| resolve(widgets, QTOOLTIP_SHOW4_SYMBOL).ok())
+        .map(|target| std::mem::transmute::<RawProc, FnQToolTipShow4>(target));
+    let tooltip5_target = widgets
+        .and_then(|widgets| resolve(widgets, QTOOLTIP_SHOW5_SYMBOL).ok())
+        .map(|target| std::mem::transmute::<RawProc, FnQToolTipShow5>(target));
     let widget_refresh = build_widget_refresh_hooks(major, core, namespace)?;
     Ok(QtHooks {
         strings,
@@ -795,6 +963,15 @@ unsafe fn build_hooks() -> Result<QtHooks, ()> {
         rect_f: GenericDetour::new(rect_f_target, draw_rect_f_detour).map_err(|_| ())?,
         rect_coords: rect_coords_target
             .map(|target| GenericDetour::new(target, draw_rect_coords_detour).map_err(|_| ()))
+            .transpose()?,
+        tooltip3: tooltip3_target
+            .map(|target| GenericDetour::new(target, tooltip3_detour).map_err(|_| ()))
+            .transpose()?,
+        tooltip4: tooltip4_target
+            .map(|target| GenericDetour::new(target, tooltip4_detour).map_err(|_| ()))
+            .transpose()?,
+        tooltip5: tooltip5_target
+            .map(|target| GenericDetour::new(target, tooltip5_detour).map_err(|_| ()))
             .transpose()?,
         widget_refresh,
     })
@@ -825,6 +1002,21 @@ unsafe fn install_hooks() -> Result<(), ()> {
     if let Some(rect_coords) = hooks.rect_coords.as_ref() {
         if !rect_coords.is_enabled() {
             rect_coords.enable().map_err(|_| ())?;
+        }
+    }
+    if let Some(tooltip3) = hooks.tooltip3.as_ref() {
+        if !tooltip3.is_enabled() {
+            tooltip3.enable().map_err(|_| ())?;
+        }
+    }
+    if let Some(tooltip4) = hooks.tooltip4.as_ref() {
+        if !tooltip4.is_enabled() {
+            tooltip4.enable().map_err(|_| ())?;
+        }
+    }
+    if let Some(tooltip5) = hooks.tooltip5.as_ref() {
+        if !tooltip5.is_enabled() {
+            tooltip5.enable().map_err(|_| ())?;
         }
     }
     Ok(())
@@ -882,7 +1074,7 @@ fn text_scope() -> Option<glyphshift_adapter_native_abi::NativeTextScope> {
 
 #[cfg(test)]
 mod source_tests {
-    use super::eligible_source;
+    use super::{decode_html_text, eligible_source, escape_html_text, single_rich_text_leaf};
 
     #[test]
     fn whitespace_only_painter_text_never_reaches_the_host() {
@@ -890,5 +1082,27 @@ mod source_tests {
         assert!(!eligible_source(" \t\r\n"));
         assert!(eligible_source("File"));
         assert!(eligible_source(" File "));
+    }
+
+    #[test]
+    fn single_rich_text_leaf_exposes_visible_tooltip_text_without_losing_wrapper() {
+        let leaf = single_rich_text_leaf("<b>New &amp; Virtual Layer</b>").unwrap();
+        assert_eq!(leaf.open_tag, "<b>");
+        assert_eq!(leaf.visible_text, "New & Virtual Layer");
+        assert_eq!(leaf.close_tag, "</b>");
+
+        let leaf = single_rich_text_leaf("<span class=\"title\">New Virtual Layer</span>").unwrap();
+        assert_eq!(leaf.visible_text, "New Virtual Layer");
+    }
+
+    #[test]
+    fn complex_rich_text_fails_closed_and_replacement_text_is_escaped() {
+        assert!(single_rich_text_leaf("<b>One <i>Two</i></b>").is_none());
+        assert!(single_rich_text_leaf("<b>One</b><b>Two</b>").is_none());
+        assert_eq!(decode_html_text("A &#x26; B &#60; C"), "A & B < C");
+        assert_eq!(
+            escape_html_text("A & B < C > D \"Q\" 'S'"),
+            "A &amp; B &lt; C &gt; D &quot;Q&quot; &#39;S&#39;"
+        );
     }
 }

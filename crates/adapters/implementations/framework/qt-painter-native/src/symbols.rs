@@ -49,6 +49,15 @@ impl Namespace {
                 QSTRING_DTOR_SYMBOL => b"??1QString@@QAE@XZ\0",
                 QSTRING5_CTOR_SYMBOL => b"??0QString@@QAE@PBVQChar@@H@Z\0",
                 QSTRING5_SIZE_SYMBOL => b"?size@QString@@QBEHXZ\0",
+                QTOOLTIP_SHOW3_SYMBOL => {
+                    b"?showText@QToolTip@@SAXABVQPoint@@ABVQString@@PAVQWidget@@@Z\0"
+                }
+                QTOOLTIP_SHOW4_SYMBOL => {
+                    b"?showText@QToolTip@@SAXABVQPoint@@ABVQString@@PAVQWidget@@ABVQRect@@@Z\0"
+                }
+                QTOOLTIP_SHOW5_SYMBOL => {
+                    b"?showText@QToolTip@@SAXABVQPoint@@ABVQString@@PAVQWidget@@ABVQRect@@H@Z\0"
+                }
                 QAPPLICATION_ALL_WIDGETS_SYMBOL => {
                     b"?allWidgets@QApplication@@SA?AV?$QList@PAVQWidget@@@@XZ\0"
                 }
@@ -82,6 +91,15 @@ impl Namespace {
                 QSTRING_DTOR_SYMBOL => b"??1QString@QT@@QEAA@XZ\0",
                 QSTRING6_CTOR_SYMBOL => b"??0QString@QT@@QEAA@PEBVQChar@1@_J@Z\0",
                 QSTRING6_SIZE_SYMBOL => b"?size@QString@QT@@QEBA_JXZ\0",
+                QTOOLTIP_SHOW3_SYMBOL => {
+                    b"?showText@QToolTip@QT@@SAXAEBVQPoint@2@AEBVQString@2@PEAVQWidget@2@@Z\0"
+                }
+                QTOOLTIP_SHOW4_SYMBOL => {
+                    b"?showText@QToolTip@QT@@SAXAEBVQPoint@2@AEBVQString@2@PEAVQWidget@2@AEBVQRect@2@@Z\0"
+                }
+                QTOOLTIP_SHOW5_SYMBOL => {
+                    b"?showText@QToolTip@QT@@SAXAEBVQPoint@2@AEBVQString@2@PEAVQWidget@2@AEBVQRect@2@H@Z\0"
+                }
                 QAPPLICATION_ALL_WIDGETS_SYMBOL => {
                     b"?allWidgets@QApplication@QT@@SA?AV?$QList@PEAVQWidget@QT@@@2@XZ\0"
                 }
@@ -111,6 +129,15 @@ impl Namespace {
                 QSTRING_DTOR_SYMBOL => b"??1QString@isl0@@QEAA@XZ\0",
                 QSTRING6_CTOR_SYMBOL => b"??0QString@isl0@@QEAA@PEBVQChar@1@_J@Z\0",
                 QSTRING6_SIZE_SYMBOL => b"?size@QString@isl0@@QEBA_JXZ\0",
+                QTOOLTIP_SHOW3_SYMBOL => {
+                    b"?showText@QToolTip@isl0@@SAXAEBVQPoint@2@AEBVQString@2@PEAVQWidget@2@@Z\0"
+                }
+                QTOOLTIP_SHOW4_SYMBOL => {
+                    b"?showText@QToolTip@isl0@@SAXAEBVQPoint@2@AEBVQString@2@PEAVQWidget@2@AEBVQRect@2@@Z\0"
+                }
+                QTOOLTIP_SHOW5_SYMBOL => {
+                    b"?showText@QToolTip@isl0@@SAXAEBVQPoint@2@AEBVQString@2@PEAVQWidget@2@AEBVQRect@2@H@Z\0"
+                }
                 QAPPLICATION_ALL_WIDGETS_SYMBOL => {
                     b"?allWidgets@QApplication@isl0@@SA?AV?$QList@PEAVQWidget@isl0@@@2@XZ\0"
                 }
